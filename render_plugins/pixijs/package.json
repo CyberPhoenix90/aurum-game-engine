@@ -1,0 +1,40 @@
+{
+	"name": "aurum-pixijs-renderer",
+	"version": "1.0.0",
+	"description": "",
+	"main": "dist/pixijs_render_adapter.js",
+	"typings": "dist/pixijs_render_adapter.d.ts",
+	"config": {
+		"projectType": "typescript",
+		"type": "browserLibrary",
+		"groups": [
+			"libraries",
+			"illusion_all"
+		],
+		"link": {
+			"include": [
+				"src/**/*.ts",
+				"src/**/*.tsx"
+			],
+			"assets": [
+				"pixi"
+			],
+			"internalDependencies": [
+				"illusion_engine"
+			],
+			"manualTypings": []
+		},
+		"output": {
+			"declaration": true,
+			"outFile": "{{library}}\\{{name}}\\browser\\{{name}}.js"
+		}
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {},
+	"dependencies": {
+		"@types/pixi.js": "^5.0.0",
+		"aurum-game-engine": "../../engine"
+	}
+}
