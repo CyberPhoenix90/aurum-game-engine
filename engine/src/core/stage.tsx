@@ -44,16 +44,45 @@ export function Stage(props: StageProps, children: Renderable[], api: AurumCompo
 export interface SceneGraphNode<T extends CommonEntityProps> {
 	model: T;
 	uid?: number;
+	cancellationToken: CancellationToken;
 	children?: SceneGraphNode<any>[];
 	nodeType: RenderableType;
 }
 
-function bind(renderPlugin: AbstractRenderPlugin, stageId: number, nodes: SceneGraphNode<any>[], parent: SceneGraphNode<any>) {
+function bind(renderPlugin: AbstractRenderPlugin, stageId: number, nodes: SceneGraphNode<CommonEntity>[], parent: SceneGraphNode<any>) {
 	for (let i = 0; i < nodes.length; i++) {
 		const node = nodes[i];
 		const children = node.children;
 		const renderData = render(node, parent);
 		renderPlugin.addNode(renderData, i, stageId);
+		node.model.components.listenAndRepeat((change) => {
+			switch (change.operation) {
+				case 'add':
+					for (const item of change.items) {
+						item.onAttach(node, renderData);
+					}
+					break;
+				case 'remove':
+					for (const item of change.items) {
+						item.onDetach();
+					}
+					break;
+				case 'replace':
+					change.target.onDetach();
+					for (const item of change.items) {
+						item.onAttach(node, renderData);
+					}
+					break;
+				case 'merge':
+					for (const item of change.previousState) {
+						item.onDetach();
+					}
+					for (const item of change.items) {
+						item.onAttach(node, renderData);
+					}
+					break;
+			}
+		}, renderData.cancellationToken);
 		if (children) {
 			bind(renderPlugin, stageId, children, node);
 		}
@@ -67,7 +96,7 @@ function render(node: SceneGraphNode<CommonEntity>, parent?: SceneGraphNode<any>
 		case RenderableType.SPRITE:
 			return {
 				alpha: node.model.alpha,
-				cancellationToken: new CancellationToken(),
+				cancellationToken: node.cancellationToken,
 				clip: node.model.clip,
 				name: node.model.name,
 				parentUid: parent?.uid,
@@ -90,7 +119,7 @@ function render(node: SceneGraphNode<CommonEntity>, parent?: SceneGraphNode<any>
 		case RenderableType.CAMERA:
 			return {
 				alpha: node.model.alpha,
-				cancellationToken: new CancellationToken(),
+				cancellationToken: node.cancellationToken,
 				clip: node.model.clip,
 				name: node.model.name,
 				parentUid: parent?.uid,
@@ -108,7 +137,7 @@ function render(node: SceneGraphNode<CommonEntity>, parent?: SceneGraphNode<any>
 		case RenderableType.LABEL:
 			return {
 				alpha: node.model.alpha,
-				cancellationToken: new CancellationToken(),
+				cancellationToken: node.cancellationToken,
 				clip: node.model.clip,
 				name: node.model.name,
 				parentUid: parent?.uid,
@@ -140,7 +169,7 @@ function render(node: SceneGraphNode<CommonEntity>, parent?: SceneGraphNode<any>
 		case RenderableType.NO_RENDER:
 			return {
 				alpha: node.model.alpha,
-				cancellationToken: new CancellationToken(),
+				cancellationToken: node.cancellationToken,
 				clip: node.model.clip,
 				name: node.model.name,
 				parentUid: parent?.uid,

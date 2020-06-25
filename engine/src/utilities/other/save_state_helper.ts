@@ -16,11 +16,7 @@ class SaveStateHelper {
 			if (stream instanceof ArrayDataSource) {
 				data[key] = stream.toArray();
 			} else {
-				if (typeof stream.value === 'object') {
-					data[key] = JSON.parse(JSON.stringify(stream.value));
-				} else {
-					data[key] = stream.value;
-				}
+				data[key] = stream.value;
 			}
 		}
 

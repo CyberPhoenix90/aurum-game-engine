@@ -2,7 +2,7 @@ import { SceneGraphNode } from '../core/stage';
 import { _ } from '../utilities/other/streamline';
 import { RenderableType, CommonEntityProps, CommonEntity } from '../models/entities';
 import { Data } from '../models/input_data';
-import { DataSource, ArrayDataSource } from 'aurumjs';
+import { DataSource, ArrayDataSource, AurumComponentAPI } from 'aurumjs';
 import { toSource } from '../utilities/data/to_source';
 
 export interface SpriteEntityProps extends CommonEntityProps {
@@ -35,8 +35,9 @@ export interface SpriteEntity extends CommonEntity {
 	drawDistanceY: DataSource<number>;
 }
 
-export function Sprite(props: SpriteEntityProps): SceneGraphNode<SpriteEntity> {
+export function Sprite(props: SpriteEntityProps, children, api: AurumComponentAPI): SceneGraphNode<SpriteEntity> {
 	return {
+		cancellationToken: api.cancellationToken,
 		model: {
 			x: toSource(props.x, 0),
 			y: toSource(props.y, 0),

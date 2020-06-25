@@ -12,6 +12,7 @@ export function Container(props: ContainerEntityProps, children: Renderable[], a
 	const content = api.prerender(children);
 
 	return {
+		cancellationToken: api.cancellationToken,
 		model: {
 			x: toSource(props.x, 0),
 			y: toSource(props.y, 0),

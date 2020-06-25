@@ -55,6 +55,7 @@ export function Label(props: LabelEntityProps, children: Renderable[], api: Auru
 	updateText(text, content as any);
 
 	return {
+		cancellationToken: api.cancellationToken,
 		model: {
 			x: toSource(props.x, 0),
 			y: toSource(props.y, 0),

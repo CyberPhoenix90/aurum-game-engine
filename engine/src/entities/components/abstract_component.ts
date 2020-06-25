@@ -18,6 +18,7 @@ export class AbstractComponent {
 
 	public onDetach() {
 		this.owner = undefined;
+		this.ownerRenderData = undefined;
 	}
 
 	public dispose(): void {
