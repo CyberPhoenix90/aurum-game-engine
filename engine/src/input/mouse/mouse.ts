@@ -1,10 +1,10 @@
 // import { CancellationToken } from 'aurumjs';
 
-// export enum MouseButtons {
-// 	LEFT = 0,
-// 	RIGHT = 2,
-// 	MIDDLE = 3
-// }
+export enum MouseButtons {
+	LEFT = 0,
+	RIGHT = 2,
+	MIDDLE = 3
+}
 
 // export type AurumMouseEvent = MouseEvent & { propagationStopped: boolean };
 
