@@ -42,37 +42,37 @@ export class RenderLabelEntity extends NoRenderEntity {
 			this.displayObject.style.fontStyle = v ? v : '';
 		}, this.token);
 
-		// model.dropShadow.listenAndRepeat((v) => {
-		// 	this.displayObject.style.dropShadow = v;
-		// }, this.token);
+		model.dropShadow.listenAndRepeat((v) => {
+			this.displayObject.style.dropShadow = v;
+		}, this.token);
 
-		// model.dropShadowAngle.listenAndRepeat((v) => {
-		// 	this.displayObject.style.dropShadowAngle = v;
-		// }, this.token);
+		model.dropShadowAngle.listenAndRepeat((v) => {
+			this.displayObject.style.dropShadowAngle = v;
+		}, this.token);
 
-		// model.dropShadowColor.listenAndRepeat((v) => {
-		// 	this.displayObject.style.dropShadowColor = v ? Color.fromString(v).toRGBANumber() : undefined;
-		// }, this.token);
+		model.dropShadowColor.listenAndRepeat((v) => {
+			this.displayObject.style.dropShadowColor = v ? Color.fromString(v).toRGBANumber() : undefined;
+		}, this.token);
 
-		// model.dropShadowDistance.listenAndRepeat((v) => {
-		// 	this.displayObject.style.dropShadowDistance = v;
-		// }, this.token);
+		model.dropShadowDistance.listenAndRepeat((v) => {
+			this.displayObject.style.dropShadowDistance = v;
+		}, this.token);
 
-		// model.dropShadowFuzziness.listenAndRepeat((v) => {
-		// 	this.displayObject.style.dropShadowBlur = v;
-		// }, this.token);
+		model.dropShadowFuzziness.listenAndRepeat((v) => {
+			this.displayObject.style.dropShadowBlur = v;
+		}, this.token);
 
-		// model.textBaseline.listenAndRepeat((v) => {
-		// 	this.displayObject.style.textBaseline = v;
-		// }, this.token);
+		model.textBaseline.listenAndRepeat((v) => {
+			this.displayObject.style.textBaseline = v;
+		}, this.token);
 
-		// model.stroke.listenAndRepeat((v) => {
-		// 	this.displayObject.style.stroke = v;
-		// }, this.token);
+		model.stroke.listenAndRepeat((v) => {
+			this.displayObject.style.stroke = v;
+		}, this.token);
 
-		// model.strokeThickness.listenAndRepeat((v) => {
-		// 	this.displayObject.style.strokeThickness = v;
-		// }, this.token);
+		model.strokeThickness.listenAndRepeat((v) => {
+			this.displayObject.style.strokeThickness = v === undefined ? 0 : v;
+		}, this.token);
 
 		function updateText(text: string): void {
 			this.displayObject.text = text;
