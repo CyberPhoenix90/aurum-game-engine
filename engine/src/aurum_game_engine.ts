@@ -19,7 +19,10 @@ export * from './models/input_data';
 export * from './models/point';
 export * from './models/entities';
 
+export * from './utilities/other/save_state_helper';
 export * from './utilities/other/streamline';
+export * from './utilities/data_structures/squared_array';
+export * from './utilities/data_structures/virtual_union_array';
 
 export * from './rendering/abstract_render_plugin';
 export * from './rendering/model';
@@ -35,3 +38,10 @@ export * from './graphics/color_vectors/rgba_vector';
 
 export * from './sound/active_sound_effect';
 export * from './sound/sound';
+
+export * from './game_features/building/construction_grid';
+export * from './game_features/number_formatter';
+export * from './game_features/path_finding/a_star';
+export * from './game_features/time/calendar';
+export * from './game_features/time/clock';
+export * from './game_features/time/moment';

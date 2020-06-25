@@ -1,5 +1,6 @@
 import { Unit } from '../math/unit';
 import { DataSource } from 'aurumjs';
+import { PointLike } from './point';
 
 export type Size = number | string | Unit | DataSource<number>;
 
@@ -7,6 +8,7 @@ export type Radian = number;
 export type Degrees = number;
 export type MapLike<T> = { [key: string]: T };
 export type Constructor<T> = new (...args: any[]) => T;
+export type Projector = (p: PointLike) => PointLike;
 
 export enum DIRECTION4 {
 	UP = 'UP',
