@@ -21,15 +21,20 @@ export class RenderStage {
 		this.entityDatabase = entityDatabase;
 	}
 
-	public addNode(payload: EntityRenderModel, index: number): void {
+	public addNode(payload: EntityRenderModel, index?: number): void {
 		const node = this.createRenderNode(payload);
 		this.entityDatabase[node.id] = node;
 		node.token.addCancelable(() => delete this.entityDatabase[node.id]);
 
 		if (payload.parentUid !== undefined) {
 			const parent: NoRenderEntity = this.entityDatabase[payload.parentUid] as NoRenderEntity;
-			parent.displayObject.addChildAt(node.displayObject, index);
-			parent.children.splice(index, 0, node);
+			if (index !== undefined) {
+				parent.displayObject.addChildAt(node.displayObject, index);
+				parent.children.splice(index, 0, node);
+			} else {
+				parent.displayObject.addChild(node.displayObject);
+				parent.children.push(node);
+			}
 			node.parent = parent;
 		} else {
 			this.rootNode.addChildAt(node.displayObject, index);

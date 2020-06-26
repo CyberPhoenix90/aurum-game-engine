@@ -1,25 +1,18 @@
 import { SceneGraphNode } from '../../core/stage';
 import { CancellationToken } from 'aurumjs';
 import { EntityRenderModel } from '../../rendering/model';
+import { CommonEntity } from '../../models/entities';
 
 export class AbstractComponent {
 	protected cancellationToken: CancellationToken;
-	protected owner: SceneGraphNode<any>;
-	protected ownerRenderData: EntityRenderModel;
 
 	constructor() {
 		this.cancellationToken = new CancellationToken();
 	}
 
-	public onAttach(entity: SceneGraphNode<any>, renderData: EntityRenderModel) {
-		this.owner = entity;
-		this.ownerRenderData = renderData;
-	}
+	public onAttach(entity: SceneGraphNode<CommonEntity>, renderData: EntityRenderModel) {}
 
-	public onDetach() {
-		this.owner = undefined;
-		this.ownerRenderData = undefined;
-	}
+	public onDetach() {}
 
 	public dispose(): void {
 		this.cancellationToken.cancel();

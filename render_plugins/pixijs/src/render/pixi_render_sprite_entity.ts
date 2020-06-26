@@ -3,7 +3,7 @@ import { ReadOnlyDataSource } from 'aurumjs';
 import { BaseTexture, Sprite, Texture as PixiTexture } from 'pixi.js';
 import { NoRenderEntity } from './pixi_no_render_entity';
 
-export const textureMap: Map<string, PixiTexture> = new Map();
+export const textureMap: Map<string, BaseTexture> = new Map();
 
 export class RenderSpriteEntity extends NoRenderEntity {
 	public displayObject: Sprite;
@@ -14,20 +14,40 @@ export class RenderSpriteEntity extends NoRenderEntity {
 	}
 
 	protected createDisplayObject(model: SpriteEntityRenderModel) {
-		const texture = this.createTexture(model.texture);
+		const texture = this.createTexture(model.texture, model);
 		return new Sprite(texture);
 	}
 
-	protected createTexture(texture: ReadOnlyDataSource<string>): PixiTexture {
+	protected createTexture(texture: ReadOnlyDataSource<string>, model: SpriteEntityRenderModel): PixiTexture {
 		if (!texture.value) {
 			return RenderSpriteEntity.voidTexture;
 		}
 
+		let result: PixiTexture;
 		if (!textureMap.has(texture.value)) {
-			textureMap.set(texture.value, new PixiTexture(new BaseTexture(texture.value)));
+			const img = document.createElement('img');
+			const bt = new BaseTexture(img);
+			img.addEventListener('load', () => {
+				if (model.drawDistanceX.value !== undefined) {
+					result.frame.width = model.drawDistanceX.value;
+				}
+				if (model.drawDistanceY.value !== undefined) {
+					result.frame.height = model.drawDistanceY.value;
+				}
+				if (model.drawOffsetX.value !== undefined) {
+					result.frame.x = model.drawOffsetX.value;
+				}
+				if (model.drawOffsetY.value !== undefined) {
+					result.frame.y = model.drawOffsetY.value;
+				}
+				this.displayObject.texture.updateUvs();
+			});
+			img.src = texture.value;
+			textureMap.set(texture.value, bt);
 		}
 
-		return textureMap.get(texture.value);
+		result = new PixiTexture(textureMap.get(texture.value));
+		return result;
 	}
 
 	public bind(model: SpriteEntityRenderModel) {

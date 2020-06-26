@@ -3,6 +3,7 @@ import { Rectangle } from '../../math/shapes/rectangle';
 import { SIDE } from '../../models/common';
 import { EntityRenderModel } from '../../rendering/model';
 import { AbstractComponent } from './abstract_component';
+import { CommonEntity } from '../../models/entities';
 
 export interface BoundsConfig {
 	bounds: Rectangle;
@@ -17,8 +18,7 @@ export class BoundsComponent extends AbstractComponent {
 		this.config = config;
 	}
 
-	public onAttach(entity: SceneGraphNode<any>, renderData: EntityRenderModel) {
-		super.onAttach(entity, renderData);
+	public onAttach(entity: SceneGraphNode<CommonEntity>, renderData: EntityRenderModel) {
 		renderData.positionX.listen(() => {
 			const { bounds } = this.config;
 			if (renderData.positionX.value < bounds.x) {

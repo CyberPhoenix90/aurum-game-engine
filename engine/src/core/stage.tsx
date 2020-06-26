@@ -1,4 +1,4 @@
-import { Aurum, AurumComponentAPI, CancellationToken, DataSource, Renderable, Webcomponent } from 'aurumjs';
+import { Aurum, AurumComponentAPI, CancellationToken, DataSource, Renderable, Webcomponent, ArrayDataSource } from 'aurumjs';
 import { CommonEntity, CommonEntityProps, RenderableType } from '../models/entities';
 import { SpriteEntity } from '../entities/sprite_entity';
 import { AbstractRenderPlugin } from '../rendering/abstract_render_plugin';
@@ -23,7 +23,7 @@ const StageComponent = Webcomponent(
 			<div
 				onAttach={(stageNode) => {
 					props.renderPlugin.addStage(stageId, stageNode);
-					bind(props.renderPlugin, stageId, props.nodes, undefined);
+					bind(props.renderPlugin, stageId, props.nodes, undefined, api.prerender.bind(api));
 					api.cancellationToken.animationLoop(() => {
 						for (const camera of cameras) {
 							props.renderPlugin.renderStage(stageId, camera.uid);
@@ -49,42 +49,77 @@ export interface SceneGraphNode<T extends CommonEntityProps> {
 	nodeType: RenderableType;
 }
 
-function bind(renderPlugin: AbstractRenderPlugin, stageId: number, nodes: SceneGraphNode<CommonEntity>[], parent: SceneGraphNode<any>) {
+function bind(
+	renderPlugin: AbstractRenderPlugin,
+	stageId: number,
+	nodes: SceneGraphNode<CommonEntity>[],
+	parent: SceneGraphNode<any>,
+	prerender: (renderable: Renderable[]) => SceneGraphNode<any>[]
+) {
 	for (let i = 0; i < nodes.length; i++) {
 		const node = nodes[i];
-		const children = node.children;
-		const renderData = render(node, parent);
-		renderPlugin.addNode(renderData, i, stageId);
-		node.model.components.listenAndRepeat((change) => {
-			switch (change.operation) {
-				case 'add':
-					for (const item of change.items) {
-						item.onAttach(node, renderData);
+
+		if (node instanceof ArrayDataSource) {
+			node.listenAndRepeat((change) => {
+				switch (change.operation) {
+					case 'add':
+						bind(renderPlugin, stageId, prerender(change.items), parent, prerender);
+						break;
+				}
+			});
+		} else if (node instanceof DataSource) {
+			let cleanUp: CancellationToken;
+			node.listenAndRepeat((v) => {
+				if (cleanUp) {
+					cleanUp.cancel();
+				}
+				cleanUp = new CancellationToken();
+				const subNodes = prerender(v);
+				for (const n of subNodes) {
+					if (n.cancellationToken) {
+						cleanUp.chain(n.cancellationToken);
 					}
-					break;
-				case 'remove':
-					for (const item of change.items) {
-						item.onDetach();
-					}
-					break;
-				case 'replace':
-					change.target.onDetach();
-					for (const item of change.items) {
-						item.onAttach(node, renderData);
-					}
-					break;
-				case 'merge':
-					for (const item of change.previousState) {
-						item.onDetach();
-					}
-					for (const item of change.items) {
-						item.onAttach(node, renderData);
-					}
-					break;
+				}
+				bind(renderPlugin, stageId, subNodes, parent, prerender);
+			});
+		} else {
+			const children = node.children;
+			const renderData = render(node, parent);
+			renderData.cancellationToken.addCancelable(() => {
+				renderPlugin.removeNode(renderData.uid, stageId);
+			});
+			renderPlugin.addNode(renderData, stageId);
+			node.model.components.listenAndRepeat((change) => {
+				switch (change.operation) {
+					case 'add':
+						for (const item of change.items) {
+							item.onAttach(node, renderData);
+						}
+						break;
+					case 'remove':
+						for (const item of change.items) {
+							item.onDetach();
+						}
+						break;
+					case 'replace':
+						change.target.onDetach();
+						for (const item of change.items) {
+							item.onAttach(node, renderData);
+						}
+						break;
+					case 'merge':
+						for (const item of change.previousState) {
+							item.onDetach();
+						}
+						for (const item of change.items) {
+							item.onAttach(node, renderData);
+						}
+						break;
+				}
+			}, renderData.cancellationToken);
+			if (children) {
+				bind(renderPlugin, stageId, children, node, prerender);
 			}
-		}, renderData.cancellationToken);
-		if (children) {
-			bind(renderPlugin, stageId, children, node);
 		}
 	}
 }

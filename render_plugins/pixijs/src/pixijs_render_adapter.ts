@@ -31,7 +31,7 @@ export class PixiJsRenderAdapter extends AbstractRenderPlugin {
 		this.stages[stageId] = new RenderStage(stageId, this.entityDatabase, stageNode);
 	}
 
-	public addNode(model: EntityRenderModel, index: number, stageId: number): void | Promise<void> {
+	public addNode(model: EntityRenderModel, stageId: number, index?: number): void | Promise<void> {
 		this.stages[stageId].addNode(model, index);
 	}
 

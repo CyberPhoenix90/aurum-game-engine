@@ -9,7 +9,7 @@ export abstract class AbstractRenderPlugin {
 	public abstract removeStage(stageId: number): void | Promise<void>;
 	public abstract renderStage(stageId: number, cameraId: number): void | Promise<void>;
 
-	public abstract addNode(payload: EntityRenderModel, index: number, stageId: number): void | Promise<void>;
+	public abstract addNode(payload: EntityRenderModel, stageId: number, index?: number): void | Promise<void>;
 	public abstract removeNode(uid: number, stageId: number): void | Promise<void>;
 	public abstract swapNodes(nodeIdA: number, nodeIdB: number): void | Promise<void>;
 }
