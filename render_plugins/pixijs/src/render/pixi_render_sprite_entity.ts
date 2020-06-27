@@ -1,9 +1,10 @@
-import { SpriteEntityRenderModel, Color } from 'aurum-game-engine';
+import { Color, SpriteEntityRenderModel } from 'aurum-game-engine';
 import { ReadOnlyDataSource } from 'aurumjs';
 import { BaseTexture, Sprite, Texture as PixiTexture } from 'pixi.js';
 import { NoRenderEntity } from './pixi_no_render_entity';
 
 export const textureMap: Map<string, BaseTexture> = new Map();
+export const pendingTextureMap: Map<string, HTMLImageElement> = new Map();
 
 export class RenderSpriteEntity extends NoRenderEntity {
 	public displayObject: Sprite;
@@ -23,30 +24,48 @@ export class RenderSpriteEntity extends NoRenderEntity {
 			return RenderSpriteEntity.voidTexture;
 		}
 
-		let result: PixiTexture;
 		if (!textureMap.has(texture.value)) {
-			const img = document.createElement('img');
-			const bt = new BaseTexture(img);
-			img.addEventListener('load', () => {
-				if (model.drawDistanceX.value !== undefined) {
-					result.frame.width = model.drawDistanceX.value;
-				}
-				if (model.drawDistanceY.value !== undefined) {
-					result.frame.height = model.drawDistanceY.value;
-				}
-				if (model.drawOffsetX.value !== undefined) {
-					result.frame.x = model.drawOffsetX.value;
-				}
-				if (model.drawOffsetY.value !== undefined) {
-					result.frame.y = model.drawOffsetY.value;
-				}
-				this.displayObject.texture.updateUvs();
-			});
-			img.src = texture.value;
-			textureMap.set(texture.value, bt);
+			if (pendingTextureMap.has(texture.value)) {
+				const img = pendingTextureMap.get(texture.value);
+				img.addEventListener('load', () => {
+					this.handleTextureReady(texture, img, model);
+				});
+			} else {
+				const img = document.createElement('img');
+				pendingTextureMap.set(texture.value, img);
+				img.addEventListener('load', () => {
+					this.handleTextureReady(texture, img, model);
+				});
+				img.src = texture.value;
+			}
+			return RenderSpriteEntity.voidTexture;
 		}
 
-		result = new PixiTexture(textureMap.get(texture.value));
+		return this.wrapTexture(textureMap.get(texture.value), model);
+	}
+
+	private handleTextureReady(texture: ReadOnlyDataSource<string>, img: HTMLImageElement, model: SpriteEntityRenderModel) {
+		pendingTextureMap.delete(texture.value);
+		const bt = new BaseTexture(img);
+		this.displayObject.texture = this.wrapTexture(bt, model);
+		textureMap.set(texture.value, bt);
+	}
+
+	private wrapTexture(bt: BaseTexture, model: SpriteEntityRenderModel): PixiTexture {
+		const result = new PixiTexture(bt);
+		if (model.drawDistanceX.value !== undefined) {
+			result.frame.width = model.drawDistanceX.value;
+		}
+		if (model.drawDistanceY.value !== undefined) {
+			result.frame.height = model.drawDistanceY.value;
+		}
+		if (model.drawOffsetX.value !== undefined) {
+			result.frame.x = model.drawOffsetX.value;
+		}
+		if (model.drawOffsetY.value !== undefined) {
+			result.frame.y = model.drawOffsetY.value;
+		}
+		result.updateUvs();
 		return result;
 	}
 
