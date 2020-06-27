@@ -6,12 +6,7 @@
 	"typings": "dist/aurum_game_engine.d.ts",
 	"scripts": {
 		"build": "tsc",
-		"watch": "tsc -w",
-		"prepublish": "npm run deploy",
-		"test": "jest",
-		"generateDocs": "typedoc --json docs/docs.json --mode modules --excludePrivate --excludeProtected",
-		"deploy-test": "npm run build && microbundle --no-compress --entry dist/aurum.js --output prebuilt --name aurum",
-		"deploy": "npm run build && npm run generateDocs && microbundle --no-compress --entry dist/aurum.js --output prebuilt --name aurum && microbundle --entry dist/aurum.js --output prebuilt_minified --name aurum"
+		"watch": "tsc -w"
 	},
 	"homepage": "https://aurumjs.org/",
 	"repository": {
