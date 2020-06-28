@@ -1,5 +1,6 @@
 import { Moment } from './moment';
 import { CancellationToken, DataSource } from 'aurumjs';
+import { onBeforeRender } from '../../core/stage';
 
 export interface ClockConfig {
 	timestamp?: number;
@@ -40,11 +41,11 @@ export class Clock extends Moment {
 		if (this.cancelationToken === undefined || this.cancelationToken.isCanceled) {
 			this.cancelationToken = new CancellationToken();
 			let lastTs = Date.now();
-			this.cancelationToken.animationLoop(() => {
+			onBeforeRender.subscribe(() => {
 				const delta = Date.now() - lastTs;
 				lastTs += delta;
 				this.update(delta);
-			});
+			}, this.cancelationToken);
 		} else {
 			throw new Error('clock started twice without stopping');
 		}

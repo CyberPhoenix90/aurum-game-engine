@@ -1,9 +1,9 @@
-import { SceneGraphNode } from '../../core/stage';
 import { Rectangle } from '../../math/shapes/rectangle';
 import { SIDE } from '../../models/common';
 import { EntityRenderModel } from '../../rendering/model';
 import { AbstractComponent } from './abstract_component';
 import { CommonEntity } from '../../models/entities';
+import { SceneGraphNode } from '../../models/scene_graph';
 
 export interface BoundsConfig {
 	bounds: Rectangle;

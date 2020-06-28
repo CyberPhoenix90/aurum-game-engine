@@ -1,11 +1,12 @@
 import { CancellationToken, DataSource } from 'aurumjs';
 import { Polygon } from '../../aurum_game_engine';
-import { SceneGraphNode } from '../../core/stage';
 import { PointLike } from '../../models/point';
 import { EntityRenderModel } from '../../rendering/model';
 import { AbstractComponent } from './abstract_component';
 import { Callback } from 'aurumjs/dist/utilities/common';
 import { CommonEntity } from '../../models/entities';
+import { SceneGraphNode } from '../../models/scene_graph';
+import { onBeforeRender } from '../../core/stage';
 
 export interface PathFollowingConfiguration {
 	speed: number;
@@ -24,11 +25,11 @@ export class PathFollowingComponent extends AbstractComponent {
 	}
 
 	public onAttach(entity: SceneGraphNode<CommonEntity>, renderData: EntityRenderModel) {
-		entity.cancellationToken.animationLoop(() => {
+		onBeforeRender.subscribe(() => {
 			if (this.currentTarget && !this.pause) {
 				this.moveTowardsTarget(entity, this.currentTarget);
 			}
-		});
+		}, entity.cancellationToken);
 	}
 
 	public async followPath(polygon: Polygon): Promise<void> {

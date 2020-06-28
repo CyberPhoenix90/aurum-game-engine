@@ -28,6 +28,7 @@ export * from './models/common';
 export * from './models/input_data';
 export * from './models/point';
 export * from './models/entities';
+export * from './models/scene_graph';
 
 export * from './utilities/other/save_state_helper';
 export * from './utilities/other/streamline';

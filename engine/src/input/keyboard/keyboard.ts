@@ -1,5 +1,6 @@
 import { _ } from '../../utilities/other/streamline';
 import { CancellationToken, DataSource } from 'aurumjs';
+import { onBeforeRender } from '../../core/stage';
 
 export enum KeyboardButtons {
 	BACKSPACE = 8,
@@ -127,11 +128,11 @@ export class AurumKeyboard {
 		});
 
 		this.heldDownKeys = {};
-		this.cancelationToken.animationLoop(() => {
+		onBeforeRender.subscribe(() => {
 			for (const listener of this.listeners) {
 				listener();
 			}
-		});
+		}, this.cancelationToken);
 
 		this.listeners = [];
 		this.cancelationToken.addCancelable(() => (this.listeners.length = 0));

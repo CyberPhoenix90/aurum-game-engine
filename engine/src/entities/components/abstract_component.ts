@@ -1,7 +1,7 @@
-import { SceneGraphNode } from '../../core/stage';
 import { CancellationToken } from 'aurumjs';
 import { EntityRenderModel } from '../../rendering/model';
 import { CommonEntity } from '../../models/entities';
+import { SceneGraphNode } from '../../models/scene_graph';
 
 export class AbstractComponent {
 	protected cancellationToken: CancellationToken;

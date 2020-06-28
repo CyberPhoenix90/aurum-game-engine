@@ -98,9 +98,9 @@ export class NoRenderEntity {
 		}, this.token);
 	}
 
-	private setBlendMode(model: EntityRenderModel, blendMode: BlendModes) {
+	private setBlendMode(model: EntityRenderModel, blendMode: BlendModes = BlendModes.NORMAL) {
 		let blendModeTarget = this.displayObject;
-		if (this.displayObject.constructor.name === 'Container') {
+		if (this.displayObject.constructor.name === 'Container' && blendMode !== BlendModes.NORMAL) {
 			const alphaFilter = new filters.AlphaFilter();
 			this.displayObject.filters = [alphaFilter];
 		}

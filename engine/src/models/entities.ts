@@ -2,6 +2,8 @@ import { ArrayDataSource, DataSource } from 'aurumjs';
 import { AbstractComponent } from '../entities/components/abstract_component';
 import { Size } from '../models/common';
 import { Data } from '../models/input_data';
+import { EntityRenderModel } from '../rendering/model';
+import { SceneGraphNode } from './scene_graph';
 
 export interface CommonEntityProps extends CommonEntityApiProps {
 	x?: Data<Size | 'center' | 'left' | 'right'>;
@@ -62,8 +64,8 @@ export interface CommonEntity {
 }
 
 export interface CommonEntityApiProps {
-	onAttach?(): void;
-	onDetach?(): void;
+	onAttach?(node: SceneGraphNode<CommonEntity>, renderModel: EntityRenderModel): void;
+	onDetach?(node: SceneGraphNode<CommonEntity>, renderModel: EntityRenderModel): void;
 }
 
 export enum RenderableType {

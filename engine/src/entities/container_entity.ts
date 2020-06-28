@@ -1,8 +1,8 @@
 import { AurumComponentAPI, Renderable, ArrayDataSource } from 'aurumjs';
-import { SceneGraphNode } from '../core/stage';
 import { _ } from '../utilities/other/streamline';
 import { RenderableType, CommonEntityProps, CommonEntity } from '../models/entities';
 import { toSource } from '../utilities/data/to_source';
+import { SceneGraphNode } from '../models/scene_graph';
 
 export interface ContainerEntityProps extends CommonEntityProps {}
 

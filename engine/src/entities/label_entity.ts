@@ -1,9 +1,9 @@
-import { SceneGraphNode } from '../core/stage';
 import { RenderableType, CommonEntityProps, CommonEntity } from '../models/entities';
 import { AurumComponentAPI, Renderable, DataSource, ArrayDataSource } from 'aurumjs';
 import { _ } from '../utilities/other/streamline';
 import { Data } from '../models/input_data';
 import { toSource } from '../utilities/data/to_source';
+import { SceneGraphNode } from '../models/scene_graph';
 
 export interface LabelEntityProps extends CommonEntityProps {
 	text?: Data<string>;

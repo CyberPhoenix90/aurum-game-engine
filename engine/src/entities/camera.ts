@@ -1,9 +1,9 @@
-import { SceneGraphNode } from '../core/stage';
 import { RenderableType, CommonEntityProps, CommonEntity } from '../models/entities';
 import { _ } from '../utilities/other/streamline';
 import { Renderable, AurumComponentAPI, DataSource, ArrayDataSource } from 'aurumjs';
 import { Data } from '../models/input_data';
 import { toSource } from '../utilities/data/to_source';
+import { SceneGraphNode } from '../models/scene_graph';
 
 export interface CameraProps extends CommonEntityProps {
 	screenWidth: number;

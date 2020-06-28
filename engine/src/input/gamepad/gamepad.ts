@@ -1,5 +1,6 @@
 import { DataSource, CancellationToken } from 'aurumjs';
 import { Vector2D } from '../../math/vectors/vector2d';
+import { onBeforeRender } from '../../core/stage';
 
 export class Gamepadsettings {
 	/**
@@ -62,9 +63,9 @@ export class AurumGamepad {
 		this.index = index;
 		this.cancelationToken = new CancellationToken();
 
-		this.cancelationToken.animationLoop(() => {
+		onBeforeRender.subscribe(() => {
 			this.fireEvents();
-		});
+		}, this.cancelationToken);
 
 		this.listeners = [];
 		this.cancelationToken.addCancelable(() => (this.listeners.length = 0));
