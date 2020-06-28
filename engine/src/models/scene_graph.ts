@@ -8,6 +8,6 @@ export interface SceneGraphNode<T extends CommonEntity> {
 	cancellationToken: CancellationToken;
 	children?: SceneGraphNode<CommonEntity>[];
 	nodeType: RenderableType;
-	onAttach?(node: SceneGraphNode<T>, renderModel: EntityRenderModel): void;
-	onDetach?(node: SceneGraphNode<T>, renderModel: EntityRenderModel): void;
+	onAttach(node: SceneGraphNode<T>, renderModel: EntityRenderModel): void;
+	onDetach(node: SceneGraphNode<T>, renderModel: EntityRenderModel): void;
 }

@@ -56,6 +56,8 @@ export function Label(props: LabelEntityProps, children: Renderable[], api: Auru
 
 	return {
 		cancellationToken: api.cancellationToken,
+		onAttach: props.onAttach,
+		onDetach: props.onDetach,
 		model: {
 			x: toSource(props.x, 0),
 			y: toSource(props.y, 0),

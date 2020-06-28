@@ -20,6 +20,8 @@ export interface CameraEntity extends CommonEntity {
 export function Camera(props: CameraProps, children: Renderable[], api: AurumComponentAPI): SceneGraphNode<CameraEntity> {
 	return {
 		cancellationToken: api.cancellationToken,
+		onAttach: props.onAttach,
+		onDetach: props.onDetach,
 		model: {
 			x: toSource(props.x, 0),
 			y: toSource(props.y, 0),

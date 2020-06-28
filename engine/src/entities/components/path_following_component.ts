@@ -7,9 +7,11 @@ import { Callback } from 'aurumjs/dist/utilities/common';
 import { CommonEntity } from '../../models/entities';
 import { SceneGraphNode } from '../../models/scene_graph';
 import { onBeforeRender } from '../../core/stage';
+import { Vector2D } from '../../math/vectors/vector2d';
 
 export interface PathFollowingConfiguration {
 	speed: number;
+	euclideanMovement?: boolean;
 }
 
 export class PathFollowingComponent extends AbstractComponent {
@@ -70,6 +72,24 @@ export class PathFollowingComponent extends AbstractComponent {
 		const positionX: DataSource<number> = entity.model.x as any;
 		const positionY: DataSource<number> = entity.model.y as any;
 
+		if (this.config.euclideanMovement) {
+			this.approachEuclidean(target, positionX, positionY);
+		} else {
+			this.approachManhattan(target, positionX, positionY);
+		}
+
+		if (target.x === positionX.value && target.y === positionY.value) {
+			this.pendingMovementPromise();
+		}
+	}
+
+	private approachEuclidean(target: PointLike, positionX: DataSource<number>, positionY: DataSource<number>) {
+		const travel = Vector2D.fromPolarCoordinates(this.config.speed, new Vector2D(positionX.value, positionY.value).connectingVector(target).getAngle());
+		positionX.update(positionX.value + Math.min(Math.abs(travel.x), Math.abs(positionX.value - target.x)) * Math.sign(travel.x));
+		positionY.update(positionY.value + Math.min(Math.abs(travel.y), Math.abs(positionY.value - target.y)) * Math.sign(travel.y));
+	}
+
+	private approachManhattan(target: PointLike, positionX: DataSource<number>, positionY: DataSource<number>) {
 		if (target.x > positionX.value) {
 			positionX.update(positionX.value + Math.min(this.config.speed, Math.abs(positionX.value - target.x)));
 		} else if (target.x < positionX.value) {
@@ -78,10 +98,6 @@ export class PathFollowingComponent extends AbstractComponent {
 			positionY.update(positionY.value + Math.min(this.config.speed, Math.abs(positionY.value - target.y)));
 		} else if (target.y < positionY.value) {
 			positionY.update(positionY.value - Math.min(this.config.speed, Math.abs(positionY.value - target.y)));
-		}
-
-		if (target.x === positionX.value && target.y === positionY.value) {
-			this.pendingMovementPromise();
 		}
 	}
 }

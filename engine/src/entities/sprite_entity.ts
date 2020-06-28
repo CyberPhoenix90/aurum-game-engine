@@ -38,6 +38,8 @@ export interface SpriteEntity extends CommonEntity {
 export function Sprite(props: SpriteEntityProps, children, api: AurumComponentAPI): SceneGraphNode<SpriteEntity> {
 	return {
 		cancellationToken: api.cancellationToken,
+		onAttach: props.onAttach,
+		onDetach: props.onDetach,
 		model: {
 			x: toSource(props.x, 0),
 			y: toSource(props.y, 0),

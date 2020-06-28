@@ -13,6 +13,8 @@ export function Container(props: ContainerEntityProps, children: Renderable[], a
 
 	return {
 		cancellationToken: api.cancellationToken,
+		onAttach: props.onAttach,
+		onDetach: props.onDetach,
 		model: {
 			x: toSource(props.x, 0),
 			y: toSource(props.y, 0),
