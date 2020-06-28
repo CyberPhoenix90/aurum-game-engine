@@ -204,6 +204,8 @@ function handleDataSource(
 	});
 }
 
+const dynamicRenderKeys = new Map<Renderable, CancellationToken>();
+
 function handleArraySource(
 	node: SceneGraphNode<CommonEntity> & ArrayDataSource<any>,
 	renderPlugin: AbstractRenderPlugin,
@@ -214,7 +216,22 @@ function handleArraySource(
 	node.listenAndRepeat((change) => {
 		switch (change.operation) {
 			case 'add':
-				synchronizeWithRenderPlugin(renderPlugin, stageId, prerender(change.items), parent, prerender);
+				for (const item of change.items) {
+					const node = (prerender(item) as any) as SceneGraphNode<any>;
+					dynamicRenderKeys.set(item, node.cancellationToken);
+					synchronizeWithRenderPlugin(renderPlugin, stageId, [node], parent, prerender);
+				}
+				break;
+			case 'remove':
+				for (const item of change.items) {
+					dynamicRenderKeys.get(item).cancel();
+				}
+				break;
+			case 'replace':
+				dynamicRenderKeys.get(change.target).cancel();
+				const node = (prerender(change.items[0]) as any) as SceneGraphNode<any>;
+				dynamicRenderKeys.set(change.items[0], node.cancellationToken);
+				synchronizeWithRenderPlugin(renderPlugin, stageId, [node], parent, prerender);
 				break;
 		}
 	});
