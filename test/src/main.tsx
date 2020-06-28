@@ -1,75 +1,55 @@
-import { Rectangle, Camera, Label, Stage, numberFormatter, Container, BoundsComponent, SIDE } from 'aurum-game-engine';
+import { AurumKeyboard, Camera, Container, EntityRenderModel, KeyboardButtons, Polygon, Sprite, Stage, Vector2D, _ } from 'aurum-game-engine';
 import { PixiJsRenderAdapter } from 'aurum-pixijs-renderer';
-import { Aurum, DataSource } from 'aurumjs';
+import { ArrayDataSource, Aurum } from 'aurumjs';
+import { Enemy } from './enemy/enemy';
+import { bullets, enemiesData, lives } from './session';
+import { Tower } from './tower/tower';
 
-// const scene = new DataSource('test');
-
-// const joy = new AurumGamepad(0, {
-// 	joystickDeadzone: 0.05
-// }).listenJoystick(0);
-const posX = new DataSource(20);
-const posY = new DataSource(60);
-let velX = 1;
-let frame = new DataSource(0);
-let velY = 1;
-const val = new DataSource(1);
-
-setInterval(() => {
-	frame.update(frame.value + 1);
-	posX.update(posX.value + velX);
-	posY.update(posY.value + velY);
-});
-
-setInterval(() => {
-	val.update(val.value * 10);
-}, 1000);
+const enemies = new ArrayDataSource([]);
 
 Aurum.attach(
 	<div>
 		<Stage renderPlugin={new PixiJsRenderAdapter()}>
-			<Container
-				x={posX}
-				y={posY}
-				components={[
-					new BoundsComponent({
-						bounds: new Rectangle({ x: 0, y: 0 }, { x: 1280, y: 480 }),
-						onOutOfBounds: (bound: SIDE) => {
-							if (bound === SIDE.LEFT || bound === SIDE.RIGHT) {
-								velX *= -1;
-							} else {
-								velY *= -1;
-							}
-						}
-					})
-				]}
-			>
-				{[1, 2, 3, 4, 5, 6, 7, 8, 9].map((v) => (
-					<Label
-						fontWeight={'bold'}
-						fontSize={30}
-						color={frame.map((frame) => `hsl(${(180 / Math.PI) * (v + frame / 30)},100%,50%)`)}
-						x={frame.map((frame) => Math.cos((v + frame / 30) * 0.7) * 30)}
-						y={frame.map((frame) => Math.sin((v + frame / 30) * 0.7) * 30)}
-					>
-						{v}
-					</Label>
-				))}
-			</Container>
-			{/* <Sprite tint={'#FF00FF'} x={joy.map((j) => j.x * 320 + 320)} y={joy.map((j) => j.y * 240 + 240)} texture={'images.jpg'}></Sprite> */}
-			<Camera screenWidth={1280} screenHeight={480}>
-				<Label>
-					{val.map((v) =>
-						numberFormatter.formatBigNumber({
-							value: v,
-							minDigits: 2,
-							decimals: 2,
-							abbreviationProvider: (e) => (e ? ['k', 'm', 'b', 't', 'qa', 'qu', 'se', 'sep', 'oct', 'non'][e / 3 - 1] ?? `e${e}` : ''),
-							formatGranularity: 3
-						})
+			<Container>
+				<Sprite name="background" texture="assets/bg.png"></Sprite>
+				<Container>
+					{lives.map((v) =>
+						_.for(v, (i) => <Sprite tint="#ff0000" x={600 + 40 * i} y={10} width={32} height={32} texture="assets/enemy.png"></Sprite>)
 					)}
-				</Label>
-			</Camera>
+					{enemies}
+					{bullets}
+					<Tower x={200} y={250}></Tower>
+					<Tower x={300} y={450}></Tower>
+					<Tower x={600} y={450}></Tower>
+				</Container>
+			</Container>
+			<Camera screenWidth={800} screenHeight={600}></Camera>
 		</Stage>
 	</div>,
 	document.body
 );
+
+const enemyPath = new Polygon({ x: 0, y: 0 }, [new Vector2D(40, -70), new Vector2D(40, 550), new Vector2D(750, 150), new Vector2D(850, 150)]);
+new AurumKeyboard().listenKey(KeyboardButtons.KEY_A).listen((v) => {
+	if (v) {
+		setInterval(() => {
+			const e = (
+				<Enemy
+					onReachEndOfPath={() => {
+						lives.update(lives.value - 1);
+						enemies.remove(e);
+					}}
+					onAttach={(node, renderModel: EntityRenderModel) => {
+						enemiesData.push(renderModel);
+					}}
+					onDetach={(node, renderModel: EntityRenderModel) => {
+						enemiesData.remove(renderModel);
+					}}
+					path={enemyPath}
+				></Enemy>
+			);
+
+			enemies.push(e);
+		}, 33);
+	}
+});
