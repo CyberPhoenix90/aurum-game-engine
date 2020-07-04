@@ -22,7 +22,7 @@ Aurum.attach(
 				<Canvas
 					paintOperations={[
 						{
-							strokeStyle: 'red',
+							strokeStyle: '#FF000050',
 							strokeThickness: 4,
 							shape: enemyPath
 						}

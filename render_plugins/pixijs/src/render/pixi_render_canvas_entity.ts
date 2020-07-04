@@ -36,9 +36,9 @@ export class RenderCanvasEntity extends NoRenderEntity {
 
 	private drawAction(action: PaintOperation) {
 		const color = Color.fromString(action.fillStyle ?? 'transparent');
-		this.displayObject.beginFill(color.toRGBNumber(), color.a);
+		this.displayObject.beginFill(color.toRGBNumber(), color.a / 256);
 		const strokeColor = Color.fromString(action.strokeStyle ?? 'transparent');
-		this.displayObject.lineStyle(action.strokeThickness ?? 1, strokeColor.toRGBNumber(), strokeColor.a);
+		this.displayObject.lineStyle(action.strokeThickness ?? 1, strokeColor.toRGBNumber(), strokeColor.a / 256);
 		const shape = action.shape;
 		this.renderShape(shape);
 	}
