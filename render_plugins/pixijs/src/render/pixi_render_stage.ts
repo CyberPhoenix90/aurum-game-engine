@@ -1,10 +1,18 @@
-import { CameraEntityRenderModel, EntityRenderModel, LabelEntityRenderModel, RenderableType, SpriteEntityRenderModel } from 'aurum-game-engine';
+import {
+	CameraEntityRenderModel,
+	EntityRenderModel,
+	LabelEntityRenderModel,
+	RenderableType,
+	SpriteEntityRenderModel,
+	CanvasEntityRenderModel
+} from 'aurum-game-engine';
 import { Container } from 'pixi.js';
 import { NoRenderEntity } from './pixi_no_render_entity';
 import { RenderCameraEntity } from './pixi_render_camera';
 import { RenderLabelEntity } from './pixi_render_label_entity';
 import { RenderSpriteEntity } from './pixi_render_sprite_entity';
 import { RenderTiledSpriteEntity } from './pixi_render_tiled_sprite_entity';
+import { RenderCanvasEntity } from './pixi_render_canvas_entity';
 
 export class RenderStage {
 	public readonly id: number;
@@ -60,6 +68,8 @@ export class RenderStage {
 				return new RenderLabelEntity(model as LabelEntityRenderModel);
 			case RenderableType.SPRITE:
 				return new RenderSpriteEntity(model as SpriteEntityRenderModel);
+			case RenderableType.CANVAS:
+				return new RenderCanvasEntity(model as CanvasEntityRenderModel);
 			case RenderableType.TILED_SPRITE:
 				return new RenderTiledSpriteEntity(model as SpriteEntityRenderModel);
 			case RenderableType.BOX_SPRITE:

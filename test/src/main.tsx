@@ -1,4 +1,4 @@
-import { AurumKeyboard, Camera, Container, EntityRenderModel, KeyboardButtons, Polygon, Sprite, Stage, Vector2D, _ } from 'aurum-game-engine';
+import { AurumKeyboard, Camera, Container, EntityRenderModel, KeyboardButtons, Polygon, Sprite, Stage, Vector2D, _, Canvas } from 'aurum-game-engine';
 import { PixiJsRenderAdapter } from 'aurum-pixijs-renderer';
 import { ArrayDataSource, Aurum } from 'aurumjs';
 import { Enemy } from './enemy/enemy';
@@ -6,12 +6,28 @@ import { bullets, enemiesData, lives } from './session';
 import { Tower } from './tower/tower';
 
 const enemies = new ArrayDataSource([]);
+const enemyPath = new Polygon({ x: 0, y: 0 }, [
+	new Vector2D(40, -70),
+	new Vector2D(40, 550),
+	new Vector2D(750, 550),
+	new Vector2D(750, 150),
+	new Vector2D(850, 150)
+]);
 
 Aurum.attach(
 	<div>
 		<Stage renderPlugin={new PixiJsRenderAdapter()}>
 			<Container>
 				<Sprite name="background" texture="assets/bg.png"></Sprite>
+				<Canvas
+					paintOperations={[
+						{
+							strokeStyle: 'red',
+							strokeThickness: 4,
+							shape: enemyPath
+						}
+					]}
+				></Canvas>
 				<Container>
 					{lives.map((v) =>
 						_.for(v, (i) => <Sprite tint="#ff0000" x={600 + 40 * i} y={10} width={32} height={32} texture="assets/enemy.png"></Sprite>)
@@ -29,7 +45,6 @@ Aurum.attach(
 	document.body
 );
 
-const enemyPath = new Polygon({ x: 0, y: 0 }, [new Vector2D(40, -70), new Vector2D(40, 550), new Vector2D(750, 150), new Vector2D(850, 150)]);
 new AurumKeyboard().listenKey(KeyboardButtons.KEY_A).listen((v) => {
 	if (v) {
 		setInterval(() => {

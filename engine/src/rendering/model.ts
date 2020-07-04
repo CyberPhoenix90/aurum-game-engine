@@ -1,5 +1,6 @@
-import { CancellationToken, ReadOnlyDataSource } from 'aurumjs';
+import { CancellationToken, ReadOnlyDataSource, ArrayDataSource } from 'aurumjs';
 import { RenderableType, BlendModes } from '../models/entities';
+import { PaintOperation } from '../entities/canvas_entity';
 
 export interface EntityRenderModel {
 	uid: number;
@@ -31,6 +32,10 @@ export interface SpriteEntityRenderModel extends EntityRenderModel {
 	 */
 	drawDistanceX: ReadOnlyDataSource<number>;
 	drawDistanceY: ReadOnlyDataSource<number>;
+}
+
+export interface CanvasEntityRenderModel extends EntityRenderModel {
+	painerOperations: ArrayDataSource<PaintOperation>;
 }
 
 export interface CameraEntityRenderModel extends EntityRenderModel {

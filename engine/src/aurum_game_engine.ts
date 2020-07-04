@@ -4,6 +4,7 @@ export * from './core/stage';
 export * from './entities/label_entity';
 export * from './entities/sprite_entity';
 export * from './entities/container_entity';
+export * from './entities/canvas_entity';
 export * from './entities/camera';
 export * from './entities/components/abstract_component';
 export * from './entities/components/bounds_component';

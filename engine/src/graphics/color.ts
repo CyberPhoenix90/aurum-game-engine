@@ -536,5 +536,6 @@ const colorByName = {
 	white: Color.fromHex('#ffffff'),
 	whitesmoke: Color.fromHex('#f5f5f5'),
 	yellow: Color.fromHex('#ffff00'),
-	yellowgreen: Color.fromHex('#9acd32')
+	yellowgreen: Color.fromHex('#9acd32'),
+	transparent: Color.TRANSPARENT
 };

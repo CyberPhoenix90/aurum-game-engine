@@ -3,7 +3,8 @@ import { AbstractRenderPlugin, LabelEntity, SpriteEntity } from '../aurum_game_e
 import { CameraEntity } from '../entities/camera';
 import { CommonEntity, RenderableType } from '../models/entities';
 import { SceneGraphNode } from '../models/scene_graph';
-import { CameraEntityRenderModel, EntityRenderModel, LabelEntityRenderModel, SpriteEntityRenderModel } from '../rendering/model';
+import { CameraEntityRenderModel, EntityRenderModel, LabelEntityRenderModel, SpriteEntityRenderModel, CanvasEntityRenderModel } from '../rendering/model';
+import { CanvasEntity } from '../entities/canvas_entity';
 
 export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: SceneGraphNode<any>): EntityRenderModel {
 	const { x, y, sizeX, sizeY } = layoutAlgorithm(node);
@@ -32,6 +33,24 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 				drawDistanceX: (node.model as SpriteEntity).drawDistanceX,
 				drawDistanceY: (node.model as SpriteEntity).drawDistanceY
 			} as SpriteEntityRenderModel;
+		case RenderableType.CANVAS:
+			return {
+				alpha: node.model.alpha,
+				cancellationToken: node.cancellationToken,
+				clip: node.model.clip,
+				name: node.model.name,
+				parentUid: parent?.uid,
+				positionX: x,
+				positionY: y,
+				sizeX: sizeX,
+				sizeY: sizeY,
+				renderableType: node.nodeType,
+				uid: node.uid,
+				visible: node.model.visible,
+				zIndex: node.model.zIndex,
+				blendMode: node.model.blendMode,
+				painerOperations: (node.model as CanvasEntity).paintOperations
+			} as CanvasEntityRenderModel;
 		case RenderableType.CAMERA:
 			return {
 				alpha: node.model.alpha,
