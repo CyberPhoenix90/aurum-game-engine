@@ -1,4 +1,4 @@
-import { CancellationToken, ReadOnlyDataSource, ArrayDataSource } from 'aurumjs';
+import { CancellationToken, ReadOnlyDataSource, ArrayDataSource, DataSource } from 'aurumjs';
 import { RenderableType, BlendModes } from '../models/entities';
 import { PaintOperation } from '../entities/canvas_entity';
 
@@ -10,8 +10,8 @@ export interface EntityRenderModel {
 	name: string;
 	positionX: ReadOnlyDataSource<number>;
 	positionY: ReadOnlyDataSource<number>;
-	sizeX: ReadOnlyDataSource<number>;
-	sizeY: ReadOnlyDataSource<number>;
+	sizeX: DataSource<number>;
+	sizeY: DataSource<number>;
 	zIndex: ReadOnlyDataSource<number>;
 	clip: ReadOnlyDataSource<boolean>;
 	visible: ReadOnlyDataSource<boolean>;

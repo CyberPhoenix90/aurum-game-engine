@@ -122,15 +122,29 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 	}
 }
 
-function layoutAlgorithm(
-	node: SceneGraphNode<CommonEntity>
-): { x: DataSource<number>; y: DataSource<number>; sizeX: DataSource<number>; sizeY: DataSource<number> } {
-	return {
-		x: node.model.x.map((v) => parseInt(v.toString())),
-		y: node.model.y.map((v) => parseInt(v.toString())),
-		sizeX: node.model.width.map((v) => (v === undefined ? undefined : parseInt(v.toString()))),
-		sizeY: node.model.height.map((v) => (v === undefined ? undefined : parseInt(v.toString())))
+interface LayoutData {
+	x: DataSource<number>;
+	y: DataSource<number>;
+	sizeX: DataSource<number>;
+	sizeY: DataSource<number>;
+}
+
+function layoutAlgorithm(node: SceneGraphNode<CommonEntity>): LayoutData {
+	const sizeX = node.model.width.map((v) => (v === undefined ? undefined : parseInt(v.toString())));
+	const sizeY = node.model.height.map((v) => (v === undefined ? undefined : parseInt(v.toString())));
+
+	const result: LayoutData = {
+		x: node.model.x.map((v) => {
+			return parseInt(v.toString()) - node.model.originX.value * (sizeX.value ?? 0);
+		}),
+		y: node.model.y.map((v) => {
+			return parseInt(v.toString()) - node.model.originY.value * (sizeY.value ?? 0);
+		}),
+		sizeX,
+		sizeY
 	};
+
+	return result;
 }
 
 export function synchronizeWithRenderPlugin(

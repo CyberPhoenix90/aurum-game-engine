@@ -57,6 +57,10 @@ export function Label(props: LabelEntityProps, children: Renderable[], api: Auru
 	}
 	updateText(text, content as any);
 
+	const fontWeight: DataSource<string> = toSource((props as LabelEntityProps).fontWeight, undefined);
+	const fontSize: DataSource<number> = toSource((props as LabelEntityProps).fontSize, 16);
+	const fontFamily: DataSource<string> = toSource((props as LabelEntityProps).fontFamily, 'arial');
+
 	return {
 		cancellationToken: api.cancellationToken,
 		onAttach: props.onAttach,
@@ -67,10 +71,10 @@ export function Label(props: LabelEntityProps, children: Renderable[], api: Auru
 			originX: toSource(props.originX, 0),
 			originY: toSource(props.originY, 0),
 			minHeight: toSource(props.minHeight, undefined),
-			height: toSource(props.height, undefined),
+			height: toSource(props.height, fontSize.value),
 			maxHeight: toSource(props.maxHeight, undefined),
 			minWidth: toSource(props.minWidth, undefined),
-			width: toSource(props.width, undefined),
+			width: toSource(props.width, measureStringWidth(text.value, fontWeight.value, fontSize.value, fontFamily.value)),
 			maxWidth: toSource(props.maxWidth, undefined),
 			alpha: toSource(props.alpha, 1),
 			clip: toSource(props.clip, false),
@@ -95,10 +99,10 @@ export function Label(props: LabelEntityProps, children: Renderable[], api: Auru
 			renderCharCount: toSource((props as LabelEntityProps).renderCharCount, undefined),
 			stroke: toSource((props as LabelEntityProps).stroke, undefined),
 			strokeThickness: toSource((props as LabelEntityProps).strokeThickness, undefined),
-			fontSize: toSource((props as LabelEntityProps).fontSize, undefined),
-			fontFamily: toSource((props as LabelEntityProps).fontFamily, undefined),
+			fontSize,
+			fontFamily,
 			fontStyle: toSource((props as LabelEntityProps).fontStyle, undefined),
-			fontWeight: toSource((props as LabelEntityProps).fontWeight, undefined),
+			fontWeight,
 			dropShadowColor: toSource((props as LabelEntityProps).dropShadowColor, undefined),
 			dropShadowDistance: toSource((props as LabelEntityProps).dropShadowDistance, undefined),
 			dropShadowFuzziness: toSource((props as LabelEntityProps).dropShadowFuzziness, undefined),
@@ -124,4 +128,17 @@ function updateText(text: DataSource<string>, content: Array<string | DataSource
 			}
 		}, '')
 	);
+}
+const canvas: HTMLCanvasElement = typeof document === 'undefined' ? undefined : document.createElement('canvas');
+
+function measureStringWidth(text: string, fontWeight: string, fontSize: number, fontFamily: string): number {
+	if (text.trim().length === 0) {
+		return 0;
+	}
+
+	const context = canvas.getContext('2d');
+	context.font = `${fontWeight || ''} ${fontSize}px ${fontFamily || ''}`;
+	const width = context.measureText(text).width;
+
+	return width;
 }

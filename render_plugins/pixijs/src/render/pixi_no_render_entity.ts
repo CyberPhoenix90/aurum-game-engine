@@ -59,12 +59,16 @@ export class NoRenderEntity {
 		model.sizeX.listenAndRepeat((v) => {
 			if (v !== undefined) {
 				this.displayObject.width = v;
+			} else {
+				model.sizeX.update(this.displayObject.width);
 			}
 		}, this.token);
 
 		model.sizeY.listenAndRepeat((v) => {
 			if (v !== undefined) {
 				this.displayObject.height = v;
+			} else {
+				model.sizeY.update(this.displayObject.height);
 			}
 		}, this.token);
 

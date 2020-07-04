@@ -11,7 +11,8 @@ import {
 	Vector2D,
 	_,
 	Canvas,
-	PointLike
+	PointLike,
+	Label
 } from 'aurum-game-engine';
 import { PixiJsRenderAdapter } from 'aurum-pixijs-renderer';
 import { ArrayDataSource, Aurum, DataSource } from 'aurumjs';
@@ -53,6 +54,15 @@ Aurum.attach(
 					<Tower x={300} y={450}></Tower>
 					<Tower x={600} y={450}></Tower>
 					<Sprite tint="#ff0000" x={pos.pick('x')} y={pos.pick('y')} width={24} height={24} texture="assets/enemy.png"></Sprite>
+					<Label x={400} y={60} color="red">
+						Center Test A
+					</Label>
+					<Label x={400} y={80} color="red" originX={0.5}>
+						Center Test B
+					</Label>
+					<Label x={400} y={100} color="red" originX={1}>
+						Center Test C
+					</Label>
 				</Container>
 			</Container>
 			<Camera
