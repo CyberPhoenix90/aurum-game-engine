@@ -4,6 +4,7 @@ import { Data } from '../models/input_data';
 import { DataSource, ArrayDataSource, AurumComponentAPI } from 'aurumjs';
 import { toSource } from '../utilities/data/to_source';
 import { SceneGraphNode } from '../models/scene_graph';
+import { SpriteEntityRenderModel } from '../rendering/model';
 
 export interface SpriteEntityProps extends CommonEntityProps {
 	texture?: Data<string>;
@@ -18,6 +19,9 @@ export interface SpriteEntityProps extends CommonEntityProps {
 	 */
 	drawDistanceX?: Data<number>;
 	drawDistanceY?: Data<number>;
+
+	onAttach?(node: SceneGraphNode<SpriteEntity>, renderModel: SpriteEntityRenderModel): void;
+	onDetach?(node: SceneGraphNode<SpriteEntity>, renderModel: SpriteEntityRenderModel): void;
 }
 
 export interface SpriteEntity extends CommonEntity {

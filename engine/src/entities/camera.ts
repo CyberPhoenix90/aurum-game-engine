@@ -4,6 +4,8 @@ import { Renderable, AurumComponentAPI, DataSource, ArrayDataSource } from 'auru
 import { Data } from '../models/input_data';
 import { toSource } from '../utilities/data/to_source';
 import { SceneGraphNode } from '../models/scene_graph';
+import { PointLike } from '../models/point';
+import { CameraEntityRenderModel } from '../rendering/model';
 
 export interface CameraProps extends CommonEntityProps {
 	screenWidth: number;
@@ -11,18 +13,44 @@ export interface CameraProps extends CommonEntityProps {
 	resolutionX?: number;
 	resolutionY?: number;
 	backgroundColor?: Data<string>;
+	onAttach?(node: SceneGraphNode<CameraEntity>, renderModel: CameraEntityRenderModel): void;
+	onDetach?(node: SceneGraphNode<CameraEntity>, renderModel: CameraEntityRenderModel): void;
 }
 
 export interface CameraEntity extends CommonEntity {
+	projectMouseCoordinates(e: MouseEvent): PointLike;
+	projectPoint(e: PointLike): PointLike;
 	backgroundColor: DataSource<string>;
 }
 
 export function Camera(props: CameraProps, children: Renderable[], api: AurumComponentAPI): SceneGraphNode<CameraEntity> {
-	return {
+	let cameraRenderModel: CameraEntityRenderModel;
+
+	const result = {
 		cancellationToken: api.cancellationToken,
-		onAttach: props.onAttach,
+		onAttach: (entity, entityRenderModel) => {
+			cameraRenderModel = entityRenderModel as CameraEntityRenderModel;
+			props.onAttach(entity, entityRenderModel as CameraEntityRenderModel);
+		},
 		onDetach: props.onDetach,
 		model: {
+			projectMouseCoordinates: (e: MouseEvent) => {
+				return result.model.projectPoint({
+					x: e.clientX,
+					y: e.clientY
+				});
+			},
+			projectPoint(point: PointLike): PointLike {
+				const rect = cameraRenderModel.view.getBoundingClientRect();
+				return {
+					x:
+						((point.x - rect.left + cameraRenderModel.positionX.value) * cameraRenderModel.sizeX.value) /
+						(props.resolutionX || cameraRenderModel.sizeX.value),
+					y:
+						((point.y - rect.top + cameraRenderModel.positionY.value) * cameraRenderModel.sizeY.value) /
+						(props.resolutionY || cameraRenderModel.sizeY.value)
+				};
+			},
 			x: toSource(props.x, 0),
 			y: toSource(props.y, 0),
 			originX: toSource(props.originX, 0),
@@ -56,4 +84,5 @@ export function Camera(props: CameraProps, children: Renderable[], api: AurumCom
 		nodeType: RenderableType.CAMERA,
 		uid: _.getUId()
 	};
+	return result;
 }

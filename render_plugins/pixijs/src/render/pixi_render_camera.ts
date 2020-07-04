@@ -11,6 +11,7 @@ export class RenderCameraEntity extends NoRenderEntity {
 		super(model);
 		this.model = model;
 		const view: HTMLCanvasElement = document.createElement('canvas');
+		model.view = view;
 		view.width = model.sizeX.value;
 		view.height = model.sizeY.value;
 		stageNode.appendChild(view);

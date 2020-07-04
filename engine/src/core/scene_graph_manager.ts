@@ -53,6 +53,7 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 			} as CanvasEntityRenderModel;
 		case RenderableType.CAMERA:
 			return {
+				view: undefined,
 				alpha: node.model.alpha,
 				cancellationToken: node.cancellationToken,
 				clip: node.model.clip,

@@ -39,6 +39,7 @@ export interface CanvasEntityRenderModel extends EntityRenderModel {
 }
 
 export interface CameraEntityRenderModel extends EntityRenderModel {
+	view: HTMLElement;
 	backgroundColor: ReadOnlyDataSource<string>;
 }
 

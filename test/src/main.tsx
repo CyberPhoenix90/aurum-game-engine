@@ -1,10 +1,25 @@
-import { AurumKeyboard, Camera, Container, EntityRenderModel, KeyboardButtons, Polygon, Sprite, Stage, Vector2D, _, Canvas } from 'aurum-game-engine';
+import {
+	AurumMouse,
+	AurumKeyboard,
+	Camera,
+	Container,
+	EntityRenderModel,
+	KeyboardButtons,
+	Polygon,
+	Sprite,
+	Stage,
+	Vector2D,
+	_,
+	Canvas,
+	PointLike
+} from 'aurum-game-engine';
 import { PixiJsRenderAdapter } from 'aurum-pixijs-renderer';
-import { ArrayDataSource, Aurum } from 'aurumjs';
+import { ArrayDataSource, Aurum, DataSource } from 'aurumjs';
 import { Enemy } from './enemy/enemy';
 import { bullets, enemiesData, lives } from './session';
 import { Tower } from './tower/tower';
 
+const pos = new DataSource<PointLike>();
 const enemies = new ArrayDataSource([]);
 const enemyPath = new Polygon({ x: 0, y: 0 }, [
 	new Vector2D(40, -70),
@@ -37,9 +52,20 @@ Aurum.attach(
 					<Tower x={200} y={250}></Tower>
 					<Tower x={300} y={450}></Tower>
 					<Tower x={600} y={450}></Tower>
+					<Sprite tint="#ff0000" x={pos.pick('x')} y={pos.pick('y')} width={24} height={24} texture="assets/enemy.png"></Sprite>
 				</Container>
 			</Container>
-			<Camera screenWidth={800} screenHeight={600}></Camera>
+			<Camera
+				onAttach={(camera) => {
+					new AurumMouse()
+						.listenMouseMove()
+						.map(camera.model.projectMouseCoordinates)
+						.map((v) => ({ x: v.x - 12, y: v.y - 12 }))
+						.pipe(pos);
+				}}
+				screenWidth={800}
+				screenHeight={600}
+			></Camera>
 		</Stage>
 	</div>,
 	document.body

@@ -41,6 +41,7 @@ export * from './rendering/model';
 
 export * from './input/gamepad/gamepad';
 export * from './input/keyboard/keyboard';
+export * from './input/mouse/mouse';
 
 export * from './graphics/color';
 export * from './graphics/color_vectors/hsla_vector';

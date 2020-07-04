@@ -4,6 +4,7 @@ import { SceneGraphNode } from '../models/scene_graph';
 import { toSource } from '../utilities/data/to_source';
 import { _ } from '../utilities/other/streamline';
 import { AbstractShape } from '../math/shapes/abstract_shape';
+import { CanvasEntityRenderModel } from '../rendering/model';
 
 export interface PaintOperation {
 	shape?: AbstractShape;
@@ -14,6 +15,8 @@ export interface PaintOperation {
 
 export interface CanvasEntityProps extends CommonEntityProps {
 	paintOperations: PaintOperation[] | ArrayDataSource<PaintOperation>;
+	onAttach?(node: SceneGraphNode<CanvasEntity>, renderModel: CanvasEntityRenderModel): void;
+	onDetach?(node: SceneGraphNode<CanvasEntity>, renderModel: CanvasEntityRenderModel): void;
 }
 
 export interface CanvasEntity extends CommonEntity {

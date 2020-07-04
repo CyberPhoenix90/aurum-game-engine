@@ -4,6 +4,7 @@ import { _ } from '../utilities/other/streamline';
 import { Data } from '../models/input_data';
 import { toSource } from '../utilities/data/to_source';
 import { SceneGraphNode } from '../models/scene_graph';
+import { LabelEntityRenderModel } from '../rendering/model';
 
 export interface LabelEntityProps extends CommonEntityProps {
 	text?: Data<string>;
@@ -21,6 +22,8 @@ export interface LabelEntityProps extends CommonEntityProps {
 	dropShadowColor?: Data<string>;
 	dropShadowFuzziness?: Data<number>;
 	textBaseline?: Data<'top' | 'bottom' | 'hanging' | 'alphabetic' | 'middle'>;
+	onAttach?(node: SceneGraphNode<LabelEntity>, renderModel: LabelEntityRenderModel): void;
+	onDetach?(node: SceneGraphNode<LabelEntity>, renderModel: LabelEntityRenderModel): void;
 }
 
 export interface LabelEntity extends CommonEntity {

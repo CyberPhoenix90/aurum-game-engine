@@ -2,10 +2,10 @@ import { ArrayDataSource, DataSource } from 'aurumjs';
 import { AbstractComponent } from '../entities/components/abstract_component';
 import { Size } from '../models/common';
 import { Data } from '../models/input_data';
-import { EntityRenderModel } from '../rendering/model';
 import { SceneGraphNode } from './scene_graph';
+import { EntityRenderModel } from '../rendering/model';
 
-export interface CommonEntityProps extends CommonEntityApiProps {
+export interface CommonEntityProps {
 	x?: Data<Size | 'center' | 'left' | 'right'>;
 	y?: Data<Size | 'center' | 'top' | 'bottom'>;
 	originX?: Data<number>;
@@ -32,6 +32,8 @@ export interface CommonEntityProps extends CommonEntityApiProps {
 	//class?: StyleClass<any>[];
 	name?: string;
 	//layout?: ReadonlyData<AbstractLayout>;
+	onAttach?(node: SceneGraphNode<CommonEntity>, renderModel: EntityRenderModel): void;
+	onDetach?(node: SceneGraphNode<CommonEntity>, renderModel: EntityRenderModel): void;
 }
 
 export interface CommonEntity {
@@ -61,11 +63,6 @@ export interface CommonEntity {
 	//class?: StyleClass<any>[];
 	name: string;
 	//layout?: ReadonlyData<AbstractLayout>;
-}
-
-export interface CommonEntityApiProps {
-	onAttach?(node: SceneGraphNode<CommonEntity>, renderModel: EntityRenderModel): void;
-	onDetach?(node: SceneGraphNode<CommonEntity>, renderModel: EntityRenderModel): void;
 }
 
 export enum RenderableType {

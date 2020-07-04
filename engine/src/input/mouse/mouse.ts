@@ -15,16 +15,19 @@ export class AurumMouse {
 	private cancellationToken: CancellationToken;
 	private mouseDown: DataSource<MouseEvent>;
 	private mouseUp: DataSource<MouseEvent>;
+	private mouseMove: DataSource<MouseEvent>;
 
 	constructor() {
 		this.cancellationToken = new CancellationToken();
 		this.heldDownButtons = {};
 		this.mouseDown = new DataSource();
 		this.mouseUp = new DataSource();
+		this.mouseMove = new DataSource();
 
 		this.cancellationToken.registerDomEvent(document, 'mousemove', (e: any) => {
 			this.lastPositionX = (e as MouseEvent).clientX;
 			this.lastPositionY = (e as MouseEvent).clientY;
+			this.mouseMove.update(e);
 		});
 		this.cancellationToken.registerDomEvent(document, 'mousedown', (e: any) => {
 			this.heldDownButtons[(e as MouseEvent).button] = true;
@@ -40,6 +43,14 @@ export class AurumMouse {
 		const result = new DataSource<MouseEvent>();
 
 		this.mouseDown.filter((e) => e.button === key).pipe(result);
+
+		return result;
+	}
+
+	public listenMouseMove(): DataSource<MouseEvent> {
+		const result = new DataSource<MouseEvent>();
+
+		this.mouseMove.pipe(result);
 
 		return result;
 	}
