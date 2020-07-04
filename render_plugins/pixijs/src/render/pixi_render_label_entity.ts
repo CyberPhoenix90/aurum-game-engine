@@ -71,7 +71,7 @@ export class RenderLabelEntity extends NoRenderEntity {
 		}, this.token);
 
 		model.strokeThickness.listenAndRepeat((v) => {
-			this.displayObject.style.strokeThickness = v === undefined ? 0 : v;
+			this.displayObject.style.strokeThickness = v === undefined ? 1 : v;
 		}, this.token);
 
 		function updateText(text: string): void {

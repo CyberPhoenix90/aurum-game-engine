@@ -54,7 +54,7 @@ Aurum.attach(
 					<Tower x={300} y={450}></Tower>
 					<Tower x={600} y={450}></Tower>
 					<Sprite tint="#ff0000" x={pos.pick('x')} y={pos.pick('y')} width={24} height={24} texture="assets/enemy.png"></Sprite>
-					<Label x={400} y={60} color="red">
+					<Label x={400} y={60} stroke="black" color="white">
 						Center Test A
 					</Label>
 					<Label x={400} y={80} color="red" originX={0.5}>
