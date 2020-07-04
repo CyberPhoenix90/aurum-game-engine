@@ -60,6 +60,8 @@ export function Label(props: LabelEntityProps, children: Renderable[], api: Auru
 	const fontWeight: DataSource<string> = toSource((props as LabelEntityProps).fontWeight, undefined);
 	const fontSize: DataSource<number> = toSource((props as LabelEntityProps).fontSize, 16);
 	const fontFamily: DataSource<string> = toSource((props as LabelEntityProps).fontFamily, 'arial');
+	const scaleX: DataSource<number> = toSource(props.scaleX, 1);
+	const scaleY: DataSource<number> = toSource(props.scaleY, 1);
 
 	return {
 		cancellationToken: api.cancellationToken,
@@ -76,6 +78,8 @@ export function Label(props: LabelEntityProps, children: Renderable[], api: Auru
 			minWidth: toSource(props.minWidth, undefined),
 			width: toSource(props.width, measureStringWidth(text.value, fontWeight.value, fontSize.value, fontFamily.value)),
 			maxWidth: toSource(props.maxWidth, undefined),
+			scaleX,
+			scaleY,
 			alpha: toSource(props.alpha, 1),
 			clip: toSource(props.clip, false),
 			marginTop: toSource(props.marginTop, 0),

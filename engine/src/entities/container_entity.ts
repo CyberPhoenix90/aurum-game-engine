@@ -26,6 +26,8 @@ export function Container(props: ContainerEntityProps, children: Renderable[], a
 			minWidth: toSource(props.minWidth, undefined),
 			width: toSource(props.width, undefined),
 			maxWidth: toSource(props.maxWidth, undefined),
+			scaleX: toSource(props.scaleX, 1),
+			scaleY: toSource(props.scaleY, 1),
 			alpha: toSource(props.alpha, 1),
 			clip: toSource(props.clip, false),
 			marginTop: toSource(props.marginTop, 0),

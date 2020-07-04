@@ -49,6 +49,8 @@ export function Sprite(props: SpriteEntityProps, children, api: AurumComponentAP
 			y: toSource(props.y, 0),
 			originX: toSource(props.originX, 0),
 			originY: toSource(props.originY, 0),
+			scaleX: toSource(props.scaleX, 1),
+			scaleY: toSource(props.scaleY, 1),
 			minHeight: toSource(props.minHeight, undefined),
 			height: toSource(props.height, undefined),
 			maxHeight: toSource(props.maxHeight, undefined),

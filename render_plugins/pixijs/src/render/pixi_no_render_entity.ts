@@ -58,17 +58,25 @@ export class NoRenderEntity {
 
 		model.sizeX.listenAndRepeat((v) => {
 			if (v !== undefined) {
-				this.displayObject.width = v;
-			} else {
-				model.sizeX.update(this.displayObject.width);
+				this.displayObject.width = v * model.scaleX.value;
 			}
 		}, this.token);
 
 		model.sizeY.listenAndRepeat((v) => {
 			if (v !== undefined) {
-				this.displayObject.height = v;
-			} else {
-				model.sizeY.update(this.displayObject.height);
+				this.displayObject.height = v * model.scaleY.value;
+			}
+		}, this.token);
+
+		model.scaleX.listenAndRepeat((v) => {
+			if (model.sizeX.value !== undefined) {
+				this.displayObject.width = model.sizeX.value * v;
+			}
+		}, this.token);
+
+		model.scaleY.listenAndRepeat((v) => {
+			if (model.sizeY.value !== undefined) {
+				this.displayObject.height = model.sizeY.value * v;
 			}
 		}, this.token);
 

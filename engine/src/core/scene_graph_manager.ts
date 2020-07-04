@@ -21,6 +21,8 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 				positionY: y,
 				sizeX: sizeX,
 				sizeY: sizeY,
+				scaleX: node.model.scaleX,
+				scaleY: node.model.scaleY,
 				renderableType: node.nodeType,
 				uid: node.uid,
 				visible: node.model.visible,
@@ -44,6 +46,8 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 				positionY: y,
 				sizeX: sizeX,
 				sizeY: sizeY,
+				scaleX: node.model.scaleX,
+				scaleY: node.model.scaleY,
 				renderableType: node.nodeType,
 				uid: node.uid,
 				visible: node.model.visible,
@@ -65,6 +69,8 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 				positionY: y,
 				sizeX: sizeX,
 				sizeY: sizeY,
+				scaleX: node.model.scaleX,
+				scaleY: node.model.scaleY,
 				visible: node.model.visible,
 				zIndex: node.model.zIndex,
 				blendMode: node.model.blendMode,
@@ -83,6 +89,8 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 				positionY: y,
 				sizeX: sizeX,
 				sizeY: sizeY,
+				scaleX: node.model.scaleX,
+				scaleY: node.model.scaleY,
 				visible: node.model.visible,
 				zIndex: node.model.zIndex,
 				blendMode: node.model.blendMode,
@@ -115,6 +123,8 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 				positionY: y,
 				sizeX: sizeX,
 				sizeY: sizeY,
+				scaleX: node.model.scaleX,
+				scaleY: node.model.scaleY,
 				visible: node.model.visible,
 				zIndex: node.model.zIndex,
 				blendMode: node.model.blendMode
@@ -135,10 +145,10 @@ function layoutAlgorithm(node: SceneGraphNode<CommonEntity>): LayoutData {
 
 	const result: LayoutData = {
 		x: node.model.x.map((v) => {
-			return parseInt(v.toString()) - node.model.originX.value * (sizeX.value ?? 0);
+			return parseInt(v.toString()) - node.model.originX.value * (sizeX.value ?? 0) * node.model.scaleX.value;
 		}),
 		y: node.model.y.map((v) => {
-			return parseInt(v.toString()) - node.model.originY.value * (sizeY.value ?? 0);
+			return parseInt(v.toString()) - node.model.originY.value * (sizeY.value ?? 0) * node.model.scaleY.value;
 		}),
 		sizeX,
 		sizeY

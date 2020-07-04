@@ -26,6 +26,8 @@ export interface CommonEntityProps {
 	maxWidth?: Data<Size | 'content' | 'inherit' | 'remainder'>;
 	maxHeight?: Data<Size | 'content' | 'inherit' | 'remainder'>;
 	height?: Data<Size | 'content' | 'inherit' | 'remainder'>;
+	scaleX?: Data<number>;
+	scaleY?: Data<number>;
 	visible?: Data<boolean>;
 	alpha?: Data<number>;
 	components?: ArrayDataSource<AbstractComponent> | AbstractComponent[];
@@ -49,6 +51,8 @@ export interface CommonEntity {
 	ignoreLayout: DataSource<boolean>;
 	spreadLayout: DataSource<boolean>;
 	zIndex: DataSource<number>;
+	scaleX: DataSource<number>;
+	scaleY: DataSource<number>;
 	//fragmentShaders?: FragmentShader[];
 	blendMode: DataSource<BlendModes>;
 	minWidth: DataSource<Size | 'content' | 'inherit' | 'remainder'>;

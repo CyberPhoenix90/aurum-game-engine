@@ -46,7 +46,7 @@ Aurum.attach(
 				></Canvas>
 				<Container>
 					{lives.map((v) =>
-						_.for(v, (i) => <Sprite tint="#ff0000" x={600 + 40 * i} y={10} width={32} height={32} texture="assets/enemy.png"></Sprite>)
+						_.for(v, (i) => <Sprite tint="#ff0000" x={600 + 40 * i} y={10} scaleX={0.15} scaleY={0.15} texture="assets/enemy.png"></Sprite>)
 					)}
 					{enemies}
 					{bullets}
@@ -57,7 +57,7 @@ Aurum.attach(
 					<Label x={400} y={60} stroke="black" color="white">
 						Center Test A
 					</Label>
-					<Label x={400} y={80} color="red" originX={0.5}>
+					<Label x={400} y={80} color="red" originX={0.5} scaleX={2} scaleY={2}>
 						Center Test B
 					</Label>
 					<Label x={400} y={100} color="red" originX={1}>

@@ -61,6 +61,8 @@ export function Camera(props: CameraProps, children: Renderable[], api: AurumCom
 			minWidth: toSource(props.minWidth, 0),
 			width: toSource(props.screenWidth, 0),
 			maxWidth: toSource(props.maxWidth, 0),
+			scaleX: toSource(props.scaleX, 1),
+			scaleY: toSource(props.scaleY, 1),
 			alpha: toSource(props.alpha, 1),
 			clip: toSource(props.clip, false),
 			marginTop: toSource(props.marginTop, 0),
