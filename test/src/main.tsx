@@ -45,9 +45,9 @@ Aurum.attach(
 					]}
 				></Canvas>
 				<Container>
-					{lives.map((v) =>
-						_.for(v, (i) => <Sprite tint="#ff0000" x={600 + 40 * i} y={10} scaleX={0.15} scaleY={0.15} texture="assets/enemy.png"></Sprite>)
-					)}
+					<Label x={600} y={10} color="red">
+						{lives}
+					</Label>
 					{enemies}
 					{bullets}
 					<Tower x={200} y={250}></Tower>
@@ -130,7 +130,10 @@ Aurum.attach(
 	document.body
 );
 
-new AurumKeyboard().listenKey(KeyboardButtons.KEY_A).listen((v) => {
+const key = new AurumKeyboard();
+key.listenKey(KeyboardButtons.KEY_1).listen((v) => v && lives.update(lives.value - 1));
+key.listenKey(KeyboardButtons.KEY_2).listen((v) => v && lives.update(lives.value + 1));
+key.listenKey(KeyboardButtons.KEY_A).listen((v) => {
 	if (v) {
 		setInterval(() => {
 			const e = (
@@ -150,6 +153,6 @@ new AurumKeyboard().listenKey(KeyboardButtons.KEY_A).listen((v) => {
 			);
 
 			enemies.push(e);
-		}, 33);
+		}, 330);
 	}
 });

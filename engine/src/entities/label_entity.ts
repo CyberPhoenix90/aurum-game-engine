@@ -7,7 +7,6 @@ import { SceneGraphNode } from '../models/scene_graph';
 import { LabelEntityRenderModel } from '../rendering/model';
 
 export interface LabelEntityProps extends CommonEntityProps {
-	text?: Data<string>;
 	renderCharCount?: Data<number>;
 	color?: Data<string>;
 	stroke?: Data<string>;
@@ -27,8 +26,8 @@ export interface LabelEntityProps extends CommonEntityProps {
 }
 
 export interface LabelEntity extends CommonEntity {
-	text: DataSource<string>;
 	renderCharCount: DataSource<number>;
+	text?: DataSource<string>;
 	color: DataSource<string>;
 	stroke: DataSource<string>;
 	strokeThickness: DataSource<number>;
@@ -76,7 +75,7 @@ export function Label(props: LabelEntityProps, children: Renderable[], api: Auru
 			height: toSource(props.height, fontSize.value),
 			maxHeight: toSource(props.maxHeight, undefined),
 			minWidth: toSource(props.minWidth, undefined),
-			width: toSource(props.width, measureStringWidth(text.value, fontWeight.value, fontSize.value, fontFamily.value)),
+			width: toSource(props.width, undefined),
 			maxWidth: toSource(props.maxWidth, undefined),
 			scaleX,
 			scaleY,
@@ -125,7 +124,7 @@ function updateText(text: DataSource<string>, content: Array<string | DataSource
 			if (typeof c === 'string' || typeof c === 'number' || typeof c === 'bigint' || typeof c === 'boolean') {
 				return `${p}${c}`;
 			} else {
-				if (c.value) {
+				if (c.value !== undefined) {
 					return `${p}${c.value}`;
 				} else {
 					return p;
@@ -136,7 +135,7 @@ function updateText(text: DataSource<string>, content: Array<string | DataSource
 }
 const canvas: HTMLCanvasElement = typeof document === 'undefined' ? undefined : document.createElement('canvas');
 
-function measureStringWidth(text: string, fontWeight: string, fontSize: number, fontFamily: string): number {
+export function measureStringWidth(text: string, fontWeight: string, fontSize: number, fontFamily: string): number {
 	if (text.trim().length === 0) {
 		return 0;
 	}

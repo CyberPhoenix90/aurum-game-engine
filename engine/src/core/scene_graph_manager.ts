@@ -5,6 +5,7 @@ import { CommonEntity, RenderableType } from '../models/entities';
 import { SceneGraphNode } from '../models/scene_graph';
 import { CameraEntityRenderModel, EntityRenderModel, LabelEntityRenderModel, SpriteEntityRenderModel, CanvasEntityRenderModel } from '../rendering/model';
 import { CanvasEntity } from '../entities/canvas_entity';
+import { measureStringWidth } from '../entities/label_entity';
 
 export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: SceneGraphNode<any>): EntityRenderModel {
 	const { x, y, sizeX, sizeY } = layoutAlgorithm(node);
@@ -90,7 +91,12 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 				uid: node.uid,
 				positionX: x,
 				positionY: y,
-				sizeX: sizeX,
+				sizeX: sizeX.aggregateFour(
+					(node.model as LabelEntity).text,
+					(node.model as LabelEntity).fontSize,
+					(node.model as LabelEntity).fontFamily,
+					(size, text, fs, ff) => (size === undefined ? measureStringWidth(text, (node.model as LabelEntity).fontWeight.value, fs, ff) : size)
+				),
 				sizeY: sizeY,
 				scaleX: node.model.scaleX,
 				scaleY: node.model.scaleY,
