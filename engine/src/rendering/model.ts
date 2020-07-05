@@ -1,5 +1,5 @@
 import { CancellationToken, ReadOnlyDataSource, ArrayDataSource, DataSource } from 'aurumjs';
-import { RenderableType, BlendModes } from '../models/entities';
+import { RenderableType, BlendModes, Shader } from '../models/entities';
 import { PaintOperation } from '../entities/canvas_entity';
 
 export interface EntityRenderModel {
@@ -19,6 +19,7 @@ export interface EntityRenderModel {
 	visible: ReadOnlyDataSource<boolean>;
 	alpha: ReadOnlyDataSource<number>;
 	blendMode?: ReadOnlyDataSource<BlendModes>;
+	shader: ArrayDataSource<Shader>;
 }
 
 export interface SpriteEntityRenderModel extends EntityRenderModel {

@@ -1,6 +1,6 @@
-import { BlendModes, EntityRenderModel } from 'aurum-game-engine';
+import { BlendModes, EntityRenderModel, Shader } from 'aurum-game-engine';
 import { CancellationToken } from 'aurumjs';
-import { Container, filters, BLEND_MODES } from 'pixi.js';
+import { Container, filters, BLEND_MODES, Filter } from 'pixi.js';
 
 export class NoRenderEntity {
 	public token: CancellationToken;
@@ -37,12 +37,17 @@ export class NoRenderEntity {
 			this.displayObject.visible = v;
 		}, this.token);
 
-		// if ('fragmentShaders' in style) {
-		// 	this.setShaders(style.fragmentShaders);
-		// 	if (this.style.blendMode) {
-		// 		this.setBlendMode(this.style);
-		// 	}
-		// }
+		model.shader.listenAndRepeat((change) => {
+			this.displayObject.filters = [];
+			switch (change.operation) {
+				case 'add':
+					this.displayObject.filters.push(...change.items.map((s) => this.createShader(s)));
+					break;
+				case 'remove':
+					throw new Error('not implemented');
+					break;
+			}
+		});
 
 		model.positionX.listenAndRepeat((v) => {
 			if (v !== undefined) {
@@ -140,17 +145,15 @@ export class NoRenderEntity {
 		}
 	}
 
-	// protected setShaders(shaders: FragmentShader[]) {
-	// 	this.displayObject.filters = shaders.map((s) => this.createShader(s));
-	// }
+	protected createShader(shaderSource: Shader): Filter {
+		const shader = new Filter(shaderSource.vertex, shaderSource.fragment);
+		if (shaderSource.uniforms)
+			for (const key in shaderSource.uniforms) {
+				shader.uniforms[key] = shaderSource.uniforms[key];
+			}
 
-	// protected createShader(shader: FragmentShader): Filter<ShaderUniforms> {
-	// 	if (shader instanceof PIXI.Filter) {
-	// 		return shader;
-	// 	}
-
-	// 	return new Filter('', shader.source, shader.uniforms as any);
-	// }
+		return shader;
+	}
 
 	protected createDisplayObject(model: EntityRenderModel) {
 		return new Container();

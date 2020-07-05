@@ -74,6 +74,7 @@ export function Camera(props: CameraProps, children: Renderable[], api: AurumCom
 					? props.components
 					: new ArrayDataSource(props.components)
 				: new ArrayDataSource([]),
+			shaders: props.shaders ? (props.shaders instanceof ArrayDataSource ? props.shaders : new ArrayDataSource(props.shaders)) : new ArrayDataSource([]),
 			backgroundColor: toSource(props.backgroundColor, 'black'),
 			ignoreLayout: toSource(props.ignoreLayout, false),
 			spreadLayout: toSource(props.spreadLayout, false),

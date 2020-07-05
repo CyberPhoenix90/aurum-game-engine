@@ -91,6 +91,7 @@ export function Label(props: LabelEntityProps, children: Renderable[], api: Auru
 					? props.components
 					: new ArrayDataSource(props.components)
 				: new ArrayDataSource([]),
+			shaders: props.shaders ? (props.shaders instanceof ArrayDataSource ? props.shaders : new ArrayDataSource(props.shaders)) : new ArrayDataSource([]),
 			ignoreLayout: toSource(props.ignoreLayout, false),
 			spreadLayout: toSource(props.spreadLayout, false),
 			name: props.name,

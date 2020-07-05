@@ -70,6 +70,7 @@ export function Sprite(props: SpriteEntityProps, children, api: AurumComponentAP
 					? props.components
 					: new ArrayDataSource(props.components)
 				: new ArrayDataSource([]),
+			shaders: props.shaders ? (props.shaders instanceof ArrayDataSource ? props.shaders : new ArrayDataSource(props.shaders)) : new ArrayDataSource([]),
 			name: props.name,
 			visible: toSource(props.visible, true),
 			zIndex: toSource(props.zIndex, undefined),

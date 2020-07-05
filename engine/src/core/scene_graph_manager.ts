@@ -33,7 +33,8 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 				drawOffsetX: (node.model as SpriteEntity).drawOffsetX,
 				drawOffsetY: (node.model as SpriteEntity).drawOffsetY,
 				drawDistanceX: (node.model as SpriteEntity).drawDistanceX,
-				drawDistanceY: (node.model as SpriteEntity).drawDistanceY
+				drawDistanceY: (node.model as SpriteEntity).drawDistanceY,
+				shader: node.model.shaders
 			} as SpriteEntityRenderModel;
 		case RenderableType.CANVAS:
 			return {
@@ -53,7 +54,8 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 				visible: node.model.visible,
 				zIndex: node.model.zIndex,
 				blendMode: node.model.blendMode,
-				painerOperations: (node.model as CanvasEntity).paintOperations
+				painerOperations: (node.model as CanvasEntity).paintOperations,
+				shader: node.model.shaders
 			} as CanvasEntityRenderModel;
 		case RenderableType.CAMERA:
 			return {
@@ -74,7 +76,8 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 				visible: node.model.visible,
 				zIndex: node.model.zIndex,
 				blendMode: node.model.blendMode,
-				backgroundColor: (node.model as CameraEntity).backgroundColor
+				backgroundColor: (node.model as CameraEntity).backgroundColor,
+				shader: node.model.shaders
 			} as CameraEntityRenderModel;
 		case RenderableType.LABEL:
 			return {
@@ -108,7 +111,8 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 				dropShadowDistance: (node.model as LabelEntity).dropShadowDistance,
 				dropShadowFuzziness: (node.model as LabelEntity).dropShadowFuzziness,
 				textBaseline: (node.model as LabelEntity).textBaseline,
-				dropShadow: (node.model as LabelEntity).dropShadow
+				dropShadow: (node.model as LabelEntity).dropShadow,
+				shader: node.model.shaders
 			} as LabelEntityRenderModel;
 		case RenderableType.NO_RENDER:
 			return {
@@ -127,7 +131,8 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 				scaleY: node.model.scaleY,
 				visible: node.model.visible,
 				zIndex: node.model.zIndex,
-				blendMode: node.model.blendMode
+				blendMode: node.model.blendMode,
+				shader: node.model.shaders
 			} as EntityRenderModel;
 	}
 }

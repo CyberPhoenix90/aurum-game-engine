@@ -1,9 +1,17 @@
 import { ArrayDataSource, DataSource } from 'aurumjs';
 import { AbstractComponent } from '../entities/components/abstract_component';
-import { Size } from '../models/common';
+import { Size, MapLike } from '../models/common';
 import { Data } from '../models/input_data';
 import { SceneGraphNode } from './scene_graph';
 import { EntityRenderModel } from '../rendering/model';
+
+export interface Shader {
+	vertex?: string;
+	fragment?: string;
+	uniforms?: ShaderUniforms;
+}
+
+export type ShaderUniforms = MapLike<boolean | number | number[]>;
 
 export interface CommonEntityProps {
 	x?: Data<Size | 'center' | 'left' | 'right'>;
@@ -14,7 +22,7 @@ export interface CommonEntityProps {
 	ignoreLayout?: Data<boolean>;
 	spreadLayout?: Data<boolean>;
 	zIndex?: Data<number>;
-	//fragmentShaders?: FragmentShader[];
+	shaders?: Shader[] | ArrayDataSource<Shader>;
 	blendMode?: Data<BlendModes>;
 	marginTop?: Data<number>;
 	marginRight?: Data<number>;
@@ -53,7 +61,7 @@ export interface CommonEntity {
 	zIndex: DataSource<number>;
 	scaleX: DataSource<number>;
 	scaleY: DataSource<number>;
-	//fragmentShaders?: FragmentShader[];
+	shaders: ArrayDataSource<Shader>;
 	blendMode: DataSource<BlendModes>;
 	minWidth: DataSource<Size | 'content' | 'inherit' | 'remainder'>;
 	minHeight: DataSource<Size | 'content' | 'inherit' | 'remainder'>;
