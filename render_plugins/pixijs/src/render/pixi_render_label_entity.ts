@@ -10,7 +10,9 @@ export class RenderLabelEntity extends NoRenderEntity {
 	}
 
 	protected createDisplayObject(model: LabelEntityRenderModel) {
-		return new Text('');
+		const result = new Text('');
+		result.resolution = 2;
+		return result;
 	}
 
 	public bind(model: LabelEntityRenderModel) {
