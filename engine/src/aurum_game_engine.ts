@@ -63,3 +63,4 @@ export * from './game_features/drawing/tools/line';
 export * from './game_features/drawing/tools/pencil';
 export * from './game_features/drawing/tools/rectangle';
 export * from './game_features/drawing/tools/solid_rectangle';
+export * from './game_features/floating_messages/floating_message_service';

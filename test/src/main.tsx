@@ -12,16 +12,18 @@ import {
 	_,
 	Canvas,
 	PointLike,
-	Label
+	Label,
+	floatingMessageService
 } from 'aurum-game-engine';
 import { PixiJsRenderAdapter } from 'aurum-pixijs-renderer';
-import { ArrayDataSource, Aurum, DataSource } from 'aurumjs';
+import { ArrayDataSource, Aurum, DataSource, Renderable } from 'aurumjs';
 import { Enemy } from './enemy/enemy';
 import { bullets, enemiesData, lives } from './session';
 import { Tower } from './tower/tower';
 
 const pos = new DataSource<PointLike>();
 const enemies = new ArrayDataSource([]);
+const floatingMessageContainer = new ArrayDataSource<Renderable>();
 const enemyPath = new Polygon({ x: 0, y: 0 }, [
 	new Vector2D(40, -70),
 	new Vector2D(40, 550),
@@ -112,6 +114,7 @@ Aurum.attach(
 					<Label x={400} y={100} color="red" originX={1}>
 						Center Test C
 					</Label>
+					{floatingMessageContainer}
 				</Container>
 			</Container>
 			<Camera
@@ -131,6 +134,26 @@ Aurum.attach(
 );
 
 const key = new AurumKeyboard();
+key.listenKey(KeyboardButtons.KEY_3).listen(
+	(v) =>
+		v &&
+		floatingMessageService.displayMessage('hello floating messages', {
+			duration: 1500,
+			fadeIn: 700,
+			fadeOut: 700,
+			output: floatingMessageContainer,
+			movement: {
+				x: 0,
+				y: -90
+			},
+			position: { x: 50, y: 350 },
+			baseStyle: {
+				color: 'red',
+				fontSize: 60,
+				fontFamily: 'Comic Sans MS'
+			}
+		})
+);
 key.listenKey(KeyboardButtons.KEY_1).listen((v) => v && lives.update(lives.value - 1));
 key.listenKey(KeyboardButtons.KEY_2).listen((v) => v && lives.update(lives.value + 1));
 key.listenKey(KeyboardButtons.KEY_A).listen((v) => {

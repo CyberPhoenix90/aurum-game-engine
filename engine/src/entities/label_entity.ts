@@ -6,7 +6,12 @@ import { toSource } from '../utilities/data/to_source';
 import { SceneGraphNode } from '../models/scene_graph';
 import { LabelEntityRenderModel } from '../rendering/model';
 
-export interface LabelEntityProps extends CommonEntityProps {
+export interface LabelEntityProps extends CommonEntityProps, LabelEntityStyle {
+	onAttach?(node: SceneGraphNode<LabelEntity>, renderModel: LabelEntityRenderModel): void;
+	onDetach?(node: SceneGraphNode<LabelEntity>, renderModel: LabelEntityRenderModel): void;
+}
+
+export interface LabelEntityStyle {
 	renderCharCount?: Data<number>;
 	color?: Data<string>;
 	stroke?: Data<string>;
@@ -21,8 +26,6 @@ export interface LabelEntityProps extends CommonEntityProps {
 	dropShadowColor?: Data<string>;
 	dropShadowFuzziness?: Data<number>;
 	textBaseline?: Data<'top' | 'bottom' | 'hanging' | 'alphabetic' | 'middle'>;
-	onAttach?(node: SceneGraphNode<LabelEntity>, renderModel: LabelEntityRenderModel): void;
-	onDetach?(node: SceneGraphNode<LabelEntity>, renderModel: LabelEntityRenderModel): void;
 }
 
 export interface LabelEntity extends CommonEntity {
