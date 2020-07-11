@@ -4,7 +4,7 @@ import { RenderableType } from '../models/entities';
 import { synchronizeWithRenderPlugin } from './scene_graph_manager';
 import { AbstractRenderPlugin } from '../rendering/abstract_render_plugin';
 import { _ } from '../utilities/other/streamline';
-import { EventEmitter } from 'aurumjs/dist/utilities/event_emitter';
+import { EventEmitter } from 'aurumjs';
 
 export interface StageProps {
 	renderPlugin: AbstractRenderPlugin;
