@@ -4,6 +4,7 @@ import { PointLike } from '../../models/point';
 import { Data } from '../../models/input_data';
 import { animate } from '../../graphics/animation/animate';
 import { Vector2D } from '../../math/vectors/vector2d';
+import { Shader } from '../../models/entities';
 
 export interface IFloatingMessageOptions {
 	position: PointLike;
@@ -12,6 +13,7 @@ export interface IFloatingMessageOptions {
 	duration: number;
 	movement?: PointLike;
 	output: ArrayDataSource<Renderable>;
+	shaders?: Shader[];
 	baseStyle?: LabelEntityStyle;
 }
 
@@ -21,7 +23,7 @@ export class FloatingMessageService {
 		const x = new DataSource(floatingMessageOptions.position.x);
 		const y = new DataSource(floatingMessageOptions.position.y);
 		const msg = (
-			<Label x={x} y={y} {...floatingMessageOptions.baseStyle} alpha={alpha}>
+			<Label shaders={floatingMessageOptions.shaders} x={x} y={y} {...floatingMessageOptions.baseStyle} alpha={alpha}>
 				{message}
 			</Label>
 		);
