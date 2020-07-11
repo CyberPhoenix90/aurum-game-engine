@@ -91,13 +91,8 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 				uid: node.uid,
 				positionX: x,
 				positionY: y,
-				sizeX: sizeX.aggregateFour(
-					(node.model as LabelEntity).text,
-					(node.model as LabelEntity).fontSize,
-					(node.model as LabelEntity).fontFamily,
-					(size, text, fs, ff) => (size === undefined ? measureStringWidth(text, (node.model as LabelEntity).fontWeight.value, fs, ff) : size)
-				),
-				sizeY: sizeY,
+				sizeX,
+				sizeY,
 				scaleX: node.model.scaleX,
 				scaleY: node.model.scaleY,
 				visible: node.model.visible,
@@ -151,8 +146,22 @@ interface LayoutData {
 }
 
 function layoutAlgorithm(node: SceneGraphNode<CommonEntity>): LayoutData {
-	const sizeX = node.model.width.map((v) => (v === undefined ? undefined : parseInt(v.toString())));
-	const sizeY = node.model.height.map((v) => (v === undefined ? undefined : parseInt(v.toString())));
+	let sizeX: DataSource<number>;
+	let sizeY: DataSource<number>;
+
+	if (node.nodeType === RenderableType.LABEL) {
+		sizeX = node.model.width.aggregateFour(
+			(node.model as LabelEntity).text,
+			(node.model as LabelEntity).fontSize,
+			(node.model as LabelEntity).fontFamily,
+			(size, text, fs, ff) =>
+				size === undefined ? measureStringWidth(text, (node.model as LabelEntity).fontWeight.value, fs, ff) : parseInt(size.toString())
+		);
+		sizeY = node.model.height.map((v) => (v === undefined ? undefined : parseInt(v.toString())));
+	} else {
+		sizeX = node.model.width.map((v) => (v === undefined ? undefined : parseInt(v.toString())));
+		sizeY = node.model.height.map((v) => (v === undefined ? undefined : parseInt(v.toString())));
+	}
 
 	const result: LayoutData = {
 		x: node.model.x.map((v) => {
