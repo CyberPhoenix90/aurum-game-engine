@@ -1,6 +1,7 @@
 import { SquaredArray } from '../../utilities/data_structures/squared_array';
 import { PointLike } from '../../models/point';
 import { Projector } from '../../models/common';
+import { ArrayDataSource } from 'aurumjs';
 
 export interface BuildingModel {
 	gridPosition: PointLike;
@@ -8,13 +9,13 @@ export interface BuildingModel {
 }
 
 export class ConstructionGrid<T extends BuildingModel> {
-	public readonly buildings: T[];
+	public readonly buildings: ArrayDataSource<T>;
 	private data: SquaredArray<T>;
 	private projector: Projector;
 	private validPlacementDelegate: (point: PointLike) => boolean;
 
 	constructor(gridArea: SquaredArray<T>, validPlacementDelegate?: (point: PointLike) => boolean, coordinatesProjector?: Projector) {
-		this.buildings = [];
+		this.buildings = new ArrayDataSource([]);
 		this.data = gridArea;
 		this.projector = coordinatesProjector ?? ((p: PointLike) => p);
 		this.validPlacementDelegate = validPlacementDelegate ?? (() => true);
@@ -65,7 +66,7 @@ export class ConstructionGrid<T extends BuildingModel> {
 
 	public removeBuilding(building: T): void {
 		const p = building.gridPosition;
-		this.buildings.splice(this.buildings.indexOf(building), 1);
+		this.buildings.remove(building);
 		for (let x = 0; x < building.size.x; x++) {
 			for (let y = 0; y < building.size.y; y++) {
 				this.data.set(p.x + x, p.y + y, undefined);
