@@ -1,4 +1,4 @@
-import { ArrayDataSource, CancellationToken, DataSource, Renderable } from 'aurumjs';
+import { ArrayDataSource, CancellationToken, DataSource, Renderable, createRenderSession, render } from 'aurumjs';
 import { AbstractRenderPlugin, LabelEntity, SpriteEntity } from '../aurum_game_engine';
 import { CameraEntity } from '../entities/camera';
 import { CommonEntity, RenderableType } from '../models/entities';
@@ -258,13 +258,16 @@ function handleDataSource(
 			cleanUp.cancel();
 		}
 		cleanUp = new CancellationToken();
-		const subNodes = prerender(v);
+		const rs = createRenderSession();
+		const subNodes = render(v, rs);
 		for (const n of subNodes) {
 			if (n.cancellationToken) {
 				cleanUp.chain(n.cancellationToken);
 			}
 		}
 		synchronizeWithRenderPlugin(renderPlugin, stageId, subNodes, parent, prerender);
+		rs.attachCalls.forEach((cb) => cb());
+		cleanUp.chain(rs.sessionToken);
 	});
 }
 
@@ -281,9 +284,12 @@ function handleArraySource(
 		switch (change.operation) {
 			case 'add':
 				for (const item of change.items) {
-					const node = (prerender(item) as any) as SceneGraphNode<any>;
+					const rs = createRenderSession();
+					const node = (render(item, rs) as any) as SceneGraphNode<any>;
 					dynamicRenderKeys.set(item, node.cancellationToken);
 					synchronizeWithRenderPlugin(renderPlugin, stageId, [node], parent, prerender);
+					rs.attachCalls.forEach((cb) => cb());
+					node.cancellationToken.chain(rs.sessionToken);
 				}
 				break;
 			case 'remove':

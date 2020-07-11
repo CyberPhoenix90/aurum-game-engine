@@ -5,12 +5,13 @@ import { toSource } from '../utilities/data/to_source';
 import { _ } from '../utilities/other/streamline';
 import { AbstractShape } from '../math/shapes/abstract_shape';
 import { CanvasEntityRenderModel } from '../rendering/model';
+import { Data } from '../models/input_data';
 
 export interface PaintOperation {
 	shape?: AbstractShape;
-	strokeStyle?: string;
-	fillStyle?: string;
-	strokeThickness?: number;
+	strokeStyle?: Data<string>;
+	fillStyle?: Data<string>;
+	strokeThickness?: Data<number>;
 }
 
 export interface CanvasEntityProps extends CommonEntityProps {

@@ -43,9 +43,9 @@ export class ConstructionGrid<T extends BuildingModel> {
 		return this.data.get(point.x, point.y);
 	}
 
-	public canPlace(point: PointLike, building: T): boolean {
-		if (!building.size || !(building.size.x >= 0) || !(building.size.y >= 0)) {
-			throw new Error('Invalid building state');
+	public canPlace(point: PointLike, size: PointLike): boolean {
+		if (!size || !(size.x >= 0) || !(size.y >= 0)) {
+			throw new Error('Invalid size');
 		}
 
 		if (!this.validPlacementDelegate(point)) {
@@ -53,8 +53,8 @@ export class ConstructionGrid<T extends BuildingModel> {
 		}
 
 		const p = this.projector(point);
-		for (let x = 0; x < building.size.x; x++) {
-			for (let y = 0; y < building.size.y; y++) {
+		for (let x = 0; x < size.x; x++) {
+			for (let y = 0; y < size.y; y++) {
 				if (this.data.get(p.x + x, p.y + y) !== undefined) {
 					return false;
 				}
@@ -84,7 +84,7 @@ export class ConstructionGrid<T extends BuildingModel> {
 	}
 
 	public placeBuilding(point: PointLike, building: T): T {
-		if (!this.canPlace(point, building)) {
+		if (!this.canPlace(point, building.size)) {
 			throw new Error('Cannot place building here');
 		} else {
 			const p = this.projector(point);
