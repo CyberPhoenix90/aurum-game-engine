@@ -2,6 +2,8 @@ import { AbstractRenderPlugin, EntityRenderModel } from 'aurum-game-engine';
 import { NoRenderEntity } from './render/pixi_no_render_entity';
 import { RenderStage } from './render/pixi_render_stage';
 
+export { enableTilemap } from './render/pixi_render_map_entity';
+
 export class PixiJsRenderAdapter extends AbstractRenderPlugin {
 	private stages: { [id: number]: RenderStage };
 	private entityDatabase: { [id: string]: NoRenderEntity } = {};

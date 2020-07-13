@@ -6,6 +6,7 @@ import { SceneGraphNode } from '../models/scene_graph';
 import { CameraEntityRenderModel, EntityRenderModel, LabelEntityRenderModel, SpriteEntityRenderModel, CanvasEntityRenderModel } from '../rendering/model';
 import { CanvasEntity } from '../entities/canvas_entity';
 import { measureStringWidth } from '../entities/label_entity';
+import { TiledMapRenderModel, TiledMapEntity } from '../game_features/tile_maps/tiled/tiled_map_entity';
 
 export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: SceneGraphNode<any>): EntityRenderModel {
 	const { x, y, sizeX, sizeY } = layoutAlgorithm(node);
@@ -135,6 +136,29 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 				blendMode: node.model.blendMode,
 				shader: node.model.shaders
 			} as EntityRenderModel;
+		case RenderableType.TILE_MAP:
+			return {
+				layers: (node.model as TiledMapEntity).layers,
+				mapData: (node.model as TiledMapEntity).mapData,
+				tilesets: (node.model as TiledMapEntity).tilesets,
+				alpha: node.model.alpha,
+				cancellationToken: node.cancellationToken,
+				clip: node.model.clip,
+				name: node.model.name,
+				parentUid: parent?.uid,
+				renderableType: node.nodeType,
+				uid: node.uid,
+				positionX: x,
+				positionY: y,
+				sizeX: sizeX,
+				sizeY: sizeY,
+				scaleX: node.model.scaleX,
+				scaleY: node.model.scaleY,
+				visible: node.model.visible,
+				zIndex: node.model.zIndex,
+				blendMode: node.model.blendMode,
+				shader: node.model.shaders
+			} as TiledMapRenderModel;
 	}
 }
 

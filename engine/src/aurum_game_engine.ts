@@ -33,6 +33,7 @@ export * from './models/scene_graph';
 
 export * from './utilities/other/save_state_helper';
 export * from './utilities/other/streamline';
+export * from './utilities/data/to_source';
 export * from './utilities/data_structures/squared_array';
 export * from './utilities/data_structures/virtual_union_array';
 
@@ -64,3 +65,7 @@ export * from './game_features/drawing/tools/pencil';
 export * from './game_features/drawing/tools/rectangle';
 export * from './game_features/drawing/tools/solid_rectangle';
 export * from './game_features/floating_messages/floating_message_service';
+export * from './game_features/tile_maps/tiled/tiled_layer';
+export * from './game_features/tile_maps/tiled/tiled_map_format';
+export * from './game_features/tile_maps/tiled/tileset';
+export * from './game_features/tile_maps/tiled/tiled_map_entity';

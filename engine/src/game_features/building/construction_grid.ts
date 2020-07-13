@@ -43,6 +43,10 @@ export class ConstructionGrid<T extends BuildingModel> {
 		return this.data.get(point.x, point.y);
 	}
 
+	public isInBounds(point: PointLike): boolean {
+		return point.x >= 0 && point.x < this.data.width && point.y >= 0;
+	}
+
 	public canPlace(point: PointLike, size: PointLike): boolean {
 		if (!size || !(size.x >= 0) || !(size.y >= 0)) {
 			throw new Error('Invalid size');
@@ -55,6 +59,9 @@ export class ConstructionGrid<T extends BuildingModel> {
 		const p = this.projector(point);
 		for (let x = 0; x < size.x; x++) {
 			for (let y = 0; y < size.y; y++) {
+				if (!this.isInBounds({ x: p.x + x, y: p.y + y })) {
+					return false;
+				}
 				if (this.data.get(p.x + x, p.y + y) !== undefined) {
 					return false;
 				}
