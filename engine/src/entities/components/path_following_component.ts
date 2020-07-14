@@ -67,9 +67,9 @@ export class PathFollowingComponent extends AbstractComponent {
 
 	public onAttach(entity: SceneGraphNode<CommonEntity>, renderData: EntityRenderModel) {
 		this.renderData = renderData;
-		onBeforeRender.subscribe(() => {
+		onBeforeRender.subscribe((delta) => {
 			if (this.currentTarget && !this.pause) {
-				this.moveTowardsTarget(entity, this.currentTarget);
+				this.moveTowardsTarget(entity, this.currentTarget, delta);
 			}
 		}, entity.cancellationToken);
 	}
@@ -101,7 +101,7 @@ export class PathFollowingComponent extends AbstractComponent {
 		this.currentTarget = undefined;
 	}
 
-	private moveTowardsTarget(entity: SceneGraphNode<CommonEntity>, target: PointLike) {
+	private moveTowardsTarget(entity: SceneGraphNode<CommonEntity>, target: PointLike, delta: number) {
 		if (this.pause) {
 			return;
 		}
@@ -117,9 +117,9 @@ export class PathFollowingComponent extends AbstractComponent {
 		const positionY: DataSource<number> = entity.model.y as any;
 
 		if (this.config.euclideanMovement) {
-			this.approachEuclidean(target, positionX, positionY, 16);
+			this.approachEuclidean(target, positionX, positionY, delta);
 		} else {
-			this.approachManhattan(target, positionX, positionY, 16);
+			this.approachManhattan(target, positionX, positionY, delta);
 		}
 
 		if (target.x === positionX.value && target.y === positionY.value) {
