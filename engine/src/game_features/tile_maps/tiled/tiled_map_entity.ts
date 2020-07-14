@@ -21,6 +21,7 @@ import { Polygon } from '../../../math/shapes/polygon';
 import { Circle } from '../../../math/shapes/circle';
 import { Rectangle } from '../../../math/shapes/rectangle';
 import { Vector2D } from '../../../math/vectors/vector2d';
+import { getComponentByTypeFactory } from '../../../entities/shared';
 
 export interface EntityFactory {
 	[type: string]: (position: PointLike, props: TiledMapCustomProperties[], shape: AbstractShape) => Renderable;
@@ -73,11 +74,18 @@ export function TiledMap(props: TiledMapProps, children: Renderable[], api: Auru
 		layers.push(layer);
 	});
 
+	const components = props.components
+		? props.components instanceof ArrayDataSource
+			? props.components
+			: new ArrayDataSource(props.components)
+		: new ArrayDataSource([]);
+
 	const result: SceneGraphNode<TiledMapEntity> = {
 		cancellationToken: api.cancellationToken,
 		onAttach: props.onAttach,
 		onDetach: props.onDetach,
 		model: {
+			getComponentByType: getComponentByTypeFactory(components),
 			getTileMetaDataByGid(tileGid: number): TiledMapTileModel {
 				if (tileGid === 0) {
 					return undefined;
@@ -128,11 +136,7 @@ export function TiledMap(props: TiledMapProps, children: Renderable[], api: Auru
 			marginRight: toSource(props.marginRight, 0),
 			marginBottom: toSource(props.marginBottom, 0),
 			marginLeft: toSource(props.marginLeft, 0),
-			components: props.components
-				? props.components instanceof ArrayDataSource
-					? props.components
-					: new ArrayDataSource(props.components)
-				: new ArrayDataSource([]),
+			components,
 			shaders: props.shaders ? (props.shaders instanceof ArrayDataSource ? props.shaders : new ArrayDataSource(props.shaders)) : new ArrayDataSource([]),
 			ignoreLayout: toSource(props.ignoreLayout, false),
 			spreadLayout: toSource(props.spreadLayout, false),

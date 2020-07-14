@@ -1,4 +1,4 @@
-import { CancellationToken, DataSource } from 'aurumjs';
+import { CancellationToken, DataSource, TransientDataSource } from 'aurumjs';
 import { Polygon } from '../../aurum_game_engine';
 import { PointLike } from '../../models/point';
 import { EntityRenderModel } from '../../rendering/model';
@@ -19,14 +19,54 @@ export class PathFollowingComponent extends AbstractComponent {
 	public pause: boolean;
 	private currentTarget: PointLike;
 	private pendingMovementPromise: Callback<void>;
+	private movementListeners: DataSource<PointLike>;
+	private renderData: EntityRenderModel;
 
 	constructor(config: PathFollowingConfiguration) {
 		super();
 		this.config = config;
 		this.pause = false;
+		this.movementListeners = new DataSource();
+	}
+
+	public predictPosition(inMs: number): PointLike {
+		if (this.pause) {
+			return { x: this.renderData.positionX.value, y: this.renderData.positionY.value };
+		} else {
+			const positionX = new DataSource(this.renderData.positionX.value);
+			const positionY = new DataSource(this.renderData.positionY.value);
+			while (inMs > 0) {
+				const chunk = Math.min(inMs, 33);
+				if (this.config.euclideanMovement) {
+					this.approachEuclidean(this.currentTarget, positionX, positionY, chunk);
+				} else {
+					this.approachManhattan(this.currentTarget, positionX, positionY, chunk);
+				}
+				inMs -= chunk;
+			}
+			return { x: positionX.value, y: positionY.value };
+		}
+	}
+
+	public listenMovement(cancellationToken?: CancellationToken): TransientDataSource<PointLike> {
+		const token = cancellationToken ?? new CancellationToken();
+		const result = new TransientDataSource<PointLike>(token);
+
+		this.movementListeners.pipe(result, token);
+
+		return result;
+	}
+
+	public stop(): void {
+		this.pause = true;
+	}
+
+	public resume(): void {
+		this.pause = false;
 	}
 
 	public onAttach(entity: SceneGraphNode<CommonEntity>, renderData: EntityRenderModel) {
+		this.renderData = renderData;
 		onBeforeRender.subscribe(() => {
 			if (this.currentTarget && !this.pause) {
 				this.moveTowardsTarget(entity, this.currentTarget);
@@ -62,6 +102,10 @@ export class PathFollowingComponent extends AbstractComponent {
 	}
 
 	private moveTowardsTarget(entity: SceneGraphNode<CommonEntity>, target: PointLike) {
+		if (this.pause) {
+			return;
+		}
+
 		if (typeof entity.model.x.value !== 'number') {
 			entity.model.x.update(target.x);
 		}
@@ -73,9 +117,9 @@ export class PathFollowingComponent extends AbstractComponent {
 		const positionY: DataSource<number> = entity.model.y as any;
 
 		if (this.config.euclideanMovement) {
-			this.approachEuclidean(target, positionX, positionY);
+			this.approachEuclidean(target, positionX, positionY, 16);
 		} else {
-			this.approachManhattan(target, positionX, positionY);
+			this.approachManhattan(target, positionX, positionY, 16);
 		}
 
 		if (target.x === positionX.value && target.y === positionY.value) {
@@ -83,21 +127,44 @@ export class PathFollowingComponent extends AbstractComponent {
 		}
 	}
 
-	private approachEuclidean(target: PointLike, positionX: DataSource<number>, positionY: DataSource<number>) {
-		const travel = Vector2D.fromPolarCoordinates(this.config.speed, new Vector2D(positionX.value, positionY.value).connectingVector(target).getAngle());
+	private approachEuclidean(target: PointLike, positionX: DataSource<number>, positionY: DataSource<number>, time: number) {
+		const travel = Vector2D.fromPolarCoordinates(
+			this.config.speed * time,
+			new Vector2D(positionX.value, positionY.value).connectingVector(target).getAngle()
+		);
 		positionX.update(positionX.value + Math.min(Math.abs(travel.x), Math.abs(positionX.value - target.x)) * Math.sign(travel.x));
 		positionY.update(positionY.value + Math.min(Math.abs(travel.y), Math.abs(positionY.value - target.y)) * Math.sign(travel.y));
+		this.movementListeners.update({
+			x: Math.min(Math.abs(travel.x), Math.abs(positionX.value - target.x)) * Math.sign(travel.x),
+			y: Math.min(Math.abs(travel.y), Math.abs(positionY.value - target.y)) * Math.sign(travel.y)
+		});
 	}
 
-	private approachManhattan(target: PointLike, positionX: DataSource<number>, positionY: DataSource<number>) {
+	private approachManhattan(target: PointLike, positionX: DataSource<number>, positionY: DataSource<number>, time: number) {
 		if (target.x > positionX.value) {
-			positionX.update(positionX.value + Math.min(this.config.speed, Math.abs(positionX.value - target.x)));
+			positionX.update(positionX.value + Math.min(this.config.speed * time, Math.abs(positionX.value - target.x)));
+			this.movementListeners.update({
+				x: Math.min(this.config.speed * time, Math.abs(positionX.value - target.x)),
+				y: 0
+			});
 		} else if (target.x < positionX.value) {
-			positionX.update(positionX.value - Math.min(this.config.speed, Math.abs(positionX.value - target.x)));
+			positionX.update(positionX.value - Math.min(this.config.speed * time, Math.abs(positionX.value - target.x)));
+			this.movementListeners.update({
+				x: -Math.min(this.config.speed * time, Math.abs(positionX.value - target.x)),
+				y: 0
+			});
 		} else if (target.y > positionY.value) {
-			positionY.update(positionY.value + Math.min(this.config.speed, Math.abs(positionY.value - target.y)));
+			positionY.update(positionY.value + Math.min(this.config.speed * time, Math.abs(positionY.value - target.y)));
+			this.movementListeners.update({
+				x: 0,
+				y: Math.min(this.config.speed * time, Math.abs(positionY.value - target.y))
+			});
 		} else if (target.y < positionY.value) {
-			positionY.update(positionY.value - Math.min(this.config.speed, Math.abs(positionY.value - target.y)));
+			positionY.update(positionY.value - Math.min(this.config.speed * time, Math.abs(positionY.value - target.y)));
+			this.movementListeners.update({
+				x: 0,
+				y: -Math.min(this.config.speed * time, Math.abs(positionY.value - target.y))
+			});
 		}
 	}
 }

@@ -6,6 +6,7 @@ import { toSource } from '../utilities/data/to_source';
 import { SceneGraphNode } from '../models/scene_graph';
 import { PointLike } from '../models/point';
 import { CameraEntityRenderModel } from '../rendering/model';
+import { getComponentByTypeFactory } from './shared';
 
 export interface CameraProps extends CommonEntityProps {
 	screenWidth: number;
@@ -26,6 +27,11 @@ export interface CameraEntity extends CommonEntity {
 export function Camera(props: CameraProps, children: Renderable[], api: AurumComponentAPI): SceneGraphNode<CameraEntity> {
 	let cameraRenderModel: CameraEntityRenderModel;
 
+	const components = props.components
+		? props.components instanceof ArrayDataSource
+			? props.components
+			: new ArrayDataSource(props.components)
+		: new ArrayDataSource([]);
 	const result = {
 		cancellationToken: api.cancellationToken,
 		onAttach: (entity, entityRenderModel) => {
@@ -34,6 +40,7 @@ export function Camera(props: CameraProps, children: Renderable[], api: AurumCom
 		},
 		onDetach: props.onDetach,
 		model: {
+			getComponentByType: getComponentByTypeFactory(components),
 			projectMouseCoordinates: (e: MouseEvent) => {
 				return result.model.projectPoint({
 					x: e.clientX,
@@ -69,11 +76,7 @@ export function Camera(props: CameraProps, children: Renderable[], api: AurumCom
 			marginRight: toSource(props.marginRight, 0),
 			marginBottom: toSource(props.marginBottom, 0),
 			marginLeft: toSource(props.marginLeft, 0),
-			components: props.components
-				? props.components instanceof ArrayDataSource
-					? props.components
-					: new ArrayDataSource(props.components)
-				: new ArrayDataSource([]),
+			components,
 			shaders: props.shaders ? (props.shaders instanceof ArrayDataSource ? props.shaders : new ArrayDataSource(props.shaders)) : new ArrayDataSource([]),
 			backgroundColor: toSource(props.backgroundColor, 'black'),
 			ignoreLayout: toSource(props.ignoreLayout, false),

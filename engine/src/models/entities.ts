@@ -1,6 +1,6 @@
 import { ArrayDataSource, DataSource } from 'aurumjs';
 import { AbstractComponent } from '../entities/components/abstract_component';
-import { Size, MapLike } from '../models/common';
+import { Size, MapLike, Constructor } from '../models/common';
 import { Data } from '../models/input_data';
 import { SceneGraphNode } from './scene_graph';
 import { EntityRenderModel } from '../rendering/model';
@@ -72,6 +72,7 @@ export interface CommonEntity {
 	visible: DataSource<boolean>;
 	alpha: DataSource<number>;
 	components: ArrayDataSource<AbstractComponent>;
+	getComponentByType<T extends AbstractComponent>(type: Constructor<T>): T;
 	//class?: StyleClass<any>[];
 	name: string;
 	//layout?: ReadonlyData<AbstractLayout>;

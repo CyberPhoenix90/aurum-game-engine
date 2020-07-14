@@ -5,6 +5,7 @@ import { Data } from '../models/input_data';
 import { toSource } from '../utilities/data/to_source';
 import { SceneGraphNode } from '../models/scene_graph';
 import { LabelEntityRenderModel } from '../rendering/model';
+import { getComponentByTypeFactory } from './shared';
 
 export interface LabelEntityProps extends CommonEntityProps, LabelEntityStyle {
 	onAttach?(node: SceneGraphNode<LabelEntity>, renderModel: LabelEntityRenderModel): void;
@@ -65,11 +66,18 @@ export function Label(props: LabelEntityProps, children: Renderable[], api: Auru
 	const scaleX: DataSource<number> = toSource(props.scaleX, 1);
 	const scaleY: DataSource<number> = toSource(props.scaleY, 1);
 
+	const components = props.components
+	? props.components instanceof ArrayDataSource
+		? props.components
+		: new ArrayDataSource(props.components)
+	: new ArrayDataSource([]);
+
 	return {
 		cancellationToken: api.cancellationToken,
 		onAttach: props.onAttach,
 		onDetach: props.onDetach,
 		model: {
+			getComponentByType: getComponentByTypeFactory(components),
 			x: toSource(props.x, 0),
 			y: toSource(props.y, 0),
 			originX: toSource(props.originX, 0),
@@ -88,11 +96,7 @@ export function Label(props: LabelEntityProps, children: Renderable[], api: Auru
 			marginRight: toSource(props.marginRight, 0),
 			marginBottom: toSource(props.marginBottom, 0),
 			marginLeft: toSource(props.marginLeft, 0),
-			components: props.components
-				? props.components instanceof ArrayDataSource
-					? props.components
-					: new ArrayDataSource(props.components)
-				: new ArrayDataSource([]),
+			components,
 			shaders: props.shaders ? (props.shaders instanceof ArrayDataSource ? props.shaders : new ArrayDataSource(props.shaders)) : new ArrayDataSource([]),
 			ignoreLayout: toSource(props.ignoreLayout, false),
 			spreadLayout: toSource(props.spreadLayout, false),

@@ -5,6 +5,7 @@ import { DataSource, ArrayDataSource, AurumComponentAPI } from 'aurumjs';
 import { toSource } from '../utilities/data/to_source';
 import { SceneGraphNode } from '../models/scene_graph';
 import { SpriteEntityRenderModel } from '../rendering/model';
+import { getComponentByTypeFactory } from './shared';
 
 export interface SpriteEntityProps extends CommonEntityProps {
 	texture?: Data<string>;
@@ -40,11 +41,18 @@ export interface SpriteEntity extends CommonEntity {
 }
 
 export function Sprite(props: SpriteEntityProps, children, api: AurumComponentAPI): SceneGraphNode<SpriteEntity> {
+	const components = props.components
+		? props.components instanceof ArrayDataSource
+			? props.components
+			: new ArrayDataSource(props.components)
+		: new ArrayDataSource([]);
+
 	return {
 		cancellationToken: api.cancellationToken,
 		onAttach: props.onAttach,
 		onDetach: props.onDetach,
 		model: {
+			getComponentByType: getComponentByTypeFactory(components),
 			x: toSource(props.x, 0),
 			y: toSource(props.y, 0),
 			originX: toSource(props.originX, 0),
@@ -65,11 +73,7 @@ export function Sprite(props: SpriteEntityProps, children, api: AurumComponentAP
 			marginLeft: toSource(props.marginLeft, 0),
 			ignoreLayout: toSource(props.ignoreLayout, false),
 			spreadLayout: toSource(props.spreadLayout, false),
-			components: props.components
-				? props.components instanceof ArrayDataSource
-					? props.components
-					: new ArrayDataSource(props.components)
-				: new ArrayDataSource([]),
+			components,
 			shaders: props.shaders ? (props.shaders instanceof ArrayDataSource ? props.shaders : new ArrayDataSource(props.shaders)) : new ArrayDataSource([]),
 			name: props.name,
 			visible: toSource(props.visible, true),

@@ -6,6 +6,7 @@ import { _ } from '../utilities/other/streamline';
 import { AbstractShape } from '../math/shapes/abstract_shape';
 import { CanvasEntityRenderModel } from '../rendering/model';
 import { Data } from '../models/input_data';
+import { getComponentByTypeFactory } from './shared';
 
 export interface PaintOperation {
 	shape?: AbstractShape;
@@ -25,11 +26,18 @@ export interface CanvasEntity extends CommonEntity {
 }
 
 export function Canvas(props: CanvasEntityProps, children, api: AurumComponentAPI): SceneGraphNode<CanvasEntity> {
+	const components = props.components
+		? props.components instanceof ArrayDataSource
+			? props.components
+			: new ArrayDataSource(props.components)
+		: new ArrayDataSource([]);
+
 	return {
 		cancellationToken: api.cancellationToken,
 		onAttach: props.onAttach,
 		onDetach: props.onDetach,
 		model: {
+			getComponentByType: getComponentByTypeFactory(components),
 			x: toSource(props.x, 0),
 			y: toSource(props.y, 0),
 			originX: toSource(props.originX, 0),
@@ -50,11 +58,7 @@ export function Canvas(props: CanvasEntityProps, children, api: AurumComponentAP
 			marginLeft: toSource(props.marginLeft, 0),
 			ignoreLayout: toSource(props.ignoreLayout, false),
 			spreadLayout: toSource(props.spreadLayout, false),
-			components: props.components
-				? props.components instanceof ArrayDataSource
-					? props.components
-					: new ArrayDataSource(props.components)
-				: new ArrayDataSource([]),
+			components,
 			shaders: props.shaders ? (props.shaders instanceof ArrayDataSource ? props.shaders : new ArrayDataSource(props.shaders)) : new ArrayDataSource([]),
 			name: props.name,
 			visible: toSource(props.visible, true),
