@@ -1,4 +1,4 @@
-import { Webcomponent, AurumComponentAPI, Aurum, Renderable } from 'aurumjs';
+import { Webcomponent, AurumComponentAPI, Aurum, Renderable, DataSource } from 'aurumjs';
 import { SceneGraphNode } from '../models/scene_graph';
 import { RenderableType } from '../models/entities';
 import { synchronizeWithRenderPlugin } from './scene_graph_manager';
@@ -7,10 +7,18 @@ import { _ } from '../utilities/other/streamline';
 import { EventEmitter } from 'aurumjs';
 import { Clock } from '../game_features/time/clock';
 
+export let engineRootTime: DataSource<number> = new DataSource(0);
+
+requestAnimationFrame((time) => {
+	engineRootTime.update(engineRootTime.value + time);
+});
+
 export interface StageProps {
 	clock?: Clock;
 	renderPlugin: AbstractRenderPlugin;
 }
+
+export let engineClock: Clock;
 
 const StageComponent = Webcomponent(
 	{
@@ -19,7 +27,7 @@ const StageComponent = Webcomponent(
 	(props: { renderPlugin: AbstractRenderPlugin; nodes: SceneGraphNode<any>[]; clock: Clock }, api: AurumComponentAPI) => {
 		const stageId = _.getUId();
 		const cameras = props.nodes.filter((n) => n.nodeType === RenderableType.CAMERA);
-		const clock = props.clock;
+		const clock = (engineClock = props.clock);
 		let running = true;
 		clock.start = () => (running = true);
 		clock.stop = () => (running = false);

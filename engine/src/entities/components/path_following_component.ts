@@ -6,12 +6,14 @@ import { AbstractComponent } from './abstract_component';
 import { Callback } from 'aurumjs/dist/utilities/common';
 import { CommonEntity } from '../../models/entities';
 import { SceneGraphNode } from '../../models/scene_graph';
-import { onBeforeRender } from '../../core/stage';
+import { onBeforeRender, engineClock } from '../../core/stage';
 import { Vector2D } from '../../math/vectors/vector2d';
+import { Clock } from '../../game_features/time/clock';
 
 export interface PathFollowingConfiguration {
 	speed: number;
 	euclideanMovement?: boolean;
+	clock?: Clock;
 }
 
 export class PathFollowingComponent extends AbstractComponent {
@@ -21,11 +23,13 @@ export class PathFollowingComponent extends AbstractComponent {
 	private pendingMovementPromise: Callback<void>;
 	private movementListeners: DataSource<PointLike>;
 	private renderData: EntityRenderModel;
+	private clock: Clock;
 
 	constructor(config: PathFollowingConfiguration) {
 		super();
 		this.config = config;
 		this.pause = false;
+		this.clock = config.clock ?? engineClock;
 		this.movementListeners = new DataSource();
 	}
 
@@ -67,7 +71,10 @@ export class PathFollowingComponent extends AbstractComponent {
 
 	public onAttach(entity: SceneGraphNode<CommonEntity>, renderData: EntityRenderModel) {
 		this.renderData = renderData;
-		onBeforeRender.subscribe((delta) => {
+		let time = this.clock.timestamp;
+		onBeforeRender.subscribe(() => {
+			const delta = this.clock.timestamp - time;
+			time += delta;
 			if (this.currentTarget && !this.pause) {
 				this.moveTowardsTarget(entity, this.currentTarget, delta);
 			}

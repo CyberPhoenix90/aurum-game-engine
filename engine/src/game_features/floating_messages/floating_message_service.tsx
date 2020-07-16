@@ -5,6 +5,8 @@ import { Data } from '../../models/input_data';
 import { animate } from '../../graphics/animation/animate';
 import { Vector2D } from '../../math/vectors/vector2d';
 import { Shader } from '../../models/entities';
+import { Clock } from '../time/clock';
+import { engineClock } from '../../core/stage';
 
 export interface IFloatingMessageOptions {
 	position: PointLike;
@@ -15,11 +17,13 @@ export interface IFloatingMessageOptions {
 	output: ArrayDataSource<Renderable>;
 	shaders?: Shader[];
 	baseStyle?: LabelEntityStyle;
+	clock?: Clock;
 }
 
 export class FloatingMessageService {
 	public async displayMessage(message: Data<string>, floatingMessageOptions: IFloatingMessageOptions): Promise<void> {
 		const alpha = new DataSource(0);
+		const clock = floatingMessageOptions.clock ?? engineClock;
 		const x = new DataSource(floatingMessageOptions.position.x);
 		const y = new DataSource(floatingMessageOptions.position.y);
 		const msg = (
@@ -38,7 +42,8 @@ export class FloatingMessageService {
 			this.processMovement(
 				{ x, y },
 				floatingMessageOptions.movement,
-				(floatingMessageOptions.fadeIn || 0) + (floatingMessageOptions.fadeOut || 0) + floatingMessageOptions.duration
+				(floatingMessageOptions.fadeIn || 0) + (floatingMessageOptions.fadeOut || 0) + floatingMessageOptions.duration,
+				floatingMessageOptions.clock
 			);
 		}
 
@@ -48,19 +53,21 @@ export class FloatingMessageService {
 					alpha.update(progress);
 				},
 				{
-					duration: floatingMessageOptions.fadeIn
+					duration: floatingMessageOptions.fadeIn,
+					clock: floatingMessageOptions.clock
 				}
 			);
 		}
 
-		setTimeout(async () => {
+		clock.setTimeout(async () => {
 			if (floatingMessageOptions.fadeOut) {
 				await animate(
 					(progress: number) => {
 						alpha.update(1 - progress);
 					},
 					{
-						duration: floatingMessageOptions.fadeOut
+						duration: floatingMessageOptions.fadeOut,
+						clock: floatingMessageOptions.clock
 					}
 				);
 			}
@@ -68,7 +75,7 @@ export class FloatingMessageService {
 		}, floatingMessageOptions.duration);
 	}
 
-	private processMovement({ x, y }: { x: DataSource<number>; y: DataSource<number> }, movement: PointLike, time: number) {
+	private processMovement({ x, y }: { x: DataSource<number>; y: DataSource<number> }, movement: PointLike, time: number, clock?: Clock) {
 		let posX = x.value;
 		let posY = y.value;
 		animate(
@@ -78,7 +85,8 @@ export class FloatingMessageService {
 				y.update(posY + shift.y);
 			},
 			{
-				duration: time
+				duration: time,
+				clock
 			}
 		);
 	}
