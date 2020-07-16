@@ -4,10 +4,13 @@ import { PaintOperation } from '../entities/canvas_entity';
 
 export interface EntityRenderModel {
 	uid: number;
+	parent: EntityRenderModel;
 	renderableType: RenderableType;
 	parentUid: number;
 	cancellationToken: CancellationToken;
 	name: string;
+	getAbsolutePositionX(): number;
+	getAbsolutePositionY(): number;
 	positionX: ReadOnlyDataSource<number>;
 	positionY: ReadOnlyDataSource<number>;
 	sizeX: DataSource<number>;

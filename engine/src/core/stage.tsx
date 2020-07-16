@@ -35,7 +35,7 @@ const StageComponent = Webcomponent(
 			<div
 				onAttach={(stageNode) => {
 					props.renderPlugin.addStage(stageId, stageNode);
-					synchronizeWithRenderPlugin(props.renderPlugin, stageId, props.nodes, undefined, api.prerender.bind(api));
+					synchronizeWithRenderPlugin(props.renderPlugin, stageId, props.nodes, undefined, undefined, api.prerender.bind(api));
 					let lastBefore = clock.timestamp;
 					let lastAfter = clock.timestamp;
 					let lastTick = Date.now();

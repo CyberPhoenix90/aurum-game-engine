@@ -1,9 +1,9 @@
+import { PointLike } from '../../models/point';
 import { AbstractShape } from './abstract_shape';
 import { Rectangle } from './rectangle';
-import { Vector2D } from '../vectors/vector2d';
 
 export class Point extends AbstractShape {
-	constructor(position: Vector2D) {
+	constructor(position: PointLike) {
 		super(position);
 	}
 
@@ -12,6 +12,6 @@ export class Point extends AbstractShape {
 	}
 
 	public getBoundingBox(): Rectangle {
-		return new Rectangle(this.position, new Vector2D(1, 1));
+		return new Rectangle(this.position, { x: 1, y: 1 });
 	}
 }

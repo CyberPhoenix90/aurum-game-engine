@@ -9,6 +9,7 @@ export * from './entities/camera';
 export * from './entities/components/abstract_component';
 export * from './entities/components/bounds_component';
 export * from './entities/components/path_following_component';
+export * from './entities/components/mouse_interaction_component';
 
 export * from './math/calculation';
 export * from './math/unit';
