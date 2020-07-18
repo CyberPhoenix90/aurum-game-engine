@@ -1,21 +1,22 @@
-import { ArrayDataSource, CancellationToken, DataSource, Renderable, createRenderSession, render } from 'aurumjs';
+import { ArrayDataSource, CancellationToken, createRenderSession, DataSource, render, Renderable } from 'aurumjs';
 import { AbstractRenderPlugin, LabelEntity, SpriteEntity } from '../aurum_game_engine';
 import { CameraEntity } from '../entities/camera';
+import { CanvasEntity } from '../entities/canvas_entity';
+import { TiledMapEntity, TiledMapRenderModel } from '../game_features/tile_maps/tiled/tiled_map_entity';
 import { CommonEntity, RenderableType } from '../models/entities';
 import { SceneGraphNode } from '../models/scene_graph';
-import { CameraEntityRenderModel, EntityRenderModel, LabelEntityRenderModel, SpriteEntityRenderModel, CanvasEntityRenderModel } from '../rendering/model';
-import { CanvasEntity } from '../entities/canvas_entity';
-import { measureStringWidth } from '../entities/label_entity';
-import { TiledMapRenderModel, TiledMapEntity } from '../game_features/tile_maps/tiled/tiled_map_entity';
+import { CameraEntityRenderModel, CanvasEntityRenderModel, EntityRenderModel, LabelEntityRenderModel, SpriteEntityRenderModel } from '../rendering/model';
+import { layoutAlgorithm } from './layout_engine';
 
 export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: SceneGraphNode<any>, parentRenderModel?: EntityRenderModel): EntityRenderModel {
-	const { x, y, sizeX, sizeY } = layoutAlgorithm(node);
+	const { x, y, sizeX, sizeY } = layoutAlgorithm(node, parentRenderModel);
 	let result;
 
 	switch (node.nodeType) {
 		case RenderableType.SPRITE:
 			result = {
 				parent: parentRenderModel,
+				children: new ArrayDataSource(),
 				getAbsolutePositionX: undefined,
 				getAbsolutePositionY: undefined,
 				alpha: node.model.alpha,
@@ -46,6 +47,7 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 		case RenderableType.CANVAS:
 			result = {
 				parent: parentRenderModel,
+				children: new ArrayDataSource(),
 				getAbsolutePositionX: undefined,
 				getAbsolutePositionY: undefined,
 				alpha: node.model.alpha,
@@ -71,6 +73,7 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 		case RenderableType.CAMERA:
 			result = {
 				parent: parentRenderModel,
+				children: new ArrayDataSource(),
 				getAbsolutePositionX: undefined,
 				getAbsolutePositionY: undefined,
 				view: undefined,
@@ -97,6 +100,7 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 		case RenderableType.LABEL:
 			result = {
 				parent: parentRenderModel,
+				children: new ArrayDataSource(),
 				getAbsolutePositionX: undefined,
 				getAbsolutePositionY: undefined,
 				alpha: node.model.alpha,
@@ -136,6 +140,7 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 		case RenderableType.NO_RENDER:
 			result = {
 				parent: parentRenderModel,
+				children: new ArrayDataSource(),
 				getAbsolutePositionX: undefined,
 				getAbsolutePositionY: undefined,
 				alpha: node.model.alpha,
@@ -160,6 +165,7 @@ export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: S
 		case RenderableType.TILE_MAP:
 			result = {
 				parent: parentRenderModel,
+				children: new ArrayDataSource(),
 				getAbsolutePositionX: undefined,
 				getAbsolutePositionY: undefined,
 				layers: (node.model as TiledMapEntity).layers,
@@ -208,44 +214,6 @@ function getAbsolutePositionY(this: EntityRenderModel) {
 		ptr = ptr.parent;
 	}
 	return y;
-}
-interface LayoutData {
-	x: DataSource<number>;
-	y: DataSource<number>;
-	sizeX: DataSource<number>;
-	sizeY: DataSource<number>;
-}
-
-function layoutAlgorithm(node: SceneGraphNode<CommonEntity>): LayoutData {
-	let sizeX: DataSource<number>;
-	let sizeY: DataSource<number>;
-
-	if (node.nodeType === RenderableType.LABEL) {
-		sizeX = node.model.width.aggregateFour(
-			(node.model as LabelEntity).text,
-			(node.model as LabelEntity).fontSize,
-			(node.model as LabelEntity).fontFamily,
-			(size, text, fs, ff) =>
-				size === undefined ? measureStringWidth(text, (node.model as LabelEntity).fontWeight.value, fs, ff) : parseInt(size.toString())
-		);
-		sizeY = node.model.height.map((v) => (v === undefined ? undefined : parseInt(v.toString())));
-	} else {
-		sizeX = node.model.width.map((v) => (v === undefined ? undefined : parseInt(v.toString())));
-		sizeY = node.model.height.map((v) => (v === undefined ? undefined : parseInt(v.toString())));
-	}
-
-	const result: LayoutData = {
-		x: node.model.x.map((v) => {
-			return parseInt(v.toString()) - node.model.originX.value * (sizeX.value ?? 0) * node.model.scaleX.value;
-		}),
-		y: node.model.y.map((v) => {
-			return parseInt(v.toString()) - node.model.originY.value * (sizeY.value ?? 0) * node.model.scaleY.value;
-		}),
-		sizeX,
-		sizeY
-	};
-
-	return result;
 }
 
 export function synchronizeWithRenderPlugin(
@@ -313,6 +281,13 @@ function handleStaticNode(
 				break;
 		}
 	}, renderData.cancellationToken);
+	if (parentRenderModel) {
+		renderData.cancellationToken.addCancelable(() => {
+			parentRenderModel.children.remove(renderData);
+		});
+		parentRenderModel.children.push(renderData);
+	}
+
 	if (children) {
 		synchronizeWithRenderPlugin(renderPlugin, stageId, children, node, renderData, prerender);
 	}

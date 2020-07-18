@@ -5,6 +5,7 @@ import { PaintOperation } from '../entities/canvas_entity';
 export interface EntityRenderModel {
 	uid: number;
 	parent: EntityRenderModel;
+	children: ArrayDataSource<EntityRenderModel>;
 	renderableType: RenderableType;
 	parentUid: number;
 	cancellationToken: CancellationToken;

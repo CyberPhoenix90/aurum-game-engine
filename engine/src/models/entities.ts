@@ -47,8 +47,8 @@ export interface CommonEntityProps {
 }
 
 export interface CommonEntity {
-	x: DataSource<Size | 'center' | 'left' | 'right'>;
-	y: DataSource<Size | 'center' | 'top' | 'bottom'>;
+	x: DataSource<Size>;
+	y: DataSource<Size>;
 	originX: DataSource<number>;
 	originY: DataSource<number>;
 	clip: DataSource<boolean>;

@@ -1,8 +1,6 @@
-import { Unit } from '../math/unit';
-import { DataSource } from 'aurumjs';
 import { PointLike } from './point';
 
-export type Size = number | string | Unit | DataSource<number>;
+export type Size = number | string;
 
 export type Radian = number;
 export type Degrees = number;
