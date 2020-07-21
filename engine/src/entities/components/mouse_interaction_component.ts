@@ -83,6 +83,10 @@ export class MouseInteractionComponent extends AbstractComponent {
 		);
 
 		this.config.mouse.listenMouseScroll().listen((e) => {
+			//@ts-ignore
+			if (e.propagationStopped) {
+				return;
+			}
 			if (this.onScroll.hasSubscriptions() && renderData.visible.value && !renderData.cancellationToken.isCanceled) {
 				for (const camera of this.config.cameras) {
 					if (collisionCalculator.isOverlapping(new Point(camera.projectMouseCoordinates(e)), boundingBox)) {
@@ -93,6 +97,10 @@ export class MouseInteractionComponent extends AbstractComponent {
 		}, renderData.cancellationToken);
 
 		this.config.mouse.listenMouseMove().listen((e) => {
+			//@ts-ignore
+			if (e.propagationStopped) {
+				return;
+			}
 			if (this.onMouseEnter.hasSubscriptions() || this.onMouseLeave.hasSubscriptions()) {
 				this.checkMouseEnterOrLeave(e, entity, renderData, boundingBox);
 			}
@@ -105,6 +113,10 @@ export class MouseInteractionComponent extends AbstractComponent {
 		}, renderData.cancellationToken);
 
 		this.config.mouse.listenMouseDown(MouseButtons.LEFT).listen((e) => {
+			//@ts-ignore
+			if (e.propagationStopped) {
+				return;
+			}
 			if (this.onMouseDown.hasSubscriptions() && renderData.visible.value && !renderData.cancellationToken.isCanceled) {
 				for (const camera of this.config.cameras) {
 					if (collisionCalculator.isOverlapping(new Point(camera.projectMouseCoordinates(e)), boundingBox)) {
@@ -115,20 +127,14 @@ export class MouseInteractionComponent extends AbstractComponent {
 		}, renderData.cancellationToken);
 
 		this.config.mouse.listenMouseUp(MouseButtons.LEFT).listen((e) => {
+			//@ts-ignore
+			if (e.propagationStopped) {
+				return;
+			}
 			if (this.onMouseUp.hasSubscriptions() && renderData.visible.value && !renderData.cancellationToken.isCanceled) {
 				for (const camera of this.config.cameras) {
 					if (collisionCalculator.isOverlapping(new Point(camera.projectMouseCoordinates(e)), boundingBox)) {
 						this.onMouseUp.fire({ e: e, source: { entity, renderData } });
-					}
-				}
-			}
-		}, renderData.cancellationToken);
-
-		this.config.mouse.listenMouseUp(MouseButtons.LEFT).listen((e) => {
-			if (this.onClick.hasSubscriptions() && renderData.visible.value && !renderData.cancellationToken.isCanceled) {
-				for (const camera of this.config.cameras) {
-					if (collisionCalculator.isOverlapping(new Point(camera.projectMouseCoordinates(e)), boundingBox)) {
-						this.onClick.fire({ e: e, source: { entity, renderData } });
 					}
 				}
 			}
