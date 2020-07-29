@@ -11,7 +11,15 @@ export class SpriteGraphNode extends SceneGraphNode<SpriteEntity> {
 	}
 
 	protected createResolvedModel(): SpriteEntity {
-		const base = this.createBaseResolvedModel();
+		const base = this.createBaseResolvedModel() as SpriteEntity;
+
+		base.tint = this.getModelSourceWithFallback('tint');
+		base.texture = this.getModelSourceWithFallback('texture');
+		base.drawDistanceX = this.getModelSourceWithFallback('drawDistanceX');
+		base.drawDistanceY = this.getModelSourceWithFallback('drawDistanceY');
+		base.drawOffsetX = this.getModelSourceWithFallback('drawOffsetX');
+		base.drawOffsetY = this.getModelSourceWithFallback('drawOffsetY');
+
 		return base;
 	}
 

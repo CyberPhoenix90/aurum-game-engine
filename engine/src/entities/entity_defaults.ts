@@ -20,5 +20,10 @@ export const entityDefaults: CommonEntity = {
 	scaleY: new DataSource(1),
 	shaders: new ArrayDataSource([]),
 	visible: new DataSource(true),
-	spreadLayout: new DataSource(false)
+	spreadLayout: new DataSource(false),
+	maxHeight: new DataSource(undefined),
+	maxWidth: new DataSource(undefined),
+	minHeight: new DataSource(undefined),
+	minWidth: new DataSource(undefined),
+	zIndex: new DataSource(undefined)
 };

@@ -21,6 +21,6 @@
 	},
 	"homepage": "https://github.com/CyberPhoenix90/aurum-game-engine#readme",
 	"dependencies": {
-		"aurumjs": "^0.5.9"
+		"aurumjs": "^0.5.10"
 	}
 }

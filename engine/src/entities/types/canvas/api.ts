@@ -11,7 +11,8 @@ export class CanvasGraphNode extends SceneGraphNode<CanvasEntity> {
 	}
 
 	protected createResolvedModel(): CanvasEntity {
-		const base = this.createBaseResolvedModel();
+		const base = this.createBaseResolvedModel() as CanvasEntity;
+		base.paintOperations = this.getModelSourceWithFallback('paintOperations');
 		return base;
 	}
 

@@ -5,7 +5,10 @@ import { normalizeComponents, propsToModel } from '../../shared';
 import { CanvasGraphNode } from '../canvas/api';
 import { ContainerGraphNode } from './api';
 
-export interface ContainerEntityProps extends CommonEntityProps {}
+export interface ContainerEntityProps extends CommonEntityProps {
+	onAttach?(node: ContainerGraphNode): void;
+	onDetach?(node: ContainerGraphNode): void;
+}
 
 export function Container(props: ContainerEntityProps, children: Renderable[], api: AurumComponentAPI): ContainerGraphNode {
 	const content = api.prerender(children);

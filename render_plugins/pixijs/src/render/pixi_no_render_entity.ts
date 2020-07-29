@@ -1,5 +1,5 @@
 import { BlendModes, EntityRenderModel, Shader, SceneGraphNode, CommonEntity, SceneGraphNodeModel } from 'aurum-game-engine';
-import { CancellationToken } from 'aurumjs';
+import { CancellationToken, dsUnique } from 'aurumjs';
 import { Container, filters, BLEND_MODES, Filter } from 'pixi.js';
 
 export class NoRenderEntity {
@@ -85,7 +85,7 @@ export class NoRenderEntity {
 			}
 		}, this.token);
 
-		model.renderState.clip.unique().listenAndRepeat((v) => {
+		model.renderState.clip.transform(dsUnique()).listenAndRepeat((v) => {
 			if (v) {
 				const mask = new PIXI.Graphics();
 				mask.lineStyle(5, 0xff0000);

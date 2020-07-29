@@ -3,7 +3,7 @@ import { CommonEntityProps } from '../../../models/entities';
 import { SpriteGraphNode } from './api';
 import { normalizeComponents, propsToModel } from '../../shared';
 import { entityDefaults } from '../../entity_defaults';
-import { ArrayDataSource } from 'aurumjs';
+import { ArrayDataSource, DataSource } from 'aurumjs';
 import { toSourceIfDefined } from '../../../utilities/data/to_source';
 
 export interface SpriteEntityProps extends CommonEntityProps {
@@ -32,7 +32,13 @@ export function Sprite(props: SpriteEntityProps): SpriteGraphNode {
 		models: {
 			coreDefault: entityDefaults,
 			appliedStyleClasses: new ArrayDataSource(),
-			entityTypeDefault: {},
+			entityTypeDefault: {
+				tint: new DataSource(undefined),
+				drawDistanceX: new DataSource(undefined),
+				drawDistanceY: new DataSource(undefined),
+				drawOffsetX: new DataSource(undefined),
+				drawOffsetY: new DataSource(undefined)
+			},
 			userSpecified: {
 				...propsToModel(props),
 				texture: toSourceIfDefined(props.texture),

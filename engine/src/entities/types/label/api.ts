@@ -11,7 +11,24 @@ export class LabelGraphNode extends SceneGraphNode<LabelEntity> {
 	}
 
 	protected createResolvedModel(): LabelEntity {
-		const base = this.createBaseResolvedModel();
+		const base = this.createBaseResolvedModel() as LabelEntity;
+
+		base.text = this.getModelSourceWithFallback('text');
+		base.color = this.getModelSourceWithFallback('color');
+		base.dropShadowAngle = this.getModelSourceWithFallback('dropShadowAngle');
+		base.renderCharCount = this.getModelSourceWithFallback('renderCharCount');
+		base.stroke = this.getModelSourceWithFallback('stroke');
+		base.strokeThickness = this.getModelSourceWithFallback('strokeThickness');
+		base.fontSize = this.getModelSourceWithFallback('fontSize');
+		base.fontWeight = this.getModelSourceWithFallback('fontWeight');
+		base.fontStyle = this.getModelSourceWithFallback('fontStyle');
+		base.fontFamily = this.getModelSourceWithFallback('fontFamily');
+		base.dropShadowColor = this.getModelSourceWithFallback('dropShadowColor');
+		base.dropShadowDistance = this.getModelSourceWithFallback('dropShadowDistance');
+		base.dropShadowFuzziness = this.getModelSourceWithFallback('dropShadowFuzziness');
+		base.textBaseline = this.getModelSourceWithFallback('textBaseline');
+		base.dropShadow = this.getModelSourceWithFallback('dropShadow');
+
 		return base;
 	}
 

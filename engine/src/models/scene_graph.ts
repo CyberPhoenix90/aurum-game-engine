@@ -41,6 +41,7 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		this.components = config.components;
 		this.models = config.models;
 		this.uid = _.getUId();
+		this.resolvedModel = this.createResolvedModel();
 		this.renderState = this.createRenderModel();
 		this.cancellationToken.addCancelable(() => {
 			config.onDetach?.(this);
@@ -79,56 +80,59 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 	public getModelSourceWithFallback<K extends keyof T>(
 		key: K
 	): T[K] extends DataSource<infer U> ? DataSource<U> : T[K] extends ArrayDataSource<infer U> ? ArrayDataSource<U> : never {
-		let collection;
 		for (const source of this.modelSourceIterator()) {
 			let ptr = source[key];
 			if (ptr) {
 				if (ptr instanceof DataSource) {
-					if (ptr.value !== undefined) {
-						return ptr.value;
-					}
+					return ptr as any;
 				} else if (ptr instanceof ArrayDataSource) {
-					if (!collection) {
-						collection = [];
-					}
-					collection.push(...ptr.getData());
+					return ptr as any;
 				}
 			}
 		}
 
-		return undefined;
+		throw new Error('Could not resolve source for key ' + key);
+	}
+
+	/**
+	 * Hack for typescript to properly infer the types of the datasources by allowing it to assume that they are unchanged between base and extended class
+	 */
+	private getModelSourceWithFallbackBase<K extends keyof CommonEntity>(
+		key: K
+	): CommonEntity[K] extends DataSource<infer U> ? DataSource<U> : CommonEntity[K] extends ArrayDataSource<infer U> ? ArrayDataSource<U> : never {
+		return this.getModelSourceWithFallback(key);
 	}
 
 	protected createBaseResolvedModel(): CommonEntity {
 		return {
-			alpha: this.createResolvedDataSource('alpha')
+			alpha: this.getModelSourceWithFallbackBase('alpha'),
+			blendMode: this.getModelSourceWithFallbackBase('blendMode'),
+			clip: this.getModelSourceWithFallbackBase('clip'),
+			height: this.getModelSourceWithFallbackBase('height'),
+			ignoreLayout: this.getModelSourceWithFallbackBase('ignoreLayout'),
+			marginBottom: this.getModelSourceWithFallbackBase('marginBottom'),
+			marginLeft: this.getModelSourceWithFallbackBase('marginLeft'),
+			marginRight: this.getModelSourceWithFallbackBase('marginRight'),
+			marginTop: this.getModelSourceWithFallbackBase('marginTop'),
+			maxHeight: this.getModelSourceWithFallbackBase('maxHeight'),
+			maxWidth: this.getModelSourceWithFallbackBase('maxWidth'),
+			minHeight: this.getModelSourceWithFallbackBase('minHeight'),
+			minWidth: this.getModelSourceWithFallbackBase('minWidth'),
+			originX: this.getModelSourceWithFallbackBase('originX'),
+			originY: this.getModelSourceWithFallbackBase('originY'),
+			scaleX: this.getModelSourceWithFallbackBase('scaleX'),
+			scaleY: this.getModelSourceWithFallbackBase('scaleY'),
+			shaders: this.getModelSourceWithFallbackBase('shaders'),
+			spreadLayout: this.getModelSourceWithFallbackBase('spreadLayout'),
+			visible: this.getModelSourceWithFallbackBase('visible'),
+			width: this.getModelSourceWithFallbackBase('width'),
+			x: this.getModelSourceWithFallbackBase('x'),
+			y: this.getModelSourceWithFallbackBase('y'),
+			zIndex: this.getModelSourceWithFallbackBase('zIndex')
 		};
 	}
 
-	private createResolvedDataSource<K extends keyof T>(key: K): T[K] {
-		const result: DataSource<any> = new DataSource();
-		let ptr;
-		for (const source of this.modelSourceIterator()) {
-			let tmp;
-			if (source[key] && source[key]) {
-				tmp = source[key];
-				if (tmp instanceof DataSource) {
-					tmp.listen((v) => {
-						if (ptr === tmp) {
-							result.update(v);
-						}
-					});
-					if (tmp.value !== undefined) {
-						ptr = tmp;
-					}
-				}
-			}
-		}
-
-		return undefined;
-	}
-
-	protected abstract createResolvedModel(): CommonEntity;
+	protected abstract createResolvedModel(): T;
 	protected abstract createRenderModel(): EntityRenderModel;
 
 	public getAbsolutePositionX(): number {

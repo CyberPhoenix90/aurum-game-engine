@@ -31,7 +31,9 @@ export function Camera(props: CameraProps, children?: Renderable[]): SceneGraphN
 			coreDefault: entityDefaults,
 			appliedStyleClasses: new ArrayDataSource(),
 			entityTypeDefault: {
-				backgroundColor: new DataSource('black')
+				backgroundColor: new DataSource('black'),
+				resolutionX: new DataSource(undefined),
+				resolutionY: new DataSource(undefined)
 			},
 			userSpecified: {
 				...propsToModel(props),

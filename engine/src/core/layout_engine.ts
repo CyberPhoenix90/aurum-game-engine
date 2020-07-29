@@ -15,14 +15,6 @@ export interface LayoutData {
 	sizeY: DataSource<number>;
 }
 
-// const referenceMap = new WeakMap<
-// 	SceneGraphNode<CommonEntity>,
-// 	{
-// 		parentSizeListener: () => void;
-// 		childrenStateListener: () => void;
-// 	}
-// >();
-
 export function layoutAlgorithm(node: SceneGraphNode<any>): LayoutData {
 	let sizeX: DataSource<number>;
 	let sizeY: DataSource<number>;
@@ -30,11 +22,12 @@ export function layoutAlgorithm(node: SceneGraphNode<any>): LayoutData {
 	let y: DataSource<number>;
 
 	if (node instanceof LabelGraphNode) {
-		sizeX = node.resolvedModel.width.aggregateFour(
+		sizeX = node.resolvedModel.width.aggregateFive(
 			node.resolvedModel.text,
 			node.resolvedModel.fontSize,
 			node.resolvedModel.fontFamily,
-			(size, text, fs, ff) => (size === undefined ? measureStringWidth(text, node.resolvedModel.fontWeight.value, fs, ff) : computeSize(size))
+			node.resolvedModel.fontWeight,
+			(size, text, fs, ff, fw) => (size === undefined ? measureStringWidth(text, fw, fs, ff) : computeSize(size))
 		);
 		sizeY = node.resolvedModel.height.map((v) => computeSize(v));
 	} else {

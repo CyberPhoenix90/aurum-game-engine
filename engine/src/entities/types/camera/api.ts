@@ -12,7 +12,10 @@ export class CameraGraphNode extends SceneGraphNode<CameraEntity> {
 	}
 
 	protected createResolvedModel(): CameraEntity {
-		const base = this.createBaseResolvedModel();
+		const base = this.createBaseResolvedModel() as CameraEntity;
+		base.backgroundColor = this.getModelSourceWithFallback('backgroundColor');
+		base.resolutionX = this.getModelSourceWithFallback('resolutionX');
+		base.resolutionY = this.getModelSourceWithFallback('resolutionY');
 		return base;
 	}
 
