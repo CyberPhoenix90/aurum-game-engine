@@ -1,4 +1,4 @@
-import { Color, SpriteEntityRenderModel } from 'aurum-game-engine';
+import { Color, SpriteEntityRenderModel, SpriteGraphNode } from 'aurum-game-engine';
 import { ReadOnlyDataSource } from 'aurumjs';
 import { BaseTexture, Sprite, Texture as PixiTexture } from 'pixi.js';
 import { NoRenderEntity } from './pixi_no_render_entity';
@@ -10,12 +10,12 @@ export class RenderSpriteEntity extends NoRenderEntity {
 	public displayObject: Sprite;
 	public static voidTexture: PixiTexture = new PixiTexture(new BaseTexture(document.createElement('canvas')));
 
-	constructor(config: SpriteEntityRenderModel) {
+	constructor(config: SpriteGraphNode) {
 		super(config);
 	}
 
-	protected createDisplayObject(model: SpriteEntityRenderModel) {
-		const texture = this.createTexture(model.texture, model);
+	protected createDisplayObject(model: SpriteGraphNode) {
+		const texture = this.createTexture(model.renderState.texture, model.renderState);
 		return new Sprite(texture);
 	}
 
@@ -75,8 +75,8 @@ export class RenderSpriteEntity extends NoRenderEntity {
 		return result;
 	}
 
-	public bind(model: SpriteEntityRenderModel) {
-		model.tint.listenAndRepeat((v) => {
+	public bind(model: SpriteGraphNode) {
+		model.renderState.tint.listenAndRepeat((v) => {
 			if (v) {
 				this.displayObject.tint = Color.fromString(v).toRGBNumber();
 			} else {
@@ -84,7 +84,7 @@ export class RenderSpriteEntity extends NoRenderEntity {
 			}
 		}, this.token);
 
-		model.drawOffsetX.listenAndRepeat((v) => {
+		model.renderState.drawOffsetX.listenAndRepeat((v) => {
 			if (v === undefined) {
 				this.displayObject.texture.frame.x = 0;
 			} else {
@@ -93,7 +93,7 @@ export class RenderSpriteEntity extends NoRenderEntity {
 			this.displayObject.texture.updateUvs();
 		}, this.token);
 
-		model.drawOffsetY.listenAndRepeat((v) => {
+		model.renderState.drawOffsetY.listenAndRepeat((v) => {
 			if (v === undefined) {
 				this.displayObject.texture.frame.y = 0;
 			} else {
@@ -102,7 +102,7 @@ export class RenderSpriteEntity extends NoRenderEntity {
 			this.displayObject.texture.updateUvs();
 		}, this.token);
 
-		model.drawDistanceX.listenAndRepeat((v) => {
+		model.renderState.drawDistanceX.listenAndRepeat((v) => {
 			if (v === undefined) {
 				this.displayObject.texture.frame.width = this.displayObject.texture.baseTexture.realWidth;
 			} else {
@@ -111,7 +111,7 @@ export class RenderSpriteEntity extends NoRenderEntity {
 			this.displayObject.texture.updateUvs();
 		}, this.token);
 
-		model.drawDistanceY.listenAndRepeat((v) => {
+		model.renderState.drawDistanceY.listenAndRepeat((v) => {
 			if (v === undefined) {
 				this.displayObject.texture.frame.height = this.displayObject.texture.baseTexture.realHeight;
 			} else {

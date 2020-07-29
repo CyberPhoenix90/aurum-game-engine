@@ -1,20 +1,21 @@
 import {
-	CameraEntityRenderModel,
-	EntityRenderModel,
-	LabelEntityRenderModel,
+	CameraGraphNode,
+	CanvasGraphNode,
+	CommonEntity,
+	LabelGraphNode,
 	RenderableType,
-	SpriteEntityRenderModel,
-	CanvasEntityRenderModel,
-	TiledMapRenderModel
+	SceneGraphNode,
+	SpriteGraphNode,
+	TiledMapGraphNode
 } from 'aurum-game-engine';
 import { Container } from 'pixi.js';
 import { NoRenderEntity } from './pixi_no_render_entity';
 import { RenderCameraEntity } from './pixi_render_camera';
+import { RenderCanvasEntity } from './pixi_render_canvas_entity';
 import { RenderLabelEntity } from './pixi_render_label_entity';
+import { RenderMapEntity } from './pixi_render_map_entity';
 import { RenderSpriteEntity } from './pixi_render_sprite_entity';
 import { RenderTiledSpriteEntity } from './pixi_render_tiled_sprite_entity';
-import { RenderCanvasEntity } from './pixi_render_canvas_entity';
-import { RenderMapEntity } from './pixi_render_map_entity';
 
 export class RenderStage {
 	public readonly id: number;
@@ -31,13 +32,13 @@ export class RenderStage {
 		this.entityDatabase = entityDatabase;
 	}
 
-	public addNode(payload: EntityRenderModel, index?: number): void {
+	public addNode(payload: SceneGraphNode<CommonEntity>, index?: number): void {
 		const node = this.createRenderNode(payload);
 		this.entityDatabase[node.id] = node;
 		node.token.addCancelable(() => delete this.entityDatabase[node.id]);
 
-		if (payload.parentUid !== undefined) {
-			const parent: NoRenderEntity = this.entityDatabase[payload.parentUid] as NoRenderEntity;
+		if (payload.parent?.uid !== undefined) {
+			const parent: NoRenderEntity = this.entityDatabase[payload.parent?.uid] as NoRenderEntity;
 			if (index !== undefined) {
 				parent.displayObject.addChildAt(node.displayObject, index);
 				parent.children.splice(index, 0, node);
@@ -62,26 +63,26 @@ export class RenderStage {
 		node.token.cancel();
 	}
 
-	private createRenderNode(model: EntityRenderModel): NoRenderEntity {
-		switch (model.renderableType) {
+	private createRenderNode(model: SceneGraphNode<CommonEntity>): NoRenderEntity {
+		switch (model.renderState.renderableType) {
 			case RenderableType.NO_RENDER:
 				return new NoRenderEntity(model);
 			case RenderableType.LABEL:
-				return new RenderLabelEntity(model as LabelEntityRenderModel);
+				return new RenderLabelEntity(model as LabelGraphNode);
 			case RenderableType.SPRITE:
-				return new RenderSpriteEntity(model as SpriteEntityRenderModel);
+				return new RenderSpriteEntity(model as SpriteGraphNode);
 			case RenderableType.CANVAS:
-				return new RenderCanvasEntity(model as CanvasEntityRenderModel);
+				return new RenderCanvasEntity(model as CanvasGraphNode);
 			case RenderableType.TILED_SPRITE:
-				return new RenderTiledSpriteEntity(model as SpriteEntityRenderModel);
+				return new RenderTiledSpriteEntity(model as SpriteGraphNode);
 			case RenderableType.BOX_SPRITE:
-				return new RenderSpriteEntity(model as SpriteEntityRenderModel);
+				return new RenderSpriteEntity(model as SpriteGraphNode);
 			case RenderableType.CAMERA:
-				const camera = new RenderCameraEntity(model as CameraEntityRenderModel, this.stageNode);
+				const camera = new RenderCameraEntity(model as CameraGraphNode, this.stageNode);
 				camera.displayObject.visible = false;
 				return camera;
 			case RenderableType.TILE_MAP:
-				return new RenderMapEntity(model as TiledMapRenderModel);
+				return new RenderMapEntity(model as TiledMapGraphNode);
 		}
 	}
 

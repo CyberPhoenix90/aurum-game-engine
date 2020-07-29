@@ -1,9 +1,10 @@
-import { ArrayDataSource, DataSource } from 'aurumjs';
+import { ArrayDataSource, DataSource, MapDataSource } from 'aurumjs';
 import { AbstractComponent } from '../entities/components/abstract_component';
-import { Size, MapLike, Constructor } from '../models/common';
+import { MapLike, Position } from '../models/common';
 import { Data } from '../models/input_data';
 import { SceneGraphNode } from './scene_graph';
-import { EntityRenderModel } from '../rendering/model';
+import { Constructor } from 'aurumjs/dist/utilities/common';
+import { AbstractLayout } from '../layouts/abstract_layout';
 
 export interface Shader {
 	vertex?: string;
@@ -14,8 +15,8 @@ export interface Shader {
 export type ShaderUniforms = MapLike<boolean | number | number[]>;
 
 export interface CommonEntityProps {
-	x?: Data<Size | 'center' | 'left' | 'right'>;
-	y?: Data<Size | 'center' | 'top' | 'bottom'>;
+	x?: Data<Position>;
+	y?: Data<Position>;
 	originX?: Data<number>;
 	originY?: Data<number>;
 	clip?: Data<boolean>;
@@ -28,53 +29,49 @@ export interface CommonEntityProps {
 	marginRight?: Data<number>;
 	marginBottom?: Data<number>;
 	marginLeft?: Data<number>;
-	minWidth?: Data<Size | 'content' | 'inherit' | 'remainder'>;
-	minHeight?: Data<Size | 'content' | 'inherit' | 'remainder'>;
-	width?: Data<Size | 'content' | 'inherit' | 'remainder'>;
-	maxWidth?: Data<Size | 'content' | 'inherit' | 'remainder'>;
-	maxHeight?: Data<Size | 'content' | 'inherit' | 'remainder'>;
-	height?: Data<Size | 'content' | 'inherit' | 'remainder'>;
+	minWidth?: Data<Position | 'content' | 'inherit' | 'remainder'>;
+	minHeight?: Data<Position | 'content' | 'inherit' | 'remainder'>;
+	width?: Data<Position | 'content' | 'inherit' | 'remainder'>;
+	maxWidth?: Data<Position | 'content' | 'inherit' | 'remainder'>;
+	maxHeight?: Data<Position | 'content' | 'inherit' | 'remainder'>;
+	height?: Data<Position | 'content' | 'inherit' | 'remainder'>;
 	scaleX?: Data<number>;
 	scaleY?: Data<number>;
 	visible?: Data<boolean>;
 	alpha?: Data<number>;
-	components?: ArrayDataSource<AbstractComponent> | AbstractComponent[];
-	//class?: StyleClass<any>[];
+	components?: MapDataSource<Constructor<AbstractComponent>, AbstractComponent> | AbstractComponent[];
+	class?: string[] | ArrayDataSource<string>;
 	name?: string;
-	//layout?: ReadonlyData<AbstractLayout>;
-	onAttach?(node: SceneGraphNode<CommonEntity>, renderModel: EntityRenderModel): void;
-	onDetach?(node: SceneGraphNode<CommonEntity>, renderModel: EntityRenderModel): void;
+	layout?: AbstractLayout | DataSource<AbstractLayout>;
+	onAttach?(node: SceneGraphNode<CommonEntity>): void;
+	onDetach?(node: SceneGraphNode<CommonEntity>): void;
 }
 
 export interface CommonEntity {
-	x: DataSource<Size>;
-	y: DataSource<Size>;
-	originX: DataSource<number>;
-	originY: DataSource<number>;
-	clip: DataSource<boolean>;
-	marginTop: DataSource<number>;
-	marginRight: DataSource<number>;
-	marginBottom: DataSource<number>;
-	marginLeft: DataSource<number>;
-	ignoreLayout: DataSource<boolean>;
-	spreadLayout: DataSource<boolean>;
-	zIndex: DataSource<number>;
-	scaleX: DataSource<number>;
-	scaleY: DataSource<number>;
-	shaders: ArrayDataSource<Shader>;
-	blendMode: DataSource<BlendModes>;
-	minWidth: DataSource<Size | 'content' | 'inherit' | 'remainder'>;
-	minHeight: DataSource<Size | 'content' | 'inherit' | 'remainder'>;
-	width: DataSource<Size | 'content' | 'inherit' | 'remainder'>;
-	maxWidth: DataSource<Size | 'content' | 'inherit' | 'remainder'>;
-	maxHeight: DataSource<Size | 'content' | 'inherit' | 'remainder'>;
-	height: DataSource<Size | 'content' | 'inherit' | 'remainder'>;
-	visible: DataSource<boolean>;
-	alpha: DataSource<number>;
-	components: ArrayDataSource<AbstractComponent>;
-	getComponentByType<T extends AbstractComponent>(type: Constructor<T>): T;
-	//class?: StyleClass<any>[];
-	name: string;
+	x?: DataSource<Position>;
+	y?: DataSource<Position>;
+	originX?: DataSource<number>;
+	originY?: DataSource<number>;
+	clip?: DataSource<boolean>;
+	marginTop?: DataSource<number>;
+	marginRight?: DataSource<number>;
+	marginBottom?: DataSource<number>;
+	marginLeft?: DataSource<number>;
+	ignoreLayout?: DataSource<boolean>;
+	spreadLayout?: DataSource<boolean>;
+	zIndex?: DataSource<number>;
+	scaleX?: DataSource<number>;
+	scaleY?: DataSource<number>;
+	shaders?: ArrayDataSource<Shader>;
+	blendMode?: DataSource<BlendModes>;
+	minWidth?: DataSource<Position | 'content' | 'inherit' | 'remainder'>;
+	minHeight?: DataSource<Position | 'content' | 'inherit' | 'remainder'>;
+	width?: DataSource<Position | 'content' | 'inherit' | 'remainder'>;
+	maxWidth?: DataSource<Position | 'content' | 'inherit' | 'remainder'>;
+	maxHeight?: DataSource<Position | 'content' | 'inherit' | 'remainder'>;
+	height?: DataSource<Position | 'content' | 'inherit' | 'remainder'>;
+	visible?: DataSource<boolean>;
+	alpha?: DataSource<number>;
 	//layout?: ReadonlyData<AbstractLayout>;
 }
 

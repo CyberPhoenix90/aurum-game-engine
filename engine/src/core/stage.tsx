@@ -1,11 +1,10 @@
-import { Webcomponent, AurumComponentAPI, Aurum, Renderable, DataSource } from 'aurumjs';
+import { Aurum, AurumComponentAPI, DataSource, EventEmitter, Renderable, Webcomponent } from 'aurumjs';
+import { CameraGraphNode } from '../entities/types/camera/api';
+import { Clock } from '../game_features/time/clock';
 import { SceneGraphNode } from '../models/scene_graph';
-import { RenderableType } from '../models/entities';
-import { synchronizeWithRenderPlugin } from './scene_graph_manager';
 import { AbstractRenderPlugin } from '../rendering/abstract_render_plugin';
 import { _ } from '../utilities/other/streamline';
-import { EventEmitter } from 'aurumjs';
-import { Clock } from '../game_features/time/clock';
+import { synchronizeWithRenderPlugin } from './scene_graph_manager';
 
 export let engineRootTime: DataSource<number> = new DataSource(0);
 
@@ -26,7 +25,7 @@ const StageComponent = Webcomponent(
 	},
 	(props: { renderPlugin: AbstractRenderPlugin; nodes: SceneGraphNode<any>[]; clock: Clock }, api: AurumComponentAPI) => {
 		const stageId = _.getUId();
-		const cameras = props.nodes.filter((n) => n.nodeType === RenderableType.CAMERA);
+		const cameras = props.nodes.filter((n) => n instanceof CameraGraphNode);
 		const clock = (engineClock = props.clock);
 		let running = true;
 		clock.start = () => (running = true);
@@ -35,7 +34,7 @@ const StageComponent = Webcomponent(
 			<div
 				onAttach={(stageNode) => {
 					props.renderPlugin.addStage(stageId, stageNode);
-					synchronizeWithRenderPlugin(props.renderPlugin, stageId, props.nodes, undefined, undefined, api.prerender.bind(api));
+					synchronizeWithRenderPlugin(props.renderPlugin, stageId, props.nodes);
 					let lastBefore = clock.timestamp;
 					let lastAfter = clock.timestamp;
 					let lastTick = Date.now();

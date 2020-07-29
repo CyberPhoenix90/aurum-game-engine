@@ -1,24 +1,24 @@
-import { NoRenderEntity } from './pixi_no_render_entity';
-import { CameraEntityRenderModel, Color } from 'aurum-game-engine';
+import { CameraGraphNode, Color } from 'aurum-game-engine';
 import { autoDetectRenderer, DisplayObject } from 'pixi.js';
+import { NoRenderEntity } from './pixi_no_render_entity';
 
 export class RenderCameraEntity extends NoRenderEntity {
 	private readonly renderer: PIXI.Renderer;
-	private readonly model: CameraEntityRenderModel;
+	private readonly model: CameraGraphNode;
 	private view: HTMLCanvasElement;
 
-	constructor(model: CameraEntityRenderModel, stageNode: HTMLElement) {
+	constructor(model: CameraGraphNode, stageNode: HTMLElement) {
 		super(model);
 		this.model = model;
 		const view: HTMLCanvasElement = document.createElement('canvas');
-		model.view = view;
-		view.width = model.sizeX.value;
-		view.height = model.sizeY.value;
+		model.renderState.view = view;
+		view.width = model.renderState.sizeX.value;
+		view.height = model.renderState.sizeY.value;
 		stageNode.appendChild(view);
 
 		this.renderer = autoDetectRenderer({
 			view: view,
-			backgroundColor: Color.fromString(model.backgroundColor.value || '#000000').toRGBNumber()
+			backgroundColor: Color.fromString(model.renderState.backgroundColor.value || '#000000').toRGBNumber()
 		});
 
 		this.view = view;
@@ -27,8 +27,8 @@ export class RenderCameraEntity extends NoRenderEntity {
 	public renderView(node: DisplayObject) {
 		//@ts-ignore
 		this.view.node = node;
-		if (this.renderer.view.width !== this.model.sizeX.value || this.renderer.view.height !== this.model.sizeY.value) {
-			this.renderer.resize(this.model.sizeX.value, this.model.sizeY.value);
+		if (this.renderer.view.width !== this.model.renderState.sizeX.value || this.renderer.view.height !== this.model.renderState.sizeY.value) {
+			this.renderer.resize(this.model.renderState.sizeX.value, this.model.renderState.sizeY.value);
 		}
 		this.renderer.render(node);
 	}

@@ -1,5 +1,5 @@
 import { NoRenderEntity } from './pixi_no_render_entity';
-import { TilesetTypes, TiledLayer, TiledMapRenderModel } from 'aurum-game-engine';
+import { TilesetTypes, TiledLayer, TiledMapRenderModel, TiledMapGraphNode } from 'aurum-game-engine';
 import { Container, BaseTexture, Texture } from 'pixi.js';
 
 let CompositeRectTileLayer: any;
@@ -11,7 +11,7 @@ export class RenderMapEntity extends NoRenderEntity {
 	public displayObject: PIXI.Container;
 	private textures: PIXI.Texture[];
 
-	constructor(model: TiledMapRenderModel) {
+	constructor(model: TiledMapGraphNode) {
 		super(model);
 	}
 
@@ -125,8 +125,8 @@ export class RenderMapEntity extends NoRenderEntity {
 		mapLayer.addRect(tilesetIndex, tileX, tileY, posX, posY, tileWidth, tileHeight);
 	}
 
-	protected createDisplayObject(model: TiledMapRenderModel) {
-		this.initialize(model);
+	protected createDisplayObject(model: TiledMapGraphNode) {
+		this.initialize(model.renderState);
 		return new PIXI.Container();
 	}
 }

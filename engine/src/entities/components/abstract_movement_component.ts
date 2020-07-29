@@ -49,15 +49,15 @@ export abstract class AbstractMovementComponent extends AbstractComponent {
 			return;
 		}
 
-		if (typeof entity.model.x.value !== 'number') {
-			entity.model.x.update(target.x);
+		if (typeof entity.resolvedModel.x.value !== 'number') {
+			entity.models.userSpecified.x.update(target.x);
 		}
-		if (typeof entity.model.y.value !== 'number') {
-			entity.model.y.update(target.y);
+		if (typeof entity.resolvedModel.y.value !== 'number') {
+			entity.models.userSpecified.y.update(target.y);
 		}
 
-		const positionX: DataSource<number> = entity.model.x as any;
-		const positionY: DataSource<number> = entity.model.y as any;
+		const positionX: DataSource<number> = entity.resolvedModel.x as any;
+		const positionY: DataSource<number> = entity.resolvedModel.y as any;
 
 		if (this.config.euclideanMovement) {
 			this.approachEuclidean(target, positionX, positionY, delta);

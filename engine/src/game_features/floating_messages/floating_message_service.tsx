@@ -1,5 +1,4 @@
 import { ArrayDataSource, Renderable, DataSource, Aurum } from 'aurumjs';
-import { LabelEntityStyle, Label } from '../../entities/label_entity';
 import { PointLike } from '../../models/point';
 import { Data } from '../../models/input_data';
 import { animate } from '../../graphics/animation/animate';
@@ -7,6 +6,8 @@ import { Vector2D } from '../../math/vectors/vector2d';
 import { Shader } from '../../models/entities';
 import { Clock } from '../time/clock';
 import { engineClock } from '../../core/stage';
+import { LabelEntityStyle } from '../../entities/types/label/model';
+import { Label } from '../../entities/types/label/label_entity';
 
 export interface IFloatingMessageOptions {
 	position: PointLike;

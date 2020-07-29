@@ -1,16 +1,16 @@
+import { AbstractShape, CanvasGraphNode, Circle, Color, ComposedShape, PaintOperation, Polygon, Rectangle } from 'aurum-game-engine';
+import { ArrayDataSource, CancellationToken, DataSource } from 'aurumjs';
 import { Graphics } from 'pixi.js';
 import { NoRenderEntity } from './pixi_no_render_entity';
-import { PaintOperation, CanvasEntityRenderModel, Color, Rectangle, Circle, Polygon, AbstractShape, ComposedShape } from 'aurum-game-engine';
-import { ArrayDataSource, DataSource, CancellationToken } from 'aurumjs';
 
 export class RenderCanvasEntity extends NoRenderEntity {
 	public displayObject: Graphics;
 	private paintOperations: ArrayDataSource<PaintOperation>;
 	private drawToken: CancellationToken;
 
-	constructor(config: CanvasEntityRenderModel) {
+	constructor(config: CanvasGraphNode) {
 		super(config);
-		this.paintOperations = config.painerOperations;
+		this.paintOperations = config.renderState.paintOperations;
 		this.paintOperations.listenAndRepeat(() => {
 			this.drawAll();
 		}, config.cancellationToken);

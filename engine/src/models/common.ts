@@ -1,6 +1,6 @@
 import { PointLike } from './point';
 
-export type Size = number | string;
+export type Position = number | string;
 
 export type Radian = number;
 export type Degrees = number;

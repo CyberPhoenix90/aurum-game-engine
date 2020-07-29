@@ -1,306 +1,35 @@
 import { ArrayDataSource, CancellationToken, createRenderSession, DataSource, render, Renderable } from 'aurumjs';
-import { AbstractRenderPlugin, LabelEntity, SpriteEntity } from '../aurum_game_engine';
-import { CameraEntity } from '../entities/camera';
-import { CanvasEntity } from '../entities/canvas_entity';
-import { TiledMapEntity, TiledMapRenderModel } from '../game_features/tile_maps/tiled/tiled_map_entity';
-import { CommonEntity, RenderableType } from '../models/entities';
+import { AbstractRenderPlugin } from '../aurum_game_engine';
+import { CommonEntity } from '../models/entities';
 import { SceneGraphNode } from '../models/scene_graph';
-import { CameraEntityRenderModel, CanvasEntityRenderModel, EntityRenderModel, LabelEntityRenderModel, SpriteEntityRenderModel } from '../rendering/model';
-import { layoutAlgorithm } from './layout_engine';
 
-export function createRenderModel(node: SceneGraphNode<CommonEntity>, parent?: SceneGraphNode<any>, parentRenderModel?: EntityRenderModel): EntityRenderModel {
-	const { x, y, sizeX, sizeY } = layoutAlgorithm(node, parentRenderModel);
-	let result;
-
-	switch (node.nodeType) {
-		case RenderableType.SPRITE:
-			result = {
-				parent: parentRenderModel,
-				children: new ArrayDataSource(),
-				getAbsolutePositionX: undefined,
-				getAbsolutePositionY: undefined,
-				alpha: node.model.alpha,
-				cancellationToken: node.cancellationToken,
-				clip: node.model.clip,
-				name: node.model.name,
-				parentUid: parent?.uid,
-				positionX: x,
-				positionY: y,
-				sizeX: sizeX,
-				sizeY: sizeY,
-				scaleX: node.model.scaleX,
-				scaleY: node.model.scaleY,
-				renderableType: node.nodeType,
-				uid: node.uid,
-				visible: node.model.visible,
-				zIndex: node.model.zIndex,
-				blendMode: node.model.blendMode,
-				texture: (node.model as SpriteEntity).texture,
-				tint: (node.model as SpriteEntity).tint,
-				drawOffsetX: (node.model as SpriteEntity).drawOffsetX,
-				drawOffsetY: (node.model as SpriteEntity).drawOffsetY,
-				drawDistanceX: (node.model as SpriteEntity).drawDistanceX,
-				drawDistanceY: (node.model as SpriteEntity).drawDistanceY,
-				shader: node.model.shaders
-			} as SpriteEntityRenderModel;
-			break;
-		case RenderableType.CANVAS:
-			result = {
-				parent: parentRenderModel,
-				children: new ArrayDataSource(),
-				getAbsolutePositionX: undefined,
-				getAbsolutePositionY: undefined,
-				alpha: node.model.alpha,
-				cancellationToken: node.cancellationToken,
-				clip: node.model.clip,
-				name: node.model.name,
-				parentUid: parent?.uid,
-				positionX: x,
-				positionY: y,
-				sizeX: sizeX,
-				sizeY: sizeY,
-				scaleX: node.model.scaleX,
-				scaleY: node.model.scaleY,
-				renderableType: node.nodeType,
-				uid: node.uid,
-				visible: node.model.visible,
-				zIndex: node.model.zIndex,
-				blendMode: node.model.blendMode,
-				painerOperations: (node.model as CanvasEntity).paintOperations,
-				shader: node.model.shaders
-			} as CanvasEntityRenderModel;
-			break;
-		case RenderableType.CAMERA:
-			result = {
-				parent: parentRenderModel,
-				children: new ArrayDataSource(),
-				getAbsolutePositionX: undefined,
-				getAbsolutePositionY: undefined,
-				view: undefined,
-				alpha: node.model.alpha,
-				cancellationToken: node.cancellationToken,
-				clip: node.model.clip,
-				name: node.model.name,
-				parentUid: parent?.uid,
-				renderableType: node.nodeType,
-				uid: node.uid,
-				positionX: x,
-				positionY: y,
-				sizeX: sizeX,
-				sizeY: sizeY,
-				scaleX: node.model.scaleX,
-				scaleY: node.model.scaleY,
-				visible: node.model.visible,
-				zIndex: node.model.zIndex,
-				blendMode: node.model.blendMode,
-				backgroundColor: (node.model as CameraEntity).backgroundColor,
-				shader: node.model.shaders
-			} as CameraEntityRenderModel;
-			break;
-		case RenderableType.LABEL:
-			result = {
-				parent: parentRenderModel,
-				children: new ArrayDataSource(),
-				getAbsolutePositionX: undefined,
-				getAbsolutePositionY: undefined,
-				alpha: node.model.alpha,
-				cancellationToken: node.cancellationToken,
-				clip: node.model.clip,
-				name: node.model.name,
-				parentUid: parent?.uid,
-				renderableType: node.nodeType,
-				uid: node.uid,
-				positionX: x,
-				positionY: y,
-				sizeX,
-				sizeY,
-				scaleX: node.model.scaleX,
-				scaleY: node.model.scaleY,
-				visible: node.model.visible,
-				zIndex: node.model.zIndex,
-				blendMode: node.model.blendMode,
-				text: (node.model as LabelEntity).text,
-				color: (node.model as LabelEntity).color,
-				dropShadowAngle: (node.model as LabelEntity).dropShadowAngle,
-				renderCharCount: (node.model as LabelEntity).renderCharCount,
-				stroke: (node.model as LabelEntity).stroke,
-				strokeThickness: (node.model as LabelEntity).strokeThickness,
-				fontSize: (node.model as LabelEntity).fontSize,
-				fontFamily: (node.model as LabelEntity).fontFamily,
-				fontStyle: (node.model as LabelEntity).fontStyle,
-				fontWeight: (node.model as LabelEntity).fontWeight,
-				dropShadowColor: (node.model as LabelEntity).dropShadowColor,
-				dropShadowDistance: (node.model as LabelEntity).dropShadowDistance,
-				dropShadowFuzziness: (node.model as LabelEntity).dropShadowFuzziness,
-				textBaseline: (node.model as LabelEntity).textBaseline,
-				dropShadow: (node.model as LabelEntity).dropShadow,
-				shader: node.model.shaders
-			} as LabelEntityRenderModel;
-			break;
-		case RenderableType.NO_RENDER:
-			result = {
-				parent: parentRenderModel,
-				children: new ArrayDataSource(),
-				getAbsolutePositionX: undefined,
-				getAbsolutePositionY: undefined,
-				alpha: node.model.alpha,
-				cancellationToken: node.cancellationToken,
-				clip: node.model.clip,
-				name: node.model.name,
-				parentUid: parent?.uid,
-				renderableType: node.nodeType,
-				uid: node.uid,
-				positionX: x,
-				positionY: y,
-				sizeX: sizeX,
-				sizeY: sizeY,
-				scaleX: node.model.scaleX,
-				scaleY: node.model.scaleY,
-				visible: node.model.visible,
-				zIndex: node.model.zIndex,
-				blendMode: node.model.blendMode,
-				shader: node.model.shaders
-			} as EntityRenderModel;
-			break;
-		case RenderableType.TILE_MAP:
-			result = {
-				parent: parentRenderModel,
-				children: new ArrayDataSource(),
-				getAbsolutePositionX: undefined,
-				getAbsolutePositionY: undefined,
-				layers: (node.model as TiledMapEntity).layers,
-				mapData: (node.model as TiledMapEntity).mapData,
-				tilesets: (node.model as TiledMapEntity).tilesets,
-				alpha: node.model.alpha,
-				cancellationToken: node.cancellationToken,
-				clip: node.model.clip,
-				name: node.model.name,
-				parentUid: parent?.uid,
-				renderableType: node.nodeType,
-				uid: node.uid,
-				positionX: x,
-				positionY: y,
-				sizeX: sizeX,
-				sizeY: sizeY,
-				scaleX: node.model.scaleX,
-				scaleY: node.model.scaleY,
-				visible: node.model.visible,
-				zIndex: node.model.zIndex,
-				blendMode: node.model.blendMode,
-				shader: node.model.shaders
-			} as TiledMapRenderModel;
-			break;
-	}
-
-	result.getAbsolutePositionX = getAbsolutePositionX.bind(result);
-	result.getAbsolutePositionY = getAbsolutePositionY.bind(result);
-	return result;
-}
-
-function getAbsolutePositionX(this: EntityRenderModel) {
-	let x = this.positionX.value;
-	let ptr = this.parent;
-	while (ptr) {
-		x += ptr.positionX.value;
-		ptr = ptr.parent;
-	}
-	return x;
-}
-function getAbsolutePositionY(this: EntityRenderModel) {
-	let y = this.positionY.value;
-	let ptr = this.parent;
-	while (ptr) {
-		y += ptr.positionY.value;
-		ptr = ptr.parent;
-	}
-	return y;
-}
-
-export function synchronizeWithRenderPlugin(
-	renderPlugin: AbstractRenderPlugin,
-	stageId: number,
-	nodes: SceneGraphNode<CommonEntity>[],
-	parent: SceneGraphNode<any>,
-	parentRenderModel: EntityRenderModel,
-	prerender: (renderable: Renderable[]) => SceneGraphNode<any>[]
-) {
+export function synchronizeWithRenderPlugin(renderPlugin: AbstractRenderPlugin, stageId: number, nodes: ReadonlyArray<SceneGraphNode<CommonEntity>>) {
 	for (let i = 0; i < nodes.length; i++) {
 		const node = nodes[i];
 
 		if (node instanceof ArrayDataSource) {
-			handleArraySource(node, renderPlugin, stageId, prerender, parent, parentRenderModel);
+			handleArraySource(node, renderPlugin, stageId);
 		} else if (node instanceof DataSource) {
-			handleDataSource(node, prerender, renderPlugin, stageId, parent, parentRenderModel);
+			handleDataSource(node, renderPlugin, stageId);
 		} else {
-			handleStaticNode(node, parent, parentRenderModel, renderPlugin, stageId, prerender);
+			handleStaticNode(node, renderPlugin, stageId);
 		}
 	}
 }
 
-function handleStaticNode(
-	node: SceneGraphNode<CommonEntity>,
-	parent: SceneGraphNode<any>,
-	parentRenderModel: EntityRenderModel,
-	renderPlugin: AbstractRenderPlugin,
-	stageId: number,
-	prerender: (renderable: Renderable[]) => SceneGraphNode<any>[]
-): void {
+function handleStaticNode(node: SceneGraphNode<CommonEntity>, renderPlugin: AbstractRenderPlugin, stageId: number): void {
 	const children = node.children;
-	const renderData = createRenderModel(node, parent, parentRenderModel);
-	renderData.cancellationToken.addCancelable(() => {
-		renderPlugin.removeNode(renderData.uid, stageId);
-		node.onDetach?.(node, renderData);
+	node.cancellationToken.addCancelable(() => {
+		renderPlugin.removeNode(node.uid, stageId);
 	});
-	renderPlugin.addNode(renderData, stageId);
-	node.onAttach?.(node, renderData);
-	node.model.components.listenAndRepeat((change) => {
-		switch (change.operation) {
-			case 'add':
-				for (const item of change.items) {
-					item.onAttach(node, renderData);
-				}
-				break;
-			case 'remove':
-				for (const item of change.items) {
-					item.onDetach();
-				}
-				break;
-			case 'replace':
-				change.target.onDetach();
-				for (const item of change.items) {
-					item.onAttach(node, renderData);
-				}
-				break;
-			case 'merge':
-				for (const item of change.previousState) {
-					item.onDetach();
-				}
-				for (const item of change.items) {
-					item.onAttach(node, renderData);
-				}
-				break;
-		}
-	}, renderData.cancellationToken);
-	if (parentRenderModel) {
-		renderData.cancellationToken.addCancelable(() => {
-			parentRenderModel.children.remove(renderData);
-		});
-		parentRenderModel.children.push(renderData);
-	}
+	renderPlugin.addNode(node, stageId);
 
 	if (children) {
-		synchronizeWithRenderPlugin(renderPlugin, stageId, children, node, renderData, prerender);
+		synchronizeWithRenderPlugin(renderPlugin, stageId, children.getData());
 	}
 }
 
-function handleDataSource(
-	node: SceneGraphNode<CommonEntity> & DataSource<any>,
-	prerender: (renderable: Renderable[]) => SceneGraphNode<any>[],
-	renderPlugin: AbstractRenderPlugin,
-	stageId: number,
-	parent: SceneGraphNode<any>,
-	parentRenderModel: EntityRenderModel
-) {
+function handleDataSource(node: SceneGraphNode<CommonEntity> & DataSource<any>, renderPlugin: AbstractRenderPlugin, stageId: number) {
 	let cleanUp: CancellationToken;
 	node.listenAndRepeat((v) => {
 		if (cleanUp) {
@@ -314,7 +43,7 @@ function handleDataSource(
 				cleanUp.chain(n.cancellationToken);
 			}
 		}
-		synchronizeWithRenderPlugin(renderPlugin, stageId, subNodes, parent, parentRenderModel, prerender);
+		synchronizeWithRenderPlugin(renderPlugin, stageId, subNodes);
 		rs.attachCalls.forEach((cb) => cb());
 		cleanUp.chain(rs.sessionToken);
 	});
@@ -322,22 +51,15 @@ function handleDataSource(
 
 const dynamicRenderKeys = new Map<Renderable, CancellationToken>();
 
-function handleArraySource(
-	node: SceneGraphNode<CommonEntity> & ArrayDataSource<any>,
-	renderPlugin: AbstractRenderPlugin,
-	stageId: number,
-	prerender: (renderable: Renderable[]) => SceneGraphNode<any>[],
-	parent: SceneGraphNode<any>,
-	parentRenderModel: EntityRenderModel
-) {
+function handleArraySource(node: SceneGraphNode<CommonEntity> & ArrayDataSource<any>, renderPlugin: AbstractRenderPlugin, stageId: number) {
 	node.listenAndRepeat((change) => {
 		switch (change.operation) {
 			case 'add':
 				for (const item of change.items) {
 					const rs = createRenderSession();
-					const node = (render(item, rs) as any) as SceneGraphNode<any>;
+					const node = render(item, rs) as SceneGraphNode<any>;
 					dynamicRenderKeys.set(item, node.cancellationToken);
-					synchronizeWithRenderPlugin(renderPlugin, stageId, [node], parent, parentRenderModel, prerender);
+					synchronizeWithRenderPlugin(renderPlugin, stageId, [node]);
 					rs.attachCalls.forEach((cb) => cb());
 					node.cancellationToken.chain(rs.sessionToken);
 				}
@@ -349,9 +71,11 @@ function handleArraySource(
 				break;
 			case 'replace':
 				dynamicRenderKeys.get(change.target).cancel();
-				const node = (prerender(change.items[0]) as any) as SceneGraphNode<any>;
+				const rs = createRenderSession();
+				const node = render(change.items[0], rs) as SceneGraphNode<any>;
+				rs.attachCalls.forEach((cb) => cb());
 				dynamicRenderKeys.set(change.items[0], node.cancellationToken);
-				synchronizeWithRenderPlugin(renderPlugin, stageId, [node], parent, parentRenderModel, prerender);
+				synchronizeWithRenderPlugin(renderPlugin, stageId, [node]);
 				break;
 		}
 	});

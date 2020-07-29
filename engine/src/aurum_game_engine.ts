@@ -1,14 +1,30 @@
 export * from './core/scene_router';
 export * from './core/stage';
 
-export * from './entities/label_entity';
-export * from './entities/sprite_entity';
-export * from './entities/container_entity';
-export * from './entities/canvas_entity';
-export * from './entities/camera';
+export * from './entities/types/camera/api';
+export * from './entities/types/camera/camera';
+export * from './entities/types/camera/model';
+
+export * from './entities/types/canvas/api';
+export * from './entities/types/canvas/canvas_entity';
+export * from './entities/types/canvas/model';
+
+export * from './entities/types/container/api';
+export * from './entities/types/container/container_entity';
+export * from './entities/types/container/model';
+
+export * from './entities/types/label/label_entity';
+export * from './entities/types/label/api';
+export * from './entities/types/label/model';
+
+export * from './entities/types/sprite/api';
+export * from './entities/types/sprite/model';
+export * from './entities/types/sprite/sprite_entity';
+
 export * from './entities/components/abstract_component';
 export * from './entities/components/bounds_component';
 export * from './entities/components/path_following_component';
+export * from './entities/components/follow_component';
 export * from './entities/components/mouse_interaction_component';
 
 export * from './math/calculation';
@@ -69,4 +85,7 @@ export * from './game_features/floating_messages/floating_message_service';
 export * from './game_features/tile_maps/tiled/tiled_layer';
 export * from './game_features/tile_maps/tiled/tiled_map_format';
 export * from './game_features/tile_maps/tiled/tileset';
-export * from './game_features/tile_maps/tiled/tiled_map_entity';
+
+export * from './game_features/tile_maps/tiled/entity/api';
+export * from './game_features/tile_maps/tiled/entity/model';
+export * from './game_features/tile_maps/tiled/entity/tiled_map_entity';

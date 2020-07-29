@@ -1,13 +1,12 @@
 import { Rectangle } from '../../math/shapes/rectangle';
 import { SIDE } from '../../models/common';
-import { EntityRenderModel } from '../../rendering/model';
-import { AbstractComponent } from './abstract_component';
 import { CommonEntity } from '../../models/entities';
 import { SceneGraphNode } from '../../models/scene_graph';
+import { AbstractComponent } from './abstract_component';
 
 export interface BoundsConfig {
 	bounds: Rectangle;
-	onOutOfBounds(bound: SIDE, renderData: EntityRenderModel): void;
+	onOutOfBounds(bound: SIDE, entity: SceneGraphNode<CommonEntity>): void;
 }
 
 export class BoundsComponent extends AbstractComponent {
@@ -18,24 +17,24 @@ export class BoundsComponent extends AbstractComponent {
 		this.config = config;
 	}
 
-	public onAttach(entity: SceneGraphNode<CommonEntity>, renderData: EntityRenderModel) {
-		renderData.positionX.listen(() => {
+	public onAttach(entity: SceneGraphNode<CommonEntity>) {
+		entity.renderState.positionX.listen(() => {
 			const { bounds } = this.config;
-			if (renderData.positionX.value < bounds.x) {
-				this.config.onOutOfBounds(SIDE.LEFT, renderData);
+			if (entity.renderState.positionX.value < bounds.x) {
+				this.config.onOutOfBounds(SIDE.LEFT, entity);
 			}
-			if (renderData.positionX.value > bounds.x + bounds.width) {
-				this.config.onOutOfBounds(SIDE.RIGHT, renderData);
+			if (entity.renderState.positionX.value > bounds.x + bounds.width) {
+				this.config.onOutOfBounds(SIDE.RIGHT, entity);
 			}
 		});
 
-		renderData.positionY.listen(() => {
+		entity.renderState.positionY.listen(() => {
 			const { bounds } = this.config;
-			if (renderData.positionY.value < bounds.y) {
-				this.config.onOutOfBounds(SIDE.TOP, renderData);
+			if (entity.renderState.positionY.value < bounds.y) {
+				this.config.onOutOfBounds(SIDE.TOP, entity);
 			}
-			if (renderData.positionY.value > bounds.y + bounds.height) {
-				this.config.onOutOfBounds(SIDE.BOTTOM, renderData);
+			if (entity.renderState.positionY.value > bounds.y + bounds.height) {
+				this.config.onOutOfBounds(SIDE.BOTTOM, entity);
 			}
 		});
 	}

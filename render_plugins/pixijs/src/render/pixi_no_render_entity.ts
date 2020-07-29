@@ -1,4 +1,4 @@
-import { BlendModes, EntityRenderModel, Shader } from 'aurum-game-engine';
+import { BlendModes, EntityRenderModel, Shader, SceneGraphNode, CommonEntity, SceneGraphNodeModel } from 'aurum-game-engine';
 import { CancellationToken } from 'aurumjs';
 import { Container, filters, BLEND_MODES, Filter } from 'pixi.js';
 
@@ -10,7 +10,7 @@ export class NoRenderEntity {
 	public parent: NoRenderEntity;
 	public displayObject: Container;
 
-	constructor(model: EntityRenderModel) {
+	constructor(model: SceneGraphNode<CommonEntity>) {
 		this.id = model.uid;
 		this.token = new CancellationToken();
 
@@ -32,12 +32,12 @@ export class NoRenderEntity {
 		this.displayObject.parent.removeChild(this.displayObject);
 	}
 
-	public bind(model: EntityRenderModel): void {
-		model.visible.listenAndRepeat((v) => {
+	public bind(model: SceneGraphNode<CommonEntity>): void {
+		model.renderState.visible.listenAndRepeat((v) => {
 			this.displayObject.visible = v;
 		}, this.token);
 
-		model.shader.listenAndRepeat((change) => {
+		model.renderState.shader.listenAndRepeat((change) => {
 			this.displayObject.filters = [];
 			switch (change.operation) {
 				case 'add':
@@ -49,48 +49,48 @@ export class NoRenderEntity {
 			}
 		});
 
-		model.positionX.listenAndRepeat((v) => {
+		model.renderState.positionX.listenAndRepeat((v) => {
 			if (v !== undefined) {
 				this.displayObject.x = v;
 			}
 		}, this.token);
 
-		model.positionY.listenAndRepeat((v) => {
+		model.renderState.positionY.listenAndRepeat((v) => {
 			if (v !== undefined) {
 				this.displayObject.y = v;
 			}
 		}, this.token);
 
-		model.sizeX.listenAndRepeat((v) => {
+		model.renderState.sizeX.listenAndRepeat((v) => {
 			if (v !== undefined) {
-				this.displayObject.width = v * model.scaleX.value;
+				this.displayObject.width = v * model.renderState.scaleX.value;
 			}
 		}, this.token);
 
-		model.sizeY.listenAndRepeat((v) => {
+		model.renderState.sizeY.listenAndRepeat((v) => {
 			if (v !== undefined) {
-				this.displayObject.height = v * model.scaleY.value;
+				this.displayObject.height = v * model.renderState.scaleY.value;
 			}
 		}, this.token);
 
-		model.scaleX.listenAndRepeat((v) => {
-			if (model.sizeX.value !== undefined) {
-				this.displayObject.width = model.sizeX.value * v;
+		model.renderState.scaleX.listenAndRepeat((v) => {
+			if (model.renderState.sizeX.value !== undefined) {
+				this.displayObject.width = model.renderState.sizeX.value * v;
 			}
 		}, this.token);
 
-		model.scaleY.listenAndRepeat((v) => {
-			if (model.sizeY.value !== undefined) {
-				this.displayObject.height = model.sizeY.value * v;
+		model.renderState.scaleY.listenAndRepeat((v) => {
+			if (model.renderState.sizeY.value !== undefined) {
+				this.displayObject.height = model.renderState.sizeY.value * v;
 			}
 		}, this.token);
 
-		model.clip.unique().listenAndRepeat((v) => {
+		model.renderState.clip.unique().listenAndRepeat((v) => {
 			if (v) {
 				const mask = new PIXI.Graphics();
 				mask.lineStyle(5, 0xff0000);
 				mask.beginFill(0x880000);
-				mask.drawRect(0, 0, model.sizeX.value, model.sizeY.value);
+				mask.drawRect(0, 0, model.renderState.sizeX.value, model.renderState.sizeY.value);
 				mask.endFill();
 
 				this.displayObject.mask = mask;
@@ -100,15 +100,15 @@ export class NoRenderEntity {
 			}
 		}, this.token);
 
-		model.alpha.listenAndRepeat((v) => {
+		model.renderState.alpha.listenAndRepeat((v) => {
 			this.displayObject.alpha = v;
 		}, this.token);
 
-		model.blendMode.listenAndRepeat((v) => {
-			this.setBlendMode(model, v);
+		model.renderState.blendMode.listenAndRepeat((v) => {
+			this.setBlendMode(model.renderState, v);
 		}, this.token);
 
-		model.zIndex.listenAndRepeat((v) => {
+		model.renderState.zIndex.listenAndRepeat((v) => {
 			if (this.parent) {
 				this.parent.displayObject.children.sort((a, b) => ((a as any).entity.zIndex.value || 0) - (b as any).entity.zIndex.value || 0);
 			}
@@ -155,7 +155,7 @@ export class NoRenderEntity {
 		return shader;
 	}
 
-	protected createDisplayObject(model: EntityRenderModel) {
+	protected createDisplayObject(model: SceneGraphNodeModel<CommonEntity>) {
 		return new Container();
 	}
 }
