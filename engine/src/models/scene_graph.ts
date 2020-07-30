@@ -4,6 +4,7 @@ import { EntityRenderModel } from '../rendering/model';
 import { Constructor } from './common';
 import { CommonEntity } from './entities';
 import { _ } from '../utilities/other/streamline';
+import { AbstractRenderPlugin } from '../rendering/abstract_render_plugin';
 
 export interface SceneGraphNodeModel<T> {
 	name?: string;
@@ -23,7 +24,7 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 	public readonly renderState: EntityRenderModel;
 	public name?: string;
 	public readonly components?: MapDataSource<Constructor<AbstractComponent>, AbstractComponent>;
-	public readonly parent?: SceneGraphNode<CommonEntity>;
+	public parent?: SceneGraphNode<CommonEntity>;
 	public readonly uid: number;
 	public readonly resolvedModel: T;
 	public readonly models: {
@@ -34,9 +35,15 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 	};
 	public readonly cancellationToken: CancellationToken;
 	public readonly children: ArrayDataSource<SceneGraphNode<CommonEntity>>;
+	private stageId: number;
+	private renderPlugin: AbstractRenderPlugin;
 
 	constructor(config: SceneGraphNodeModel<T>) {
 		this.name = config.name;
+		this.children = config.children ?? new ArrayDataSource([]);
+		for (const c of this.children.getData()) {
+			this.processChild(c);
+		}
 		this.cancellationToken = new CancellationToken();
 		this.components = config.components;
 		this.models = config.models;
@@ -54,6 +61,36 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 				change.newValue.onAttach(this);
 			}
 		}, this.cancellationToken);
+	}
+
+	protected processChild(c: SceneGraphNode<CommonEntity> | DataSource<SceneGraphNode<CommonEntity>> | ArrayDataSource<SceneGraphNode<CommonEntity>>): void {
+		if (c instanceof DataSource) {
+			c = new DataSourceGraphNode(c);
+		} else if (c instanceof ArrayDataSource) {
+			c = new ArrayDataSourceGraphNode(c);
+		}
+
+		c.attachParent(this);
+	}
+
+	public attachParent(parent: SceneGraphNode<CommonEntity>) {
+		if (this.parent !== undefined) {
+			throw new Error(`Node ${this.name} already has a parent`);
+		}
+
+		this.parent = parent;
+		if (parent.stageId) {
+			this.attachToStage(parent.renderPlugin, parent.stageId);
+		}
+	}
+
+	public attachToStage(renderPlugin: AbstractRenderPlugin, stageId: number) {
+		this.cancellationToken.addCancelable(() => {
+			renderPlugin.removeNode(this.uid, stageId);
+		});
+		renderPlugin.addNode(this, stageId);
+		this.renderPlugin = renderPlugin;
+		this.stageId = stageId;
 	}
 
 	public getModelValueWithFallback<K extends keyof T>(key: K): T[K] extends DataSource<infer U> ? U : T[K] extends ArrayDataSource<infer U> ? U[] : never {

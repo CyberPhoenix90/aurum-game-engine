@@ -7,26 +7,12 @@ export function synchronizeWithRenderPlugin(renderPlugin: AbstractRenderPlugin, 
 	for (let i = 0; i < nodes.length; i++) {
 		const node = nodes[i];
 
-		if (node instanceof ArrayDataSource) {
-			handleArraySource(node, renderPlugin, stageId);
-		} else if (node instanceof DataSource) {
-			handleDataSource(node, renderPlugin, stageId);
-		} else {
-			handleStaticNode(node, renderPlugin, stageId);
-		}
+		handleStaticNode(node, renderPlugin, stageId);
 	}
 }
 
 function handleStaticNode(node: SceneGraphNode<CommonEntity>, renderPlugin: AbstractRenderPlugin, stageId: number): void {
-	const children = node.children;
-	node.cancellationToken.addCancelable(() => {
-		renderPlugin.removeNode(node.uid, stageId);
-	});
-	renderPlugin.addNode(node, stageId);
-
-	if (children) {
-		synchronizeWithRenderPlugin(renderPlugin, stageId, children.getData());
-	}
+	node.attachToStage(renderPlugin, stageId);
 }
 
 function handleDataSource(node: SceneGraphNode<CommonEntity> & DataSource<any>, renderPlugin: AbstractRenderPlugin, stageId: number) {
