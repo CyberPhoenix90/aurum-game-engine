@@ -77,12 +77,9 @@ export class MouseInteractionComponent extends AbstractComponent {
 	}
 
 	public onAttach(entity: SceneGraphNode<CommonEntity>, renderData: EntityRenderModel) {
-		const boundingBox = new Rectangle(
-			{ x: renderData.getAbsolutePositionX(), y: renderData.getAbsolutePositionY() },
-			{ x: renderData.sizeX.value, y: renderData.sizeY.value }
-		);
-
 		this.config.mouse.listenMouseScroll().listen((e) => {
+			const boundingBox = this.makeBoundingBox(renderData);
+
 			//@ts-ignore
 			if (e.propagationStopped) {
 				return;
@@ -97,6 +94,7 @@ export class MouseInteractionComponent extends AbstractComponent {
 		}, renderData.cancellationToken);
 
 		this.config.mouse.listenMouseMove().listen((e) => {
+			const boundingBox = this.makeBoundingBox(renderData);
 			//@ts-ignore
 			if (e.propagationStopped) {
 				return;
@@ -113,6 +111,7 @@ export class MouseInteractionComponent extends AbstractComponent {
 		}, renderData.cancellationToken);
 
 		this.config.mouse.listenMouseDown(MouseButtons.LEFT).listen((e) => {
+			const boundingBox = this.makeBoundingBox(renderData);
 			//@ts-ignore
 			if (e.propagationStopped) {
 				return;
@@ -127,18 +126,31 @@ export class MouseInteractionComponent extends AbstractComponent {
 		}, renderData.cancellationToken);
 
 		this.config.mouse.listenMouseUp(MouseButtons.LEFT).listen((e) => {
+			const boundingBox = this.makeBoundingBox(renderData);
 			//@ts-ignore
 			if (e.propagationStopped) {
 				return;
 			}
-			if (this.onMouseUp.hasSubscriptions() && renderData.visible.value && !renderData.cancellationToken.isCanceled) {
+			if (
+				(this.onMouseUp.hasSubscriptions() || this.onClick.hasSubscriptions()) &&
+				renderData.visible.value &&
+				!renderData.cancellationToken.isCanceled
+			) {
 				for (const camera of this.config.cameras) {
 					if (collisionCalculator.isOverlapping(new Point(camera.projectMouseCoordinates(e)), boundingBox)) {
 						this.onMouseUp.fire({ e: e, source: { entity, renderData } });
+						this.onClick.fire({ e: e, source: { entity, renderData } });
 					}
 				}
 			}
 		}, renderData.cancellationToken);
+	}
+
+	private makeBoundingBox(renderData: EntityRenderModel) {
+		return new Rectangle(
+			{ x: renderData.getAbsolutePositionX(), y: renderData.getAbsolutePositionY() },
+			{ x: renderData.sizeX.value, y: renderData.sizeY.value }
+		);
 	}
 
 	private checkMouseEnterOrLeave(e: MouseEvent, entity: SceneGraphNode<CommonEntity>, renderData: EntityRenderModel, boundinBox: Rectangle): void {
