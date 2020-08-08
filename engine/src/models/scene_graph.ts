@@ -62,22 +62,31 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 
 		this.components.listen((change) => {
 			if (change.deleted) {
-				change.oldValue.onDetach();
+				if (this.stageId) {
+					change.oldValue.onDetach();
+				}
 			} else {
-				change.newValue.onAttach(this);
+				if (this.stageId) {
+					change.newValue.onAttach(this);
+				}
 			}
 		}, this.cancellationToken);
 
 		this.processedChildren = this.children.map(this.processChild);
 		this.processedChildren.listenAndRepeat((change) => {
 			switch (change.operationDetailed) {
-				case 'append': {
+				case 'insert':
+				case 'prepend':
+				case 'append':
 					for (const item of change.items) {
 						item.attachParent(this);
 					}
 					break;
-				}
+
 				case 'remove':
+				case 'removeLeft':
+				case 'removeRight':
+				case 'clear':
 					{
 						for (const item of change.items) {
 							item.remove();
@@ -120,6 +129,9 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		this.renderPlugin = renderPlugin;
 		this.stageId = stageId;
 		this.onAttach?.(this);
+		for (const component of this.components.values()) {
+			component.onAttach(this);
+		}
 	}
 
 	public remove(): void {
@@ -133,6 +145,9 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		}
 		if (this.stageId) {
 			this.onDetach?.(this);
+			for (const component of this.components.values()) {
+				component.onAttach(this);
+			}
 			this.stageId = undefined;
 		}
 	}
