@@ -32,7 +32,9 @@ export function Label(props: LabelEntityProps, children: Renderable[], api: Auru
 			coreDefault: entityDefaults,
 			appliedStyleClasses: new ArrayDataSource(),
 			entityTypeDefault: {
-				text: new DataSource(''),
+				text,
+				width: new DataSource('auto'),
+				height: new DataSource('auto'),
 				fontStyle: new DataSource(undefined),
 				fontWeight: new DataSource(undefined),
 				renderCharCount: new DataSource(undefined),

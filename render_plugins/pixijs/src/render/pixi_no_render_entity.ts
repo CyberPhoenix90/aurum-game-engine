@@ -1,6 +1,6 @@
-import { BlendModes, EntityRenderModel, Shader, SceneGraphNode, CommonEntity, SceneGraphNodeModel } from 'aurum-game-engine';
+import { BlendModes, CommonEntity, EntityRenderModel, SceneGraphNode, SceneGraphNodeModel, Shader } from 'aurum-game-engine';
 import { CancellationToken, dsUnique } from 'aurumjs';
-import { Container, filters, BLEND_MODES, Filter } from 'pixi.js';
+import { BLEND_MODES, Container, Filter, filters } from 'pixi.js';
 
 export class NoRenderEntity {
 	public token: CancellationToken;
@@ -45,7 +45,6 @@ export class NoRenderEntity {
 					break;
 				case 'remove':
 					throw new Error('not implemented');
-					break;
 			}
 		});
 
@@ -155,7 +154,7 @@ export class NoRenderEntity {
 		return shader;
 	}
 
-	protected createDisplayObject(model: SceneGraphNodeModel<CommonEntity>) {
+	protected createDisplayObject(model: SceneGraphNodeModel<CommonEntity>): Container {
 		return new Container();
 	}
 }

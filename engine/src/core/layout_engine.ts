@@ -7,6 +7,7 @@ import { SceneGraphNode } from '../models/scene_graph';
 import { ScreenHelper } from '../utilities/other/screen_helper';
 import { LabelGraphNode } from '../entities/types/label/api';
 import { measureStringWidth } from '../entities/types/label/label_entity';
+import { SpriteGraphNode } from '../entities/types/sprite/api';
 
 export interface LayoutData {
 	x: DataSource<number>;
@@ -21,15 +22,19 @@ export function layoutAlgorithm(node: SceneGraphNode<any>): LayoutData {
 	let x: DataSource<number>;
 	let y: DataSource<number>;
 
-	if (node instanceof LabelGraphNode) {
+	if (node instanceof SpriteGraphNode) {
+		sizeX = node.resolvedModel.width.map((v) => (v === 'auto' ? undefined : computeSize(v)));
+		sizeY = node.resolvedModel.height.map((v) => (v === 'auto' ? undefined : computeSize(v)));
+	} else if (node instanceof LabelGraphNode) {
 		sizeX = node.resolvedModel.width.aggregateFive(
 			node.resolvedModel.text,
 			node.resolvedModel.fontSize,
 			node.resolvedModel.fontFamily,
 			node.resolvedModel.fontWeight,
-			(size, text, fs, ff, fw) => (size === undefined ? measureStringWidth(text, fw, fs, ff) : computeSize(size))
+			(size, text, fs, ff, fw) => (size === 'auto' ? measureStringWidth(text, fw, fs, ff) : computeSize(size))
 		);
-		sizeY = node.resolvedModel.height.map((v) => computeSize(v));
+
+		sizeY = node.resolvedModel.height.map((v) => (v === 'auto' ? node.resolvedModel.fontSize.value : computeSize(v)));
 	} else {
 		sizeX = node.resolvedModel.width.map((v) => computeSize(v));
 		sizeY = node.resolvedModel.height.map((v) => computeSize(v));

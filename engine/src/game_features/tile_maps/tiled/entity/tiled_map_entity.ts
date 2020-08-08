@@ -1,4 +1,4 @@
-import { ArrayDataSource, AurumComponentAPI, Renderable } from 'aurumjs';
+import { ArrayDataSource, AurumComponentAPI, Renderable, DataSource } from 'aurumjs';
 import { entityDefaults } from '../../../../entities/entity_defaults';
 import { normalizeComponents, propsToModel } from '../../../../entities/shared';
 import { AbstractShape } from '../../../../math/shapes/abstract_shape';
@@ -19,6 +19,7 @@ import {
 } from '../tiled_map_format';
 import { Tileset } from '../tileset';
 import { TiledMapGraphNode } from './api';
+import { toSourceIfDefined } from '../../../../utilities/data/to_source';
 
 export interface EntityFactory {
 	[type: string]: (position: PointLike, props: TiledMapCustomProperties[], shape: AbstractShape) => Renderable;
@@ -60,15 +61,19 @@ export function TiledMap(props: TiledMapProps, children: Renderable[], api: Auru
 		models: {
 			coreDefault: entityDefaults,
 			appliedStyleClasses: new ArrayDataSource(),
-			entityTypeDefault: {},
+			entityTypeDefault: {
+				resourceRootUrl: new DataSource('/'),
+				tilesets: new ArrayDataSource([]),
+				entityFactory: new DataSource(undefined)
+			},
 			userSpecified: {
 				...propsToModel(props),
-				tilesets: props.tilesets,
-				resourceRootUrl: props.resourceRootUrl,
-				entityFactory: props.entityFactory,
-				mapObjects,
-				layers,
-				mapData: props.model
+				tilesets: new ArrayDataSource(props.tilesets),
+				resourceRootUrl: toSourceIfDefined(props.resourceRootUrl),
+				entityFactory: toSourceIfDefined(props.entityFactory),
+				mapObjects: new ArrayDataSource(mapObjects),
+				layers: new ArrayDataSource(layers),
+				mapData: toSourceIfDefined(props.model)
 			}
 		},
 		onAttach: props.onAttach,

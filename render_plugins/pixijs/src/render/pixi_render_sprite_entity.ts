@@ -65,10 +65,10 @@ export class RenderSpriteEntity extends NoRenderEntity {
 		if (model.drawOffsetY.value !== undefined) {
 			result.frame.y = model.drawOffsetY.value;
 		}
-		if (model.sizeX.value === undefined && model.scaleX.value !== 1) {
+		if (model.sizeX.value === undefined) {
 			this.displayObject.width = bt.width * model.scaleX.value;
 		}
-		if (model.sizeY.value === undefined && model.scaleY.value !== 1) {
+		if (model.sizeY.value === undefined) {
 			this.displayObject.height = bt.height * model.scaleY.value;
 		}
 		result.updateUvs();

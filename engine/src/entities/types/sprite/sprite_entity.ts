@@ -33,6 +33,8 @@ export function Sprite(props: SpriteEntityProps): SpriteGraphNode {
 			coreDefault: entityDefaults,
 			appliedStyleClasses: new ArrayDataSource(),
 			entityTypeDefault: {
+				width: new DataSource('auto'),
+				height: new DataSource('auto'),
 				tint: new DataSource(undefined),
 				drawDistanceX: new DataSource(undefined),
 				drawDistanceY: new DataSource(undefined),

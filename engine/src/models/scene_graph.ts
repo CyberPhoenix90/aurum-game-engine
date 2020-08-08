@@ -1,15 +1,19 @@
-import { ArrayDataSource, CancellationToken, MapDataSource, DataSource } from 'aurumjs';
+import { ArrayDataSource, CancellationToken, MapDataSource, DataSource, Renderable, render } from 'aurumjs';
 import { AbstractComponent } from '../entities/components/abstract_component';
 import { EntityRenderModel } from '../rendering/model';
 import { Constructor } from './common';
-import { CommonEntity } from './entities';
+import { CommonEntity, RenderableType } from './entities';
 import { _ } from '../utilities/other/streamline';
 import { AbstractRenderPlugin } from '../rendering/abstract_render_plugin';
+import { entityDefaults } from '../entities/entity_defaults';
+import { layoutAlgorithm } from '../core/layout_engine';
+import { ContainerEntity, ContainerEntityRenderModel } from '../entities/types/container/model';
+import { ContainerGraphNodeModel } from '../entities/types/container/api';
 
 export interface SceneGraphNodeModel<T> {
 	name?: string;
 	components?: MapDataSource<Constructor<AbstractComponent>, AbstractComponent>;
-	children: ArrayDataSource<SceneGraphNode<any>>;
+	children: ArrayDataSource<SceneGraphNode<CommonEntity> | ArrayDataSource<Renderable> | DataSource<Renderable>>;
 	models: {
 		coreDefault: CommonEntity;
 		entityTypeDefault: T;
@@ -34,16 +38,18 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		userSpecified: T;
 	};
 	public readonly cancellationToken: CancellationToken;
-	public readonly children: ArrayDataSource<SceneGraphNode<CommonEntity>>;
+	public readonly children: ArrayDataSource<ArrayDataSource<Renderable> | DataSource<Renderable> | SceneGraphNode<CommonEntity>>;
+	protected readonly processedChildren: ArrayDataSource<SceneGraphNode<CommonEntity>>;
 	private stageId: number;
 	private renderPlugin: AbstractRenderPlugin;
+	onAttach?(entity: SceneGraphNode<T>);
+	onDetach?(entity: SceneGraphNode<T>);
 
 	constructor(config: SceneGraphNodeModel<T>) {
+		this.onAttach = config.onAttach;
+		this.onDetach = config.onDetach;
 		this.name = config.name;
 		this.children = config.children ?? new ArrayDataSource([]);
-		for (const c of this.children.getData()) {
-			this.processChild(c);
-		}
 		this.cancellationToken = new CancellationToken();
 		this.components = config.components;
 		this.models = config.models;
@@ -61,16 +67,35 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 				change.newValue.onAttach(this);
 			}
 		}, this.cancellationToken);
+
+		this.processedChildren = this.children.map(this.processChild);
+		this.processedChildren.listenAndRepeat((change) => {
+			switch (change.operationDetailed) {
+				case 'append': {
+					for (const item of change.items) {
+						item.attachParent(this);
+					}
+					break;
+				}
+				case 'remove':
+					{
+						for (const item of change.items) {
+							item.remove();
+						}
+					}
+					break;
+			}
+		});
 	}
 
-	protected processChild(c: SceneGraphNode<CommonEntity> | DataSource<SceneGraphNode<CommonEntity>> | ArrayDataSource<SceneGraphNode<CommonEntity>>): void {
+	protected processChild(c: SceneGraphNode<CommonEntity> | DataSource<Renderable> | ArrayDataSource<Renderable>): SceneGraphNode<CommonEntity> {
 		if (c instanceof DataSource) {
-			c = new DataSourceGraphNode(c);
+			c = new DataSourceSceneGraphNode(c);
 		} else if (c instanceof ArrayDataSource) {
-			c = new ArrayDataSourceGraphNode(c);
+			c = new ArrayDataSourceSceneGraphNode(c);
 		}
 
-		c.attachParent(this);
+		return c;
 	}
 
 	public attachParent(parent: SceneGraphNode<CommonEntity>) {
@@ -89,8 +114,33 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 			renderPlugin.removeNode(this.uid, stageId);
 		});
 		renderPlugin.addNode(this, stageId);
+		for (const child of this.processedChildren.getData()) {
+			child.attachToStage(renderPlugin, stageId);
+		}
 		this.renderPlugin = renderPlugin;
 		this.stageId = stageId;
+		this.onAttach?.(this);
+	}
+
+	public remove(): void {
+		this.dispose();
+	}
+
+	public dettachFromParent() {
+		if (this.parent) {
+			this.parent.children.remove(this);
+			this.parent = undefined;
+		}
+		if (this.stageId) {
+			this.onDetach?.(this);
+			this.stageId = undefined;
+		}
+	}
+
+	public dispose(): void {
+		if (!this.cancellationToken.isCanceled) {
+			this.cancellationToken.cancel();
+		}
 	}
 
 	public getModelValueWithFallback<K extends keyof T>(key: K): T[K] extends DataSource<infer U> ? U : T[K] extends ArrayDataSource<infer U> ? U[] : never {
@@ -205,5 +255,134 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 
 	public getComponent<T extends AbstractComponent>(type: Constructor<T>): T {
 		return this.components.get(type) as T;
+	}
+}
+
+export class ContainerGraphNode extends SceneGraphNode<ContainerEntity> {
+	public readonly renderState: ContainerEntityRenderModel;
+
+	constructor(config: ContainerGraphNodeModel) {
+		super({
+			children: config.children ?? new ArrayDataSource(),
+			models: {
+				appliedStyleClasses: config.models.appliedStyleClasses,
+				coreDefault: entityDefaults,
+				entityTypeDefault: {},
+				userSpecified: config.models.userSpecified
+			},
+			components: config.components,
+			name: config.name,
+			onAttach: config.onAttach,
+			onDetach: config.onDetach
+		});
+	}
+
+	protected createResolvedModel(): ContainerEntity {
+		const base = this.createBaseResolvedModel();
+		return base;
+	}
+
+	protected createRenderModel(): ContainerEntityRenderModel {
+		const { x, y, sizeX, sizeY } = layoutAlgorithm(this);
+		return {
+			alpha: this.resolvedModel.alpha,
+			clip: this.resolvedModel.clip,
+			renderableType: RenderableType.NO_RENDER,
+			positionX: x,
+			positionY: y,
+			sizeX: sizeX,
+			sizeY: sizeY,
+			scaleX: this.resolvedModel.scaleX,
+			scaleY: this.resolvedModel.scaleY,
+			visible: this.resolvedModel.visible,
+			zIndex: this.resolvedModel.zIndex,
+			blendMode: this.resolvedModel.blendMode,
+			shader: this.resolvedModel.shaders
+		};
+	}
+}
+
+export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
+	constructor(dataSource: ArrayDataSource<Renderable>) {
+		super({
+			children: new ArrayDataSource(),
+			name: ArrayDataSourceSceneGraphNode.name,
+			models: {
+				coreDefault: entityDefaults,
+				entityTypeDefault: {},
+				appliedStyleClasses: new ArrayDataSource(),
+				userSpecified: {}
+			},
+			components: new MapDataSource(new Map())
+		});
+
+		const dynamicRenderKeys = new Map<Renderable, SceneGraphNode<any>>();
+		dataSource.listenAndRepeat((change) => {
+			switch (change.operation) {
+				case 'add':
+					for (const item of change.items) {
+						const node = this.renderableToNode(item);
+						dynamicRenderKeys.set(item, node);
+						this.children.insertAt(change.index, node);
+					}
+					break;
+				case 'remove':
+					for (const item of change.items) {
+						this.children.remove(dynamicRenderKeys.get(item));
+					}
+					break;
+				case 'replace':
+					dynamicRenderKeys.get(change.target).remove();
+					const node = this.renderableToNode(change.items[0]);
+					dynamicRenderKeys.set(change.items[0], node);
+					this.children.set(change.index, node);
+					break;
+			}
+		});
+	}
+
+	private renderableToNode(item: Renderable): SceneGraphNode<any> {
+		return render(item, {
+			attachCalls: [],
+			sessionToken: undefined,
+			tokens: []
+		}) as SceneGraphNode<any>;
+	}
+}
+
+export class DataSourceSceneGraphNode extends ContainerGraphNode {
+	constructor(dataSource: DataSource<Renderable>) {
+		super({
+			children: new ArrayDataSource(),
+			name: DataSourceSceneGraphNode.name,
+			models: {
+				coreDefault: entityDefaults,
+				entityTypeDefault: {},
+				appliedStyleClasses: new ArrayDataSource(),
+				userSpecified: {}
+			},
+			components: new MapDataSource(new Map())
+		});
+
+		let cleanUp: CancellationToken;
+		dataSource.listenAndRepeat((v) => {
+			if (cleanUp) {
+				cleanUp.cancel();
+			}
+			cleanUp = new CancellationToken();
+
+			const subNodes = render(v, {
+				attachCalls: [],
+				sessionToken: undefined,
+				tokens: []
+			});
+
+			for (const n of subNodes) {
+				if (n.cancellationToken) {
+					cleanUp.chain(n.cancellationToken);
+				}
+			}
+			this.children.appendArray(subNodes);
+		});
 	}
 }

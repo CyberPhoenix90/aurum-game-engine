@@ -1,10 +1,9 @@
-import { Aurum, AurumComponentAPI, DataSource, EventEmitter, Renderable, Webcomponent } from 'aurumjs';
+import { Aurum, AurumComponentAPI, DataSource, EventEmitter, Renderable, Webcomponent, ArrayDataSource } from 'aurumjs';
 import { CameraGraphNode } from '../entities/types/camera/api';
 import { Clock } from '../game_features/time/clock';
-import { SceneGraphNode } from '../models/scene_graph';
+import { SceneGraphNode, DataSourceSceneGraphNode, ArrayDataSourceSceneGraphNode } from '../models/scene_graph';
 import { AbstractRenderPlugin } from '../rendering/abstract_render_plugin';
 import { _ } from '../utilities/other/streamline';
-import { synchronizeWithRenderPlugin } from './scene_graph_manager';
 
 export let engineRootTime: DataSource<number> = new DataSource(0);
 
@@ -23,18 +22,35 @@ const StageComponent = Webcomponent(
 	{
 		name: 'aurum-stage'
 	},
-	(props: { renderPlugin: AbstractRenderPlugin; nodes: SceneGraphNode<any>[]; clock: Clock }, api: AurumComponentAPI) => {
+	(
+		props: { renderPlugin: AbstractRenderPlugin; nodes: Array<SceneGraphNode<any> | DataSource<Renderable> | ArrayDataSource<Renderable>>; clock: Clock },
+		api: AurumComponentAPI
+	) => {
 		const stageId = _.getUId();
-		const cameras = props.nodes.filter((n) => n instanceof CameraGraphNode);
+		const cameras: CameraGraphNode[] = props.nodes.filter((n) => n instanceof CameraGraphNode) as CameraGraphNode[];
 		const clock = (engineClock = props.clock);
 		let running = true;
 		clock.start = () => (running = true);
 		clock.stop = () => (running = false);
+
+		function attachNodes(renderPlugin: AbstractRenderPlugin, nodes: Array<SceneGraphNode<any> | DataSource<Renderable> | ArrayDataSource<Renderable>>) {
+			for (let i = 0; i < nodes.length; i++) {
+				let node = nodes[i];
+				if (node instanceof DataSource) {
+					node = new DataSourceSceneGraphNode(node);
+				} else if (node instanceof ArrayDataSource) {
+					node = new ArrayDataSourceSceneGraphNode(node);
+				}
+
+				node.attachToStage(renderPlugin, stageId);
+			}
+		}
+
 		return (
 			<div
 				onAttach={(stageNode) => {
 					props.renderPlugin.addStage(stageId, stageNode);
-					synchronizeWithRenderPlugin(props.renderPlugin, stageId, props.nodes);
+					attachNodes(props.renderPlugin, props.nodes);
 					let lastBefore = clock.timestamp;
 					let lastAfter = clock.timestamp;
 					let lastTick = Date.now();

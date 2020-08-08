@@ -3,7 +3,7 @@ import { CommonEntityProps } from '../../../models/entities';
 import { entityDefaults } from '../../entity_defaults';
 import { normalizeComponents, propsToModel } from '../../shared';
 import { CanvasGraphNode } from '../canvas/api';
-import { ContainerGraphNode } from './api';
+import { ContainerGraphNode } from '../../../models/scene_graph';
 
 export interface ContainerEntityProps extends CommonEntityProps {
 	onAttach?(node: ContainerGraphNode): void;
