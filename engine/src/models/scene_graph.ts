@@ -87,10 +87,8 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 				case 'removeLeft':
 				case 'removeRight':
 				case 'clear':
-					{
-						for (const item of change.items) {
-							item.remove();
-						}
+					for (const item of change.items) {
+						item.dispose();
 					}
 					break;
 			}
@@ -119,9 +117,6 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 	}
 
 	public attachToStage(renderPlugin: AbstractRenderPlugin, stageId: number) {
-		this.cancellationToken.addCancelable(() => {
-			renderPlugin.removeNode(this.uid, stageId);
-		});
 		renderPlugin.addNode(this, stageId);
 		for (const child of this.processedChildren.getData()) {
 			child.attachToStage(renderPlugin, stageId);
@@ -134,27 +129,26 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		}
 	}
 
-	public remove(): void {
-		this.dispose();
-	}
-
-	public dettachFromParent() {
+	public dispose(): void {
 		if (this.parent) {
-			this.parent.children.remove(this);
+			if (!this.parent.cancellationToken.isCanceled) {
+				this.parent.children.remove(this);
+			}
 			this.parent = undefined;
 		}
 		if (this.stageId) {
+			this.renderPlugin.removeNode(this.uid, this.stageId);
 			this.onDetach?.(this);
 			for (const component of this.components.values()) {
-				component.onAttach(this);
+				component.onDetach();
 			}
 			this.stageId = undefined;
 		}
-	}
-
-	public dispose(): void {
 		if (!this.cancellationToken.isCanceled) {
 			this.cancellationToken.cancel();
+		}
+		for (const child of this.processedChildren.getData()) {
+			child.dispose();
 		}
 	}
 
@@ -347,7 +341,7 @@ export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 					}
 					break;
 				case 'replace':
-					dynamicRenderKeys.get(change.target).remove();
+					this.children.remove(dynamicRenderKeys.get(change.target));
 					const node = this.renderableToNode(change.items[0]);
 					dynamicRenderKeys.set(change.items[0], node);
 					this.children.set(change.index, node);
@@ -357,11 +351,15 @@ export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 	}
 
 	private renderableToNode(item: Renderable): SceneGraphNode<any> {
-		return render(item, {
+		const s = {
 			attachCalls: [],
 			sessionToken: undefined,
 			tokens: []
-		}) as SceneGraphNode<any>;
+		};
+
+		const result = render(item, s) as SceneGraphNode<any>;
+		s.attachCalls.forEach((ac) => ac());
+		return result;
 	}
 }
 
@@ -386,11 +384,12 @@ export class DataSourceSceneGraphNode extends ContainerGraphNode {
 			}
 			cleanUp = new CancellationToken();
 
-			const subNodes = render(v, {
+			const s = {
 				attachCalls: [],
-				sessionToken: undefined,
+				sessionToken: cleanUp,
 				tokens: []
-			});
+			};
+			const subNodes = render(v, s);
 
 			for (const n of subNodes) {
 				if (n.cancellationToken) {
@@ -398,6 +397,7 @@ export class DataSourceSceneGraphNode extends ContainerGraphNode {
 				}
 			}
 			this.children.appendArray(subNodes);
+			s.attachCalls.forEach((ac) => ac());
 		});
 	}
 }

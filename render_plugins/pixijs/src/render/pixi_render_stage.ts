@@ -54,12 +54,17 @@ export class RenderStage {
 
 	public removeNode(id: number) {
 		const node = this.entityDatabase[id] as NoRenderEntity;
-		node.parent.children
-			.splice(
+		if (!node) {
+			return;
+		}
+
+		if (!node.parent) {
+			node.parent.children.splice(
 				node.parent.children.findIndex((c) => c.id === id),
 				1
-			)[0]
-			.dispose();
+			);
+		}
+		node.dispose();
 		node.token.cancel();
 	}
 

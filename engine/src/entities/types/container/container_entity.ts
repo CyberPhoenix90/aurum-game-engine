@@ -1,9 +1,8 @@
-import { ArrayDataSource, AurumComponentAPI, Renderable, DataSource } from 'aurumjs';
+import { ArrayDataSource, AurumComponentAPI, DataSource, Renderable } from 'aurumjs';
 import { CommonEntityProps } from '../../../models/entities';
+import { ContainerGraphNode } from '../../../models/scene_graph';
 import { entityDefaults } from '../../entity_defaults';
 import { normalizeComponents, propsToModel } from '../../shared';
-import { CanvasGraphNode } from '../canvas/api';
-import { ContainerGraphNode } from '../../../models/scene_graph';
 
 export interface ContainerEntityProps extends CommonEntityProps {
 	onAttach?(node: ContainerGraphNode): void;
@@ -13,7 +12,7 @@ export interface ContainerEntityProps extends CommonEntityProps {
 export function Container(props: ContainerEntityProps, children: Renderable[], api: AurumComponentAPI): ContainerGraphNode {
 	const content = api.prerender(children);
 	return new ContainerGraphNode({
-		name: props.name ?? CanvasGraphNode.name,
+		name: props.name ?? ContainerGraphNode.name,
 		components: normalizeComponents(props.components),
 		children: new ArrayDataSource(content),
 		models: {
