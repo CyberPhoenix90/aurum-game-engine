@@ -1,12 +1,13 @@
-import { DataSource, CancellationToken } from 'aurumjs';
-import { CommonEntity, RenderableType } from '../models/entities';
-import { EntityRenderModel } from '../rendering/model';
-import { Size } from '../models/common';
+import { DataSource } from 'aurumjs';
 import { Calculation } from '../math/calculation';
-import { ScreenHelper } from '../utilities/other/screen_helper';
 import { Unit } from '../math/unit';
+import { Position } from '../models/common';
+import { CommonEntity } from '../models/entities';
 import { SceneGraphNode } from '../models/scene_graph';
-import { LabelEntity, measureStringWidth } from '../entities/label_entity';
+import { ScreenHelper } from '../utilities/other/screen_helper';
+import { LabelGraphNode } from '../entities/types/label/api';
+import { measureStringWidth } from '../entities/types/label/label_entity';
+import { SpriteGraphNode } from '../entities/types/sprite/api';
 
 export interface LayoutData {
 	x: DataSource<number>;
@@ -15,43 +16,36 @@ export interface LayoutData {
 	sizeY: DataSource<number>;
 }
 
-export function layoutAlgorithm(node: SceneGraphNode<CommonEntity>, parentRenderModel?: EntityRenderModel): LayoutData {
+export function layoutAlgorithm(node: SceneGraphNode<any>): LayoutData {
 	let sizeX: DataSource<number>;
 	let sizeY: DataSource<number>;
 	let x: DataSource<number>;
 	let y: DataSource<number>;
 
-	setDefaults(node);
-
-	if (node.nodeType === RenderableType.LABEL) {
-		sizeX = node.model.width.aggregateFour(
-			(node.model as LabelEntity).text,
-			(node.model as LabelEntity).fontSize,
-			(node.model as LabelEntity).fontFamily,
-			(size, text, fs, ff) => (size === undefined ? measureStringWidth(text, (node.model as LabelEntity).fontWeight.value, fs, ff) : computeSize(size))
+	if (node instanceof SpriteGraphNode) {
+		sizeX = node.resolvedModel.width.map((v) => (v === 'auto' ? undefined : computeSize(v)));
+		sizeY = node.resolvedModel.height.map((v) => (v === 'auto' ? undefined : computeSize(v)));
+	} else if (node instanceof LabelGraphNode) {
+		sizeX = node.resolvedModel.width.aggregateFive(
+			node.resolvedModel.text,
+			node.resolvedModel.fontSize,
+			node.resolvedModel.fontFamily,
+			node.resolvedModel.fontWeight,
+			(size, text, fs, ff, fw) => (size === 'auto' ? measureStringWidth(text, fw, fs, ff) : computeSize(size))
 		);
-		sizeY = node.model.height.map((v) => computeSize(v));
+
+		sizeY = node.resolvedModel.height.map((v) => (v === 'auto' ? node.resolvedModel.fontSize.value : computeSize(v)));
 	} else {
-		sizeX = node.model.width.map((v) => computeSize(v));
-		sizeY = node.model.height.map((v) => computeSize(v));
+		sizeX = node.resolvedModel.width.map((v) => computeSize(v));
+		sizeY = node.resolvedModel.height.map((v) => computeSize(v));
 	}
 
-	let xPosToken = new CancellationToken();
-	x = node.model.x.map((v) => {
-		if (xPosToken.hasCancellables()) {
-			xPosToken.cancel();
-			xPosToken = new CancellationToken();
-		}
-		return computePosition(v, sizeX, node.model.originX, node.model.scaleX, xPosToken, parentRenderModel?.sizeX ?? new DataSource(0));
+	x = node.resolvedModel.x.map((v) => {
+		return computePosition(node, v, sizeX, node.resolvedModel.originX, node.resolvedModel.scaleX, node.parent?.renderState?.sizeX ?? new DataSource(0));
 	});
 
-	let yPosToken = new CancellationToken();
-	y = node.model.y.map((v) => {
-		if (yPosToken.hasCancellables()) {
-			yPosToken.cancel();
-			yPosToken = new CancellationToken();
-		}
-		return computePosition(v, sizeY, node.model.originY, node.model.scaleY, yPosToken, parentRenderModel?.sizeY ?? new DataSource(0));
+	y = node.resolvedModel.y.map((v) => {
+		return computePosition(node, v, sizeY, node.resolvedModel.originY, node.resolvedModel.scaleY, node.parent?.renderState?.sizeY ?? new DataSource(0));
 	});
 
 	const result: LayoutData = {
@@ -64,18 +58,7 @@ export function layoutAlgorithm(node: SceneGraphNode<CommonEntity>, parentRender
 	return result;
 }
 
-function setDefaults(node: SceneGraphNode<CommonEntity>) {
-	if (node.nodeType === RenderableType.NO_RENDER) {
-		if (node.model.width.value === undefined) {
-			node.model.width.update('content');
-		}
-		if (node.model.height.value === undefined) {
-			node.model.height.update('content');
-		}
-	}
-}
-
-function computeSize(value: Size) {
+function computeSize(value: Position) {
 	if (value === 'content') {
 		return 0;
 	} else {
@@ -84,11 +67,11 @@ function computeSize(value: Size) {
 }
 
 function computePosition(
-	value: Size,
+	node: SceneGraphNode<CommonEntity>,
+	value: Position,
 	size: DataSource<number>,
 	origin: DataSource<number>,
 	scale: DataSource<number>,
-	token: CancellationToken,
 	parentSize: DataSource<number>
 ): number {
 	let computedValue;
@@ -96,8 +79,10 @@ function computePosition(
 		computedValue = value;
 	} else {
 		if (value.startsWith('calc')) {
+			// dependOnParentSize(node);
 			computedValue = new Calculation(value).toPixels(ScreenHelper.PPI, parentSize.value, 0);
 		} else {
+			// dependOnParentSize(node);
 			computedValue = new Unit(value).toPixels(ScreenHelper.PPI, parentSize.value);
 		}
 	}

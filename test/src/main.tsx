@@ -125,8 +125,8 @@ Aurum.attach(
 						.map((v) => ({ x: v.x - 12, y: v.y - 12 }))
 						.pipe(pos);
 				}}
-				screenWidth={800}
-				screenHeight={600}
+				width={800}
+				height={600}
 			></Camera>
 		</Stage>
 	</div>,

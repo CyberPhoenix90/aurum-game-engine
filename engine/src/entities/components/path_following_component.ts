@@ -5,20 +5,19 @@ import { onBeforeRender } from '../../core/stage';
 import { CommonEntity } from '../../models/entities';
 import { PointLike } from '../../models/point';
 import { SceneGraphNode } from '../../models/scene_graph';
-import { EntityRenderModel } from '../../rendering/model';
 import { AbstractMovementComponent } from './abstract_movement_component';
 
 export class PathFollowingComponent extends AbstractMovementComponent {
 	private currentTarget: PointLike;
 	private pendingMovementPromise: Callback<void>;
-	private renderData: EntityRenderModel;
+	private entity: SceneGraphNode<CommonEntity>;
 
 	public predictPosition(inMs: number): PointLike {
 		if (this.pause) {
-			return { x: this.renderData.positionX.value, y: this.renderData.positionY.value };
+			return { x: this.entity.renderState.positionX.value, y: this.entity.renderState.positionY.value };
 		} else {
-			const positionX = new DataSource(this.renderData.positionX.value);
-			const positionY = new DataSource(this.renderData.positionY.value);
+			const positionX = new DataSource(this.entity.renderState.positionX.value);
+			const positionY = new DataSource(this.entity.renderState.positionY.value);
 			while (inMs > 0) {
 				const chunk = Math.min(inMs, 33);
 				if (this.config.euclideanMovement) {
@@ -32,8 +31,8 @@ export class PathFollowingComponent extends AbstractMovementComponent {
 		}
 	}
 
-	public onAttach(entity: SceneGraphNode<CommonEntity>, renderData: EntityRenderModel) {
-		this.renderData = renderData;
+	public onAttach(entity: SceneGraphNode<CommonEntity>) {
+		this.entity = entity;
 		let time = this.clock.timestamp;
 		onBeforeRender.subscribe(() => {
 			const delta = this.clock.timestamp - time;
@@ -73,7 +72,7 @@ export class PathFollowingComponent extends AbstractMovementComponent {
 
 	protected moveTowardsTarget(entity: SceneGraphNode<CommonEntity>, target: PointLike, delta: number) {
 		super.moveTowardsTarget(entity, target, delta);
-		if (target.x === entity.model.x.value && target.y === entity.model.y.value) {
+		if (target.x === entity.resolvedModel.x.value && target.y === entity.resolvedModel.y.value) {
 			this.pendingMovementPromise();
 		}
 	}

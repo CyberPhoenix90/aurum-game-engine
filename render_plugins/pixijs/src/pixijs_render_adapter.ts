@@ -1,4 +1,4 @@
-import { AbstractRenderPlugin, EntityRenderModel } from 'aurum-game-engine';
+import { AbstractRenderPlugin, CommonEntity, SceneGraphNode } from 'aurum-game-engine';
 import { NoRenderEntity } from './render/pixi_no_render_entity';
 import { RenderStage } from './render/pixi_render_stage';
 
@@ -33,7 +33,7 @@ export class PixiJsRenderAdapter extends AbstractRenderPlugin {
 		this.stages[stageId] = new RenderStage(stageId, this.entityDatabase, stageNode);
 	}
 
-	public addNode(model: EntityRenderModel, stageId: number, index?: number): void | Promise<void> {
+	public addNode(model: SceneGraphNode<CommonEntity>, stageId: number, index?: number): void | Promise<void> {
 		this.stages[stageId].addNode(model, index);
 	}
 

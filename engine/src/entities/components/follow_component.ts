@@ -3,11 +3,10 @@ import { Vector2D } from '../../math/vectors/vector2d';
 import { CommonEntity } from '../../models/entities';
 import { PointLike } from '../../models/point';
 import { SceneGraphNode } from '../../models/scene_graph';
-import { EntityRenderModel } from '../../rendering/model';
 import { AbstractMovementComponent, MovementComponentConfiguration } from './abstract_movement_component';
 
 export interface FollowingConfig extends MovementComponentConfiguration {
-	target?: EntityRenderModel;
+	target?: SceneGraphNode<CommonEntity>;
 	offset?: PointLike;
 	tolerance?: PointLike;
 }
@@ -27,7 +26,7 @@ export class FollowComponent extends AbstractMovementComponent {
 		super(followingConfig);
 	}
 
-	public onAttach(entity: SceneGraphNode<CommonEntity>, renderData: EntityRenderModel) {
+	public onAttach(entity: SceneGraphNode<CommonEntity>) {
 		let time = this.clock.timestamp;
 		onBeforeRender.subscribe(() => {
 			const delta = this.clock.timestamp - time;
@@ -36,7 +35,7 @@ export class FollowComponent extends AbstractMovementComponent {
 				if (this.config.tolerance) {
 					const distance = new Vector2D(this.config.target.getAbsolutePositionX(), this.config.target.getAbsolutePositionY())
 						.add(this.config.offset)
-						.sub(new Vector2D(renderData.getAbsolutePositionX(), renderData.getAbsolutePositionY()));
+						.sub(new Vector2D(entity.getAbsolutePositionX(), entity.getAbsolutePositionY()));
 					if (Math.abs(distance.x) < this.config.tolerance.x) {
 						return;
 					}
@@ -47,8 +46,8 @@ export class FollowComponent extends AbstractMovementComponent {
 				this.moveTowardsTarget(
 					entity,
 					{
-						x: this.config.target.getAbsolutePositionX() - renderData.parent?.getAbsolutePositionX() ?? 0,
-						y: this.config.target.getAbsolutePositionY() - renderData.parent?.getAbsolutePositionY() ?? 0
+						x: this.config.target.getAbsolutePositionX() - entity.parent?.getAbsolutePositionX() ?? 0,
+						y: this.config.target.getAbsolutePositionY() - entity.parent?.getAbsolutePositionY() ?? 0
 					},
 					delta
 				);
@@ -61,7 +60,7 @@ export class FollowComponent extends AbstractMovementComponent {
 		return this;
 	}
 
-	public follow(target: EntityRenderModel, offset: PointLike = { x: 0, y: 0 }): this {
+	public follow(target: SceneGraphNode<CommonEntity>, offset: PointLike = { x: 0, y: 0 }): this {
 		this.config.target = target;
 		this.config.offset = offset;
 		return this;

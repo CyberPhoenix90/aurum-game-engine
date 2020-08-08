@@ -1,78 +1,78 @@
-import { Color, LabelEntityRenderModel } from 'aurum-game-engine';
+import { Color, LabelGraphNode } from 'aurum-game-engine';
 import { Text } from 'pixi.js';
 import { NoRenderEntity } from './pixi_no_render_entity';
 
 export class RenderLabelEntity extends NoRenderEntity {
 	public displayObject: Text;
 
-	constructor(model: LabelEntityRenderModel) {
+	constructor(model: LabelGraphNode) {
 		super(model);
 	}
 
-	protected createDisplayObject(model: LabelEntityRenderModel) {
+	protected createDisplayObject(model: LabelGraphNode) {
 		const result = new Text('');
 		result.resolution = 2;
 		return result;
 	}
 
-	public bind(model: LabelEntityRenderModel) {
-		model.text.listenAndRepeat((v) => {
-			updateText.call(this, v.substring(0, model.renderCharCount.value));
+	public bind(model: LabelGraphNode) {
+		model.renderState.text.listenAndRepeat((v) => {
+			updateText.call(this, v.substring(0, model.renderState.renderCharCount.value));
 		}, this.token);
 
-		model.renderCharCount.listenAndRepeat((v) => {
-			updateText.call(this, model.text.value.substring(0, v));
+		model.renderState.renderCharCount.listenAndRepeat((v) => {
+			updateText.call(this, model.renderState.text.value.substring(0, v));
 		}, this.token);
 
-		model.color.listenAndRepeat((v) => {
+		model.renderState.color.listenAndRepeat((v) => {
 			this.displayObject.style.fill = Color.fromString(v ?? 'white').toRGBNumber();
 		}, this.token);
 
-		model.fontSize.listenAndRepeat((v) => {
+		model.renderState.fontSize.listenAndRepeat((v) => {
 			this.displayObject.style.fontSize = v === undefined ? 16 : v;
 		}, this.token);
 
-		model.fontFamily.listenAndRepeat((v) => {
+		model.renderState.fontFamily.listenAndRepeat((v) => {
 			this.displayObject.style.fontFamily = v === undefined ? 'Arial' : v;
 		}, this.token);
 
-		model.fontWeight.listenAndRepeat((v) => {
+		model.renderState.fontWeight.listenAndRepeat((v) => {
 			this.displayObject.style.fontWeight = v ? v : '';
 		}, this.token);
 
-		model.fontStyle.listenAndRepeat((v) => {
+		model.renderState.fontStyle.listenAndRepeat((v) => {
 			this.displayObject.style.fontStyle = v ? v : '';
 		}, this.token);
 
-		model.dropShadow.listenAndRepeat((v) => {
+		model.renderState.dropShadow.listenAndRepeat((v) => {
 			this.displayObject.style.dropShadow = v;
 		}, this.token);
 
-		model.dropShadowAngle.listenAndRepeat((v) => {
+		model.renderState.dropShadowAngle.listenAndRepeat((v) => {
 			this.displayObject.style.dropShadowAngle = v;
 		}, this.token);
 
-		model.dropShadowColor.listenAndRepeat((v) => {
+		model.renderState.dropShadowColor.listenAndRepeat((v) => {
 			this.displayObject.style.dropShadowColor = v ? Color.fromString(v).toRGBANumber() : undefined;
 		}, this.token);
 
-		model.dropShadowDistance.listenAndRepeat((v) => {
+		model.renderState.dropShadowDistance.listenAndRepeat((v) => {
 			this.displayObject.style.dropShadowDistance = v;
 		}, this.token);
 
-		model.dropShadowFuzziness.listenAndRepeat((v) => {
+		model.renderState.dropShadowFuzziness.listenAndRepeat((v) => {
 			this.displayObject.style.dropShadowBlur = v;
 		}, this.token);
 
-		model.textBaseline.listenAndRepeat((v) => {
+		model.renderState.textBaseline.listenAndRepeat((v) => {
 			this.displayObject.style.textBaseline = v;
 		}, this.token);
 
-		model.stroke.listenAndRepeat((v) => {
+		model.renderState.stroke.listenAndRepeat((v) => {
 			this.displayObject.style.stroke = v;
 		}, this.token);
 
-		model.strokeThickness.listenAndRepeat((v) => {
+		model.renderState.strokeThickness.listenAndRepeat((v) => {
 			this.displayObject.style.strokeThickness = v === undefined ? 1 : v;
 		}, this.token);
 

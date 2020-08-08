@@ -1,27 +1,25 @@
-import { Renderable, AurumComponentAPI, ArrayDataSource } from 'aurumjs';
-import { PointLike } from '../../../models/point';
+import { ArrayDataSource, AurumComponentAPI, Renderable, DataSource } from 'aurumjs';
+import { entityDefaults } from '../../../../entities/entity_defaults';
+import { normalizeComponents, propsToModel } from '../../../../entities/shared';
+import { AbstractShape } from '../../../../math/shapes/abstract_shape';
+import { Circle } from '../../../../math/shapes/circle';
+import { Polygon } from '../../../../math/shapes/polygon';
+import { Rectangle } from '../../../../math/shapes/rectangle';
+import { Vector2D } from '../../../../math/vectors/vector2d';
+import { CommonEntityProps } from '../../../../models/entities';
+import { PointLike } from '../../../../models/point';
+import { TiledLayer } from '../tiled_layer';
 import {
 	TiledMapCustomProperties,
-	TiledMapModel,
-	TiledMapTileModel,
-	TiledMapTilesetModel,
 	TiledMapLayerModel,
+	TiledMapModel,
 	TiledMapObjectModel,
+	TiledMapTilesetModel,
 	TiledObjectShapeData
-} from './tiled_map_format';
-import { CommonEntityProps, CommonEntity, RenderableType } from '../../../models/entities';
-import { Tileset } from './tileset';
-import { TiledLayer } from './tiled_layer';
-import { EntityRenderModel } from '../../../rendering/model';
-import { SceneGraphNode } from '../../../models/scene_graph';
-import { AbstractShape } from '../../../math/shapes/abstract_shape';
-import { toSource } from '../../../utilities/data/to_source';
-import { _ } from '../../../utilities/other/streamline';
-import { Polygon } from '../../../math/shapes/polygon';
-import { Circle } from '../../../math/shapes/circle';
-import { Rectangle } from '../../../math/shapes/rectangle';
-import { Vector2D } from '../../../math/vectors/vector2d';
-import { getComponentByTypeFactory } from '../../../entities/shared';
+} from '../tiled_map_format';
+import { Tileset } from '../tileset';
+import { TiledMapGraphNode } from './api';
+import { toSourceIfDefined } from '../../../../utilities/data/to_source';
 
 export interface EntityFactory {
 	[type: string]: (position: PointLike, props: TiledMapCustomProperties[], shape: AbstractShape) => Renderable;
@@ -36,30 +34,12 @@ export interface TiledMapProps extends CommonEntityProps {
 	resourceRootUrl: string;
 	model: TiledMapModel;
 	tilesets?: Tileset[];
-	onAttach?(node: SceneGraphNode<TiledMapEntity>, renderModel: TiledMapRenderModel): void;
-	onDetach?(node: SceneGraphNode<TiledMapEntity>, renderModel: TiledMapRenderModel): void;
+	onAttach?(node: TiledMapGraphNode): void;
+	onDetach?(node: TiledMapGraphNode): void;
 	entityFactory?: Readonly<EntityFactory>;
 }
 
-export interface TiledMapEntity extends CommonEntity {
-	getTileMetaDataByGid(tileGid: number): TiledMapTileModel;
-	getTileMetadata(layer: number, tileX: number, tileY: number): TiledMapTileModel;
-	hasTile(layer: number, x: number, y: number): boolean;
-	resourceRootUrl: string;
-	tilesets: Tileset[];
-	mapObjects: MapObject[];
-	layers: TiledLayer[];
-	mapData: TiledMapModel;
-	entityFactory?: Readonly<EntityFactory>;
-}
-
-export interface TiledMapRenderModel extends EntityRenderModel {
-	tilesets: Tileset[];
-	layers: TiledLayer[];
-	mapData: TiledMapModel;
-}
-
-export function TiledMap(props: TiledMapProps, children: Renderable[], api: AurumComponentAPI): SceneGraphNode<TiledMapEntity> {
+export function TiledMap(props: TiledMapProps, children: Renderable[], api: AurumComponentAPI): TiledMapGraphNode {
 	const mapObjects: MapObject[] = [];
 	const layers: TiledLayer[] = [];
 
@@ -74,83 +54,31 @@ export function TiledMap(props: TiledMapProps, children: Renderable[], api: Auru
 		layers.push(layer);
 	});
 
-	const components = props.components
-		? props.components instanceof ArrayDataSource
-			? props.components
-			: new ArrayDataSource(props.components)
-		: new ArrayDataSource([]);
-
-	const result: SceneGraphNode<TiledMapEntity> = {
-		cancellationToken: api.cancellationToken,
-		onAttach: props.onAttach,
-		onDetach: props.onDetach,
-		model: {
-			getComponentByType: getComponentByTypeFactory(components),
-			getTileMetaDataByGid(tileGid: number): TiledMapTileModel {
-				if (tileGid === 0) {
-					return undefined;
-				}
-
-				let tileset: Tileset | undefined = props.tilesets.find((t) => t.hasGid(tileGid));
-				if (tileset === undefined) {
-					throw new Error('something went wrong, hasGid = false for every tileset');
-				}
-				return tileset.getTileMetadata(tileGid);
+	return new TiledMapGraphNode({
+		name: props.name ?? TiledMapGraphNode.name,
+		components: normalizeComponents(props.components),
+		children: undefined,
+		models: {
+			coreDefault: entityDefaults,
+			appliedStyleClasses: new ArrayDataSource(),
+			entityTypeDefault: {
+				resourceRootUrl: new DataSource('/'),
+				tilesets: new ArrayDataSource([]),
+				entityFactory: new DataSource(undefined)
 			},
-			hasTile(layer: number, x: number, y: number): boolean {
-				const selectedLayer: TiledLayer | undefined = layers[layer];
-				if (selectedLayer === undefined || !selectedLayer.hasData()) {
-					return false;
-				} else {
-					return selectedLayer.hasTile(x, y);
-				}
-			},
-			getTileMetadata(layer: number, tileX: number, tileY: number): TiledMapTileModel {
-				if (result.model.hasTile(layer, tileX, tileY)) {
-					const selectedLayer: TiledLayer | undefined = layers[layer];
-
-					return result.model.getTileMetaDataByGid(selectedLayer.getTileData(tileX, tileY));
-				} else {
-					return undefined;
-				}
-			},
-			layers,
-			mapObjects,
-			mapData: props.model,
-			tilesets: props.tilesets,
-			x: toSource(props.x, 0),
-			y: toSource(props.y, 0),
-			originX: toSource(props.originX, 0),
-			originY: toSource(props.originY, 0),
-			minHeight: toSource(props.minHeight, undefined),
-			height: toSource(props.height, 0),
-			maxHeight: toSource(props.maxHeight, undefined),
-			minWidth: toSource(props.minWidth, undefined),
-			width: toSource(props.width, undefined),
-			maxWidth: toSource(props.maxWidth, undefined),
-			scaleX: toSource(props.scaleX, 1),
-			scaleY: toSource(props.scaleY, 1),
-			alpha: toSource(props.alpha, 1),
-			clip: toSource(props.clip, false),
-			marginTop: toSource(props.marginTop, 0),
-			marginRight: toSource(props.marginRight, 0),
-			marginBottom: toSource(props.marginBottom, 0),
-			marginLeft: toSource(props.marginLeft, 0),
-			components,
-			shaders: props.shaders ? (props.shaders instanceof ArrayDataSource ? props.shaders : new ArrayDataSource(props.shaders)) : new ArrayDataSource([]),
-			ignoreLayout: toSource(props.ignoreLayout, false),
-			spreadLayout: toSource(props.spreadLayout, false),
-			name: props.name,
-			visible: toSource(props.visible, true),
-			zIndex: toSource(props.zIndex, undefined),
-			blendMode: toSource(props.blendMode, undefined),
-			resourceRootUrl: props.resourceRootUrl
+			userSpecified: {
+				...propsToModel(props),
+				tilesets: new ArrayDataSource(props.tilesets),
+				resourceRootUrl: toSourceIfDefined(props.resourceRootUrl),
+				entityFactory: toSourceIfDefined(props.entityFactory),
+				mapObjects: new ArrayDataSource(mapObjects),
+				layers: new ArrayDataSource(layers),
+				mapData: toSourceIfDefined(props.model)
+			}
 		},
-		uid: _.getUId(),
-		nodeType: RenderableType.TILE_MAP
-	};
-
-	return result;
+		onAttach: props.onAttach,
+		onDetach: props.onDetach
+	});
 }
 
 function processLayer(layer: TiledLayer, props: TiledMapProps, mapObjects: MapObject[], index: number): void {
