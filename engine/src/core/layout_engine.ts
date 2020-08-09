@@ -16,7 +16,7 @@ export interface LayoutData {
 	sizeY: DataSource<number>;
 }
 
-export function layoutAlgorithm(node: SceneGraphNode<any>): LayoutData {
+export function layoutAlgorithm(node: SceneGraphNode<CommonEntity>): LayoutData {
 	let sizeX: DataSource<number>;
 	let sizeY: DataSource<number>;
 	let x: DataSource<number>;
@@ -44,25 +44,11 @@ export function layoutAlgorithm(node: SceneGraphNode<any>): LayoutData {
 	}
 
 	x = node.resolvedModel.x.map((v) => {
-		return computePosition(
-			node,
-			v,
-			sizeX,
-			node.resolvedModel.originX,
-			node.resolvedModel.scaleX,
-			node.parent.value?.renderState?.sizeX ?? new DataSource(0)
-		);
+		return computePosition(v, sizeX.value, node.resolvedModel.originX.value, node.resolvedModel.scaleX.value, node.parent.value?.renderState?.sizeX.value);
 	});
 
 	y = node.resolvedModel.y.map((v) => {
-		return computePosition(
-			node,
-			v,
-			sizeY,
-			node.resolvedModel.originY,
-			node.resolvedModel.scaleY,
-			node.parent.value?.renderState?.sizeY ?? new DataSource(0)
-		);
+		return computePosition(v, sizeY.value, node.resolvedModel.originY.value, node.resolvedModel.scaleY.value, node.parent.value?.renderState?.sizeY.value);
 	});
 
 	const result: LayoutData = {
@@ -89,6 +75,11 @@ export function layoutAlgorithm(node: SceneGraphNode<any>): LayoutData {
 		}
 		refreshLayout();
 	});
+
+	node.resolvedModel.originX.listen(() => refreshLayout());
+	node.resolvedModel.originY.listen(() => refreshLayout());
+	node.resolvedModel.scaleX.listen(() => refreshLayout());
+	node.resolvedModel.scaleY.listen(() => refreshLayout());
 
 	return result;
 
@@ -119,26 +110,17 @@ function computeSize(value: Position, parentSize: number, distanceToEdge: number
 	}
 }
 
-function computePosition(
-	node: SceneGraphNode<CommonEntity>,
-	value: Position,
-	size: DataSource<number>,
-	origin: DataSource<number>,
-	scale: DataSource<number>,
-	parentSize: DataSource<number>
-): number {
+function computePosition(value: Position, size: number, origin: number, scale: number, parentSize: number): number {
 	let computedValue;
 	if (typeof value === 'number') {
 		computedValue = value;
 	} else {
 		if (value.startsWith('calc')) {
-			// dependOnParentSize(node);
-			computedValue = new Calculation(value).toPixels(ScreenHelper.PPI, parentSize.value, 0);
+			computedValue = new Calculation(value).toPixels(ScreenHelper.PPI, parentSize, 0);
 		} else {
-			// dependOnParentSize(node);
-			computedValue = new Unit(value).toPixels(ScreenHelper.PPI, parentSize.value);
+			computedValue = new Unit(value).toPixels(ScreenHelper.PPI, parentSize);
 		}
 	}
 
-	return computedValue - origin.value * (size.value ?? 0) * scale.value;
+	return computedValue - origin * (size ?? 0) * scale;
 }

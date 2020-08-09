@@ -37,8 +37,8 @@ export class RenderStage {
 		this.entityDatabase[node.id] = node;
 		node.token.addCancelable(() => delete this.entityDatabase[node.id]);
 
-		if (payload.parent?.uid !== undefined) {
-			const parent: NoRenderEntity = this.entityDatabase[payload.parent?.uid] as NoRenderEntity;
+		if (payload.parent.value?.uid !== undefined) {
+			const parent: NoRenderEntity = this.entityDatabase[payload.parent.value?.uid] as NoRenderEntity;
 			if (index !== undefined) {
 				parent.displayObject.addChildAt(node.displayObject, index);
 				parent.children.splice(index, 0, node);
