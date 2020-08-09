@@ -120,13 +120,13 @@ function computeSize(value: Position, parentSize: number, distanceToEdge: number
 					if (c.isSizeXRelative()) {
 						return 0;
 					} else {
-						return c.renderState.positionX.value + c.renderState.sizeX.value;
+						return c.renderState.positionX.value + (c.renderState.sizeX.value ?? 0);
 					}
 				} else {
 					if (c.isSizeYRelative()) {
 						return 0;
 					} else {
-						return c.renderState.positionY.value + c.renderState.sizeY.value;
+						return c.renderState.positionY.value + (c.renderState.sizeY.value ?? 0);
 					}
 				}
 			});
