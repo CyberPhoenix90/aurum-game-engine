@@ -1,14 +1,14 @@
-import { ArrayDataSource, CancellationToken, MapDataSource, DataSource, Renderable, render } from 'aurumjs';
+import { ArrayDataSource, CancellationToken, DataSource, MapDataSource, render, Renderable } from 'aurumjs';
+import { layoutAlgorithm } from '../core/layout_engine';
 import { AbstractComponent } from '../entities/components/abstract_component';
+import { entityDefaults } from '../entities/entity_defaults';
+import { ContainerGraphNodeModel } from '../entities/types/container/api';
+import { ContainerEntity, ContainerEntityRenderModel } from '../entities/types/container/model';
+import { AbstractRenderPlugin } from '../rendering/abstract_render_plugin';
 import { EntityRenderModel } from '../rendering/model';
+import { _ } from '../utilities/other/streamline';
 import { Constructor } from './common';
 import { CommonEntity, RenderableType } from './entities';
-import { _ } from '../utilities/other/streamline';
-import { AbstractRenderPlugin } from '../rendering/abstract_render_plugin';
-import { entityDefaults } from '../entities/entity_defaults';
-import { layoutAlgorithm } from '../core/layout_engine';
-import { ContainerEntity, ContainerEntityRenderModel } from '../entities/types/container/model';
-import { ContainerGraphNodeModel } from '../entities/types/container/api';
 
 export interface SceneGraphNodeModel<T> {
 	name?: string;
@@ -309,8 +309,8 @@ export class ContainerGraphNode extends SceneGraphNode<ContainerEntity> {
 			children: config.children ?? new ArrayDataSource(),
 			models: {
 				appliedStyleClasses: config.models.appliedStyleClasses,
-				coreDefault: entityDefaults,
-				entityTypeDefault: {},
+				coreDefault: config.models.coreDefault,
+				entityTypeDefault: config.models.entityTypeDefault,
 				userSpecified: config.models.userSpecified
 			},
 			components: config.components,
@@ -345,6 +345,14 @@ export class ContainerGraphNode extends SceneGraphNode<ContainerEntity> {
 	}
 }
 
+export const dataSourceDefaultModel: ContainerEntity = {
+	spreadLayout: new DataSource(true)
+};
+
+export const arrayDataSourceDefaultModel: ContainerEntity = {
+	spreadLayout: new DataSource(true)
+};
+
 export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 	constructor(dataSource: ArrayDataSource<Renderable>) {
 		super({
@@ -352,7 +360,7 @@ export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 			name: ArrayDataSourceSceneGraphNode.name,
 			models: {
 				coreDefault: entityDefaults,
-				entityTypeDefault: {},
+				entityTypeDefault: arrayDataSourceDefaultModel,
 				appliedStyleClasses: new ArrayDataSource(),
 				userSpecified: {}
 			},
@@ -404,7 +412,7 @@ export class DataSourceSceneGraphNode extends ContainerGraphNode {
 			name: DataSourceSceneGraphNode.name,
 			models: {
 				coreDefault: entityDefaults,
-				entityTypeDefault: {},
+				entityTypeDefault: dataSourceDefaultModel,
 				appliedStyleClasses: new ArrayDataSource(),
 				userSpecified: {}
 			},
