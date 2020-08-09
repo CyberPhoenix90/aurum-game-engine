@@ -110,7 +110,7 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		if (this.resolvedModel.layout.value && this.stageId) {
 			this.resolvedModel.layout.value.positionChildren(this.getLayoutNodes(), this);
 		}
-		if (this.parent && this.parent.resolvedModel.spreadLayout.value) {
+		if (this.parent && this.resolvedModel.spreadLayout.value) {
 			this.parent.recomputeLayout();
 		}
 	}
