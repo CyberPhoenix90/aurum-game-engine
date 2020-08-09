@@ -67,13 +67,13 @@ export function layoutAlgorithm(node: SceneGraphNode<CommonEntity>): LayoutData 
 		if (p) {
 			parentToken = new CancellationToken();
 			p.renderState.sizeX.listen(() => {
-				refreshLayout();
+				refreshLayoutIfRelative();
 			}, parentToken);
 			p.renderState.sizeY.listen(() => {
-				refreshLayout();
+				refreshLayoutIfRelative();
 			}, parentToken);
 		}
-		refreshLayout();
+		refreshLayoutIfRelative();
 	});
 
 	node.resolvedModel.originX.listen(() => refreshLayout());
@@ -82,7 +82,20 @@ export function layoutAlgorithm(node: SceneGraphNode<CommonEntity>): LayoutData 
 	node.resolvedModel.scaleY.listen(() => refreshLayout());
 
 	return result;
-
+	function refreshLayoutIfRelative() {
+		if (
+			node.resolvedModel.width.value === 'inherit' ||
+			node.resolvedModel.width.value === 'remainder' ||
+			(typeof node.resolvedModel.width.value === 'string' && node.resolvedModel.width.value.includes('%')) ||
+			node.resolvedModel.height.value === 'inherit' ||
+			node.resolvedModel.height.value === 'remainder' ||
+			(typeof node.resolvedModel.height.value === 'string' && node.resolvedModel.height.value.includes('%')) ||
+			(typeof node.resolvedModel.x.value === 'string' && node.resolvedModel.x.value.includes('%')) ||
+			(typeof node.resolvedModel.y.value === 'string' && node.resolvedModel.y.value.includes('%'))
+		) {
+			refreshLayout();
+		}
+	}
 	function refreshLayout() {
 		node.resolvedModel.width.repeatLast();
 		node.resolvedModel.height.repeatLast();
@@ -92,6 +105,10 @@ export function layoutAlgorithm(node: SceneGraphNode<CommonEntity>): LayoutData 
 }
 
 function computeSize(value: Position, parentSize: number, distanceToEdge: number) {
+	if (value === undefined) {
+		return 0;
+	}
+
 	if (value === 'inherit') {
 		value = '100%';
 	}
@@ -111,6 +128,10 @@ function computeSize(value: Position, parentSize: number, distanceToEdge: number
 }
 
 function computePosition(value: Position, size: number, origin: number, scale: number, parentSize: number): number {
+	if (value === undefined) {
+		return 0;
+	}
+
 	let computedValue;
 	if (typeof value === 'number') {
 		computedValue = value;
