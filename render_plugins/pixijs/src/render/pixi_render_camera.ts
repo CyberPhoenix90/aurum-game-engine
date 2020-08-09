@@ -4,7 +4,6 @@ import { NoRenderEntity } from './pixi_no_render_entity';
 
 export class RenderCameraEntity extends NoRenderEntity {
 	private readonly renderer: PIXI.Renderer;
-	private readonly model: CameraGraphNode;
 	private view: HTMLCanvasElement;
 
 	constructor(model: CameraGraphNode, stageNode: HTMLElement) {

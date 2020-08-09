@@ -8,6 +8,7 @@ import { ScreenHelper } from '../utilities/other/screen_helper';
 import { LabelGraphNode } from '../entities/types/label/api';
 import { measureStringWidth } from '../entities/types/label/label_entity';
 import { SpriteGraphNode } from '../entities/types/sprite/api';
+import { CanvasGraphNode } from '../entities/types/canvas/api';
 
 export interface LayoutData {
 	x: DataSource<number>;
@@ -22,9 +23,13 @@ export function layoutAlgorithm(node: SceneGraphNode<CommonEntity>): LayoutData 
 	let x: DataSource<number>;
 	let y: DataSource<number>;
 
-	if (node instanceof SpriteGraphNode) {
-		sizeX = node.resolvedModel.width.map((v) => (v === 'auto' ? undefined : computeSize(v, node.parent.value?.renderState.sizeX.value ?? 0, 0)));
-		sizeY = node.resolvedModel.height.map((v) => (v === 'auto' ? undefined : computeSize(v, node.parent.value?.renderState.sizeY.value ?? 0, 0)));
+	if (node instanceof SpriteGraphNode || node instanceof CanvasGraphNode) {
+		sizeX = node.resolvedModel.width.aggregate(node.onRequestNodeLayoutRefresh, (v) =>
+			v === 'auto' ? undefined : computeSize(v, getParentWidth(node), 0, 'x', node.processedChildren?.getData() ?? [])
+		);
+		sizeY = node.resolvedModel.height.aggregate(node.onRequestNodeLayoutRefresh, (v) =>
+			v === 'auto' ? undefined : computeSize(v, getParentHeight(node), 0, 'y', node.processedChildren?.getData() ?? [])
+		);
 	} else if (node instanceof LabelGraphNode) {
 		sizeX = node.resolvedModel.width.aggregateFive(
 			node.resolvedModel.text,
@@ -32,23 +37,29 @@ export function layoutAlgorithm(node: SceneGraphNode<CommonEntity>): LayoutData 
 			node.resolvedModel.fontFamily,
 			node.resolvedModel.fontWeight,
 			(size, text, fs, ff, fw) =>
-				size === 'auto' ? measureStringWidth(text, fw, fs, ff) : computeSize(size, node.parent.value?.renderState.sizeX.value ?? 0, 0)
+				size === 'auto'
+					? measureStringWidth(text, fw, fs, ff)
+					: computeSize(size, getParentWidth(node), 0, 'x', node.processedChildren?.getData() ?? [])
 		);
 
-		sizeY = node.resolvedModel.height.map((v) =>
-			v === 'auto' ? node.resolvedModel.fontSize.value : computeSize(v, node.parent.value?.renderState.sizeY.value ?? 0, 0)
+		sizeY = node.resolvedModel.height.aggregate(node.onRequestNodeLayoutRefresh, (v) =>
+			v === 'auto' ? node.resolvedModel.fontSize.value : computeSize(v, getParentHeight(node), 0, 'y', node.processedChildren?.getData() ?? [])
 		);
 	} else {
-		sizeX = node.resolvedModel.width.map((v) => computeSize(v, node.parent.value?.renderState.sizeX.value ?? 0, 0));
-		sizeY = node.resolvedModel.height.map((v) => computeSize(v, node.parent.value?.renderState.sizeY.value ?? 0, 0));
+		sizeX = node.resolvedModel.width.aggregate(node.onRequestNodeLayoutRefresh, (v) =>
+			computeSize(v, getParentWidth(node), 0, 'x', node.processedChildren?.getData() ?? [])
+		);
+		sizeY = node.resolvedModel.height.aggregate(node.onRequestNodeLayoutRefresh, (v) =>
+			computeSize(v, getParentHeight(node), 0, 'y', node.processedChildren?.getData() ?? [])
+		);
 	}
 
-	x = node.resolvedModel.x.map((v) => {
-		return computePosition(v, sizeX.value, node.resolvedModel.originX.value, node.resolvedModel.scaleX.value, node.parent.value?.renderState?.sizeX.value);
+	x = node.resolvedModel.x.aggregate(node.onRequestNodeLayoutRefresh, (v) => {
+		return computePosition(v, sizeX.value, node.resolvedModel.originX.value, node.resolvedModel.scaleX.value, getParentWidth(node));
 	});
 
-	y = node.resolvedModel.y.map((v) => {
-		return computePosition(v, sizeY.value, node.resolvedModel.originY.value, node.resolvedModel.scaleY.value, node.parent.value?.renderState?.sizeY.value);
+	y = node.resolvedModel.y.aggregate(node.onRequestNodeLayoutRefresh, (v) => {
+		return computePosition(v, sizeY.value, node.resolvedModel.originY.value, node.resolvedModel.scaleY.value, getParentHeight(node));
 	});
 
 	const result: LayoutData = {
@@ -67,44 +78,32 @@ export function layoutAlgorithm(node: SceneGraphNode<CommonEntity>): LayoutData 
 		if (p) {
 			parentToken = new CancellationToken();
 			p.renderState.sizeX.listen(() => {
-				refreshLayoutIfRelative();
+				node.refreshNodeLayoutIfRelative();
 			}, parentToken);
 			p.renderState.sizeY.listen(() => {
-				refreshLayoutIfRelative();
+				node.refreshNodeLayoutIfRelative();
 			}, parentToken);
 		}
-		refreshLayoutIfRelative();
+		node.refreshNodeLayoutIfRelative();
 	});
 
-	node.resolvedModel.originX.listen(() => refreshLayout());
-	node.resolvedModel.originY.listen(() => refreshLayout());
-	node.resolvedModel.scaleX.listen(() => refreshLayout());
-	node.resolvedModel.scaleY.listen(() => refreshLayout());
+	node.resolvedModel.originX.listen(() => node.refreshNodeLayout());
+	node.resolvedModel.originY.listen(() => node.refreshNodeLayout());
+	node.resolvedModel.scaleX.listen(() => node.refreshNodeLayout());
+	node.resolvedModel.scaleY.listen(() => node.refreshNodeLayout());
 
 	return result;
-	function refreshLayoutIfRelative() {
-		if (
-			node.resolvedModel.width.value === 'inherit' ||
-			node.resolvedModel.width.value === 'remainder' ||
-			(typeof node.resolvedModel.width.value === 'string' && node.resolvedModel.width.value.includes('%')) ||
-			node.resolvedModel.height.value === 'inherit' ||
-			node.resolvedModel.height.value === 'remainder' ||
-			(typeof node.resolvedModel.height.value === 'string' && node.resolvedModel.height.value.includes('%')) ||
-			(typeof node.resolvedModel.x.value === 'string' && node.resolvedModel.x.value.includes('%')) ||
-			(typeof node.resolvedModel.y.value === 'string' && node.resolvedModel.y.value.includes('%'))
-		) {
-			refreshLayout();
-		}
-	}
-	function refreshLayout() {
-		node.resolvedModel.width.repeatLast();
-		node.resolvedModel.height.repeatLast();
-		node.resolvedModel.x.repeatLast();
-		node.resolvedModel.y.repeatLast();
-	}
 }
 
-function computeSize(value: Position, parentSize: number, distanceToEdge: number) {
+function getParentWidth(node: SceneGraphNode<CommonEntity>): number {
+	return node.parent.value?.resolvedModel.width.value === 'content' ? 0 : node.parent.value?.renderState?.sizeX.value ?? 0;
+}
+
+function getParentHeight(node: SceneGraphNode<CommonEntity>): number {
+	return node.parent.value?.resolvedModel.height.value === 'content' ? 0 : node.parent.value?.renderState?.sizeY.value ?? 0;
+}
+
+function computeSize(value: Position, parentSize: number, distanceToEdge: number, component: 'x' | 'y', children: ReadonlyArray<SceneGraphNode<CommonEntity>>) {
 	if (value === undefined) {
 		return 0;
 	}
@@ -115,7 +114,27 @@ function computeSize(value: Position, parentSize: number, distanceToEdge: number
 	if (value === 'remainder') {
 		return distanceToEdge;
 	} else if (value === 'content') {
-		return 0;
+		if (children.length > 0) {
+			const sizes = children.map((c) => {
+				if (component === 'x') {
+					if (c.isSizeXRelative()) {
+						return 0;
+					} else {
+						return c.renderState.positionX.value + c.renderState.sizeX.value;
+					}
+				} else {
+					if (c.isSizeYRelative()) {
+						return 0;
+					} else {
+						return c.renderState.positionY.value + c.renderState.sizeY.value;
+					}
+				}
+			});
+
+			return Math.max(...sizes);
+		} else {
+			return 0;
+		}
 	} else {
 		if (typeof value === 'number') {
 			return value;

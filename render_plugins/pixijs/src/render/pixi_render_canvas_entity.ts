@@ -29,6 +29,13 @@ export class RenderCanvasEntity extends NoRenderEntity {
 		for (const action of this.paintOperations.getData()) {
 			this.drawAction(action, this.drawToken);
 		}
+
+		if (this.model.resolvedModel.width.value === 'auto') {
+			this.model.renderState.sizeX.update(this.displayObject.width);
+		}
+		if (this.model.resolvedModel.height.value === 'auto') {
+			this.model.renderState.sizeY.update(this.displayObject.height);
+		}
 	}
 
 	private drawAction(action: PaintOperation, token: CancellationToken) {

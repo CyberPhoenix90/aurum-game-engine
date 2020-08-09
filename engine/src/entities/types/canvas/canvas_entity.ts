@@ -1,4 +1,4 @@
-import { ArrayDataSource } from 'aurumjs';
+import { ArrayDataSource, DataSource } from 'aurumjs';
 import { CommonEntityProps } from '../../../models/entities';
 import { CanvasGraphNode } from './api';
 import { AbstractShape } from '../../../math/shapes/abstract_shape';
@@ -43,4 +43,7 @@ export function Canvas(props: CanvasEntityProps): CanvasGraphNode {
 	});
 }
 
-export const canvasDefaultModel: CanvasEntity = {};
+export const canvasDefaultModel: CanvasEntity = {
+	width: new DataSource('auto'),
+	height: new DataSource('auto')
+};

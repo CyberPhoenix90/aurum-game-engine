@@ -9,9 +9,11 @@ export class NoRenderEntity {
 
 	public parent: NoRenderEntity;
 	public displayObject: Container;
+	public model: SceneGraphNode<CommonEntity>;
 
 	constructor(model: SceneGraphNode<CommonEntity>) {
 		this.id = model.uid;
+		this.model = model;
 		this.token = new CancellationToken();
 
 		model.cancellationToken.chain(this.token);
@@ -60,29 +62,31 @@ export class NoRenderEntity {
 			}
 		}, this.token);
 
-		model.renderState.sizeX.listenAndRepeat((v) => {
-			if (v !== undefined) {
-				this.displayObject.width = v * model.renderState.scaleX.value;
-			}
-		}, this.token);
+		if (Object.getPrototypeOf(this.displayObject).constructor !== Container) {
+			model.renderState.sizeX.listenAndRepeat((v) => {
+				if (v !== undefined) {
+					this.displayObject.width = v * model.renderState.scaleX.value;
+				}
+			}, this.token);
 
-		model.renderState.sizeY.listenAndRepeat((v) => {
-			if (v !== undefined) {
-				this.displayObject.height = v * model.renderState.scaleY.value;
-			}
-		}, this.token);
+			model.renderState.sizeY.listenAndRepeat((v) => {
+				if (v !== undefined) {
+					this.displayObject.height = v * model.renderState.scaleY.value;
+				}
+			}, this.token);
 
-		model.renderState.scaleX.listenAndRepeat((v) => {
-			if (model.renderState.sizeX.value !== undefined) {
-				this.displayObject.width = model.renderState.sizeX.value * v;
-			}
-		}, this.token);
+			model.renderState.scaleX.listenAndRepeat((v) => {
+				if (model.renderState.sizeX.value !== undefined) {
+					this.displayObject.width = model.renderState.sizeX.value * v;
+				}
+			}, this.token);
 
-		model.renderState.scaleY.listenAndRepeat((v) => {
-			if (model.renderState.sizeY.value !== undefined) {
-				this.displayObject.height = model.renderState.sizeY.value * v;
-			}
-		}, this.token);
+			model.renderState.scaleY.listenAndRepeat((v) => {
+				if (model.renderState.sizeY.value !== undefined) {
+					this.displayObject.height = model.renderState.sizeY.value * v;
+				}
+			}, this.token);
+		}
 
 		model.renderState.clip.transform(dsUnique()).listenAndRepeat((v) => {
 			if (v) {

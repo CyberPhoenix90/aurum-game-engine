@@ -1,4 +1,4 @@
-import { ArrayDataSource, CancellationToken, DataSource, MapDataSource, render, Renderable } from 'aurumjs';
+import { ArrayDataSource, CancellationToken, DataSource, MapDataSource, render, Renderable, dsUnique } from 'aurumjs';
 import { layoutAlgorithm } from '../core/layout_engine';
 import { AbstractComponent } from '../entities/components/abstract_component';
 import { entityDefaults } from '../entities/entity_defaults';
@@ -39,15 +39,17 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 	};
 	public readonly cancellationToken: CancellationToken;
 	public readonly children: ArrayDataSource<ArrayDataSource<Renderable> | DataSource<Renderable> | SceneGraphNode<CommonEntity>>;
-	protected readonly processedChildren: ArrayDataSource<SceneGraphNode<CommonEntity>>;
+	public readonly processedChildren: ArrayDataSource<SceneGraphNode<CommonEntity>>;
 	private stageId: number;
 	private renderPlugin: AbstractRenderPlugin;
 	onAttach?(entity: SceneGraphNode<T>);
 	onDetach?(entity: SceneGraphNode<T>);
+	public onRequestNodeLayoutRefresh: DataSource<void>;
 
 	constructor(config: SceneGraphNodeModel<T>) {
 		this.onAttach = config.onAttach;
 		this.onDetach = config.onDetach;
+		this.onRequestNodeLayoutRefresh = new DataSource();
 		this.name = config.name;
 		this.children = config.children ?? new ArrayDataSource([]);
 		this.cancellationToken = new CancellationToken();
@@ -57,6 +59,17 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		this.parent = new DataSource();
 		this.resolvedModel = this.createResolvedModel();
 		this.renderState = this.createRenderModel();
+		this.renderState.positionX.transform(dsUnique()).listen(() => {
+			if (this.parent.value && this.parent.value.resolvedModel.width.value === 'content') {
+				this.parent.value.refreshNodeLayout();
+			}
+		});
+
+		this.renderState.positionY.transform(dsUnique()).listen(() => {
+			if (this.parent.value && this.parent.value.resolvedModel.height.value === 'content') {
+				this.parent.value.refreshNodeLayout();
+			}
+		});
 		this.cancellationToken.addCancelable(() => {
 			config.onDetach?.(this);
 		});
@@ -100,11 +113,29 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 			this.recomputeLayout();
 		});
 
-		DataSource.fromMultipleSources([this.renderState.sizeX, this.renderState.sizeY]).listen(() => {
+		DataSource.fromMultipleSources([this.renderState.sizeX.transform(dsUnique()), this.renderState.sizeY.transform(dsUnique())]).listen(() => {
 			if (this.parent.value && this.parent.value.resolvedModel.layout.value && this.parent.value.resolvedModel.layout.value.isSizeSensitive()) {
 				this.parent.value.recomputeLayout();
 			}
 		});
+		this.renderState.sizeX.repeatLast();
+		this.renderState.sizeY.repeatLast();
+	}
+
+	public isSizeXRelative(): boolean {
+		return (
+			this.resolvedModel.width.value === 'inherit' ||
+			this.resolvedModel.width.value === 'remainder' ||
+			(typeof this.resolvedModel.width.value === 'string' && this.resolvedModel.width.value.includes('%'))
+		);
+	}
+
+	public isSizeYRelative(): boolean {
+		return (
+			this.resolvedModel.height.value === 'inherit' ||
+			this.resolvedModel.height.value === 'remainder' ||
+			(typeof this.resolvedModel.height.value === 'string' && this.resolvedModel.height.value.includes('%'))
+		);
 	}
 
 	public recomputeLayout(): void {
@@ -225,6 +256,21 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		}
 
 		throw new Error('Could not resolve source for key ' + key);
+	}
+
+	public refreshNodeLayoutIfRelative(): void {
+		if (
+			(this.isSizeXRelative() && (!this.parent.value || this.parent.value.resolvedModel.width.value !== 'content')) ||
+			(this.isSizeYRelative() && (!this.parent.value || this.parent.value.resolvedModel.height.value !== 'content')) ||
+			(typeof this.resolvedModel.x.value === 'string' && this.resolvedModel.x.value.includes('%')) ||
+			(typeof this.resolvedModel.y.value === 'string' && this.resolvedModel.y.value.includes('%'))
+		) {
+			this.refreshNodeLayout();
+		}
+	}
+
+	public refreshNodeLayout(): void {
+		this.onRequestNodeLayoutRefresh.update();
 	}
 
 	/**
