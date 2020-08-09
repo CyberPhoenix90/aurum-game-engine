@@ -1,5 +1,5 @@
 import { EntityRenderModel } from '../../../rendering/model';
-import { ReadOnlyDataSource, DataSource } from 'aurumjs';
+import { ReadOnlyDataSource, DataSource, ArrayDataSource } from 'aurumjs';
 import { CommonEntity } from '../../../models/entities';
 
 export interface SpriteEntityRenderModel extends EntityRenderModel {
@@ -30,4 +30,5 @@ export interface SpriteEntity extends CommonEntity {
 	 */
 	drawDistanceX?: DataSource<number>;
 	drawDistanceY?: DataSource<number>;
+	class?: SpriteEntity[] | ArrayDataSource<SpriteEntity>;
 }

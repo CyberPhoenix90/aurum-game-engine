@@ -13,6 +13,7 @@ export interface TiledMapEntity extends CommonEntity {
 	layers?: ArrayDataSource<TiledLayer>;
 	mapData?: DataSource<TiledMapModel>;
 	entityFactory?: DataSource<EntityFactory>;
+	class?: TiledMapEntity[] | ArrayDataSource<TiledMapEntity>;
 }
 
 export interface TiledMapRenderModel extends EntityRenderModel {

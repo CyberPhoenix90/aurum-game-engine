@@ -27,8 +27,8 @@ export class LinearLayout extends AbstractLayout {
 	public positionEntityByIndex(
 		entity: SceneGraphNode<CommonEntity>,
 		index: number,
-		entities: ReadonlyArray<SceneGraphNode<CommonEntity>>,
-		relative: SceneGraphNode<CommonEntity>
+		siblings: ReadonlyArray<SceneGraphNode<CommonEntity>>,
+		parent: SceneGraphNode<CommonEntity>
 	): void {
 		entity.models.userSpecified.x.update(this.config.initialOffset.x + this.config.nodeOffset.x * index);
 		entity.models.userSpecified.y.update(this.config.initialOffset.y + this.config.nodeOffset.y * index);

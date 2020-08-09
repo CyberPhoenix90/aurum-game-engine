@@ -1,4 +1,4 @@
-import { ArrayDataSource, MapDataSource } from 'aurumjs';
+import { ArrayDataSource, MapDataSource, DataSource } from 'aurumjs';
 import { Constructor } from '../models/common';
 import { AbstractComponent } from './components/abstract_component';
 import { CommonEntityProps, CommonEntity } from '../models/entities';
@@ -12,8 +12,9 @@ export function getComponentByTypeFactory(components: ArrayDataSource<AbstractCo
 
 export function propsToModel(props: CommonEntityProps): CommonEntity {
 	return {
-		x: toSourceIfDefined(props.x),
-		y: toSourceIfDefined(props.y),
+		layout: toSourceIfDefined(props.layout),
+		x: toSourceIfDefined(props.x) ?? new DataSource(0),
+		y: toSourceIfDefined(props.y) ?? new DataSource(0),
 		originX: toSourceIfDefined(props.originX),
 		originY: toSourceIfDefined(props.originY),
 		minHeight: toSourceIfDefined(props.minHeight),

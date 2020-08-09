@@ -14,6 +14,7 @@ export interface CameraProps extends CommonEntityProps {
 	backgroundColor?: Data<string>;
 	onAttach?(node: CameraGraphNode): void;
 	onDetach?(node: CameraGraphNode): void;
+	class?: CameraEntity[] | ArrayDataSource<CameraEntity>;
 }
 
 export function Camera(props: CameraProps, children?: Renderable[]): SceneGraphNode<CameraEntity> {
@@ -29,12 +30,8 @@ export function Camera(props: CameraProps, children?: Renderable[]): SceneGraphN
 		),
 		models: {
 			coreDefault: entityDefaults,
-			appliedStyleClasses: new ArrayDataSource(),
-			entityTypeDefault: {
-				backgroundColor: new DataSource('black'),
-				resolutionX: new DataSource(undefined),
-				resolutionY: new DataSource(undefined)
-			},
+			appliedStyleClasses: props.class instanceof ArrayDataSource ? props.class : new ArrayDataSource(props.class),
+			entityTypeDefault: cameraDefaultModel,
 			userSpecified: {
 				...propsToModel(props),
 				backgroundColor: toSourceIfDefined(props.backgroundColor),
@@ -46,3 +43,9 @@ export function Camera(props: CameraProps, children?: Renderable[]): SceneGraphN
 		onDetach: props.onDetach
 	});
 }
+
+export const cameraDefaultModel: CameraEntity = {
+	backgroundColor: new DataSource('black'),
+	resolutionX: new DataSource(undefined),
+	resolutionY: new DataSource(undefined)
+};

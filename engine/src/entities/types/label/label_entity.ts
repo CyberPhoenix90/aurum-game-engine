@@ -4,11 +4,12 @@ import { toSourceIfDefined } from '../../../utilities/data/to_source';
 import { entityDefaults } from '../../entity_defaults';
 import { normalizeComponents, propsToModel } from '../../shared';
 import { LabelGraphNode } from './api';
-import { LabelEntityStyle } from './model';
+import { LabelEntityStyle, LabelEntity } from './model';
 
 export interface LabelEntityProps extends CommonEntityProps, LabelEntityStyle {
 	onAttach?(node: LabelGraphNode): void;
 	onDetach?(node: LabelGraphNode): void;
+	class?: LabelEntity[] | ArrayDataSource<LabelEntity>;
 }
 
 export function Label(props: LabelEntityProps, children: Renderable[], api: AurumComponentAPI): LabelGraphNode {
@@ -30,28 +31,11 @@ export function Label(props: LabelEntityProps, children: Renderable[], api: Auru
 		children: undefined,
 		models: {
 			coreDefault: entityDefaults,
-			appliedStyleClasses: new ArrayDataSource(),
-			entityTypeDefault: {
-				text,
-				width: new DataSource('auto'),
-				height: new DataSource('auto'),
-				fontStyle: new DataSource(undefined),
-				fontWeight: new DataSource(undefined),
-				renderCharCount: new DataSource(undefined),
-				dropShadow: new DataSource(undefined),
-				dropShadowAngle: new DataSource(undefined),
-				dropShadowColor: new DataSource(undefined),
-				dropShadowDistance: new DataSource(undefined),
-				dropShadowFuzziness: new DataSource(undefined),
-				stroke: new DataSource(undefined),
-				strokeThickness: new DataSource(undefined),
-				color: new DataSource(undefined),
-				textBaseline: new DataSource(undefined),
-				fontSize: new DataSource(16),
-				fontFamily: new DataSource('arial')
-			},
+			appliedStyleClasses: props.class instanceof ArrayDataSource ? props.class : new ArrayDataSource(props.class),
+			entityTypeDefault: labelDefaultModel,
 			userSpecified: {
 				...propsToModel(props),
+				text,
 				fontFamily: toSourceIfDefined(props.fontFamily),
 				fontSize: toSourceIfDefined(props.fontSize),
 				fontStyle: toSourceIfDefined(props.fontStyle),
@@ -101,3 +85,22 @@ export function measureStringWidth(text: string, fontWeight: string, fontSize: n
 
 	return width;
 }
+
+export const labelDefaultModel: LabelEntity = {
+	width: new DataSource('auto'),
+	height: new DataSource('auto'),
+	fontStyle: new DataSource(undefined),
+	fontWeight: new DataSource(undefined),
+	renderCharCount: new DataSource(undefined),
+	dropShadow: new DataSource(undefined),
+	dropShadowAngle: new DataSource(undefined),
+	dropShadowColor: new DataSource(undefined),
+	dropShadowDistance: new DataSource(undefined),
+	dropShadowFuzziness: new DataSource(undefined),
+	stroke: new DataSource(undefined),
+	strokeThickness: new DataSource(undefined),
+	color: new DataSource(undefined),
+	textBaseline: new DataSource(undefined),
+	fontSize: new DataSource(16),
+	fontFamily: new DataSource('arial')
+};

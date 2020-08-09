@@ -2,8 +2,8 @@ import { SceneGraphNode } from '../aurum_game_engine';
 import { CommonEntity } from '../models/entities';
 
 export abstract class AbstractLayout {
-	public positionChildren(entities: ReadonlyArray<SceneGraphNode<CommonEntity>>, relative: SceneGraphNode<CommonEntity>): void {
-		entities.forEach((e, i) => this.positionEntityByIndex(e, i, entities, relative));
+	public positionChildren(children: ReadonlyArray<SceneGraphNode<CommonEntity>>, parent: SceneGraphNode<CommonEntity>): void {
+		children.forEach((e, i) => this.positionEntityByIndex(e, i, children, parent));
 	}
 
 	public abstract isSizeSensitive(): boolean;
@@ -11,7 +11,7 @@ export abstract class AbstractLayout {
 	public abstract positionEntityByIndex(
 		entity: SceneGraphNode<CommonEntity>,
 		index: number,
-		entities: ReadonlyArray<SceneGraphNode<CommonEntity>>,
-		relative: SceneGraphNode<CommonEntity>
+		siblings: ReadonlyArray<SceneGraphNode<CommonEntity>>,
+		parent: SceneGraphNode<CommonEntity>
 	): void;
 }

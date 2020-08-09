@@ -1,4 +1,4 @@
-import { DataSource, ReadOnlyDataSource } from 'aurumjs';
+import { DataSource, ReadOnlyDataSource, ArrayDataSource } from 'aurumjs';
 import { Data } from '../../../models/input_data';
 import { CommonEntity } from '../../../models/entities';
 import { EntityRenderModel } from '../../../rendering/model';
@@ -36,6 +36,7 @@ export interface LabelEntity extends CommonEntity {
 	dropShadowColor?: DataSource<string>;
 	dropShadowFuzziness?: DataSource<number>;
 	textBaseline?: DataSource<'top' | 'bottom' | 'hanging' | 'alphabetic' | 'middle'>;
+	class?: LabelEntity[] | ArrayDataSource<LabelEntity>;
 }
 
 export interface LabelEntityRenderModel extends EntityRenderModel {

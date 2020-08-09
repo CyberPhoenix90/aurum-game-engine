@@ -1,10 +1,11 @@
-import { Data } from '../../../models/input_data';
-import { CommonEntityProps } from '../../../models/entities';
-import { SpriteGraphNode } from './api';
-import { normalizeComponents, propsToModel } from '../../shared';
-import { entityDefaults } from '../../entity_defaults';
 import { ArrayDataSource, DataSource } from 'aurumjs';
+import { CommonEntityProps } from '../../../models/entities';
+import { Data } from '../../../models/input_data';
 import { toSourceIfDefined } from '../../../utilities/data/to_source';
+import { entityDefaults } from '../../entity_defaults';
+import { normalizeComponents, propsToModel } from '../../shared';
+import { SpriteGraphNode } from './api';
+import { SpriteEntity } from './model';
 
 export interface SpriteEntityProps extends CommonEntityProps {
 	texture?: Data<string>;
@@ -22,6 +23,7 @@ export interface SpriteEntityProps extends CommonEntityProps {
 
 	onAttach?(node: SpriteGraphNode): void;
 	onDetach?(node: SpriteGraphNode): void;
+	class?: SpriteEntity[] | ArrayDataSource<SpriteEntity>;
 }
 
 export function Sprite(props: SpriteEntityProps): SpriteGraphNode {
@@ -31,16 +33,8 @@ export function Sprite(props: SpriteEntityProps): SpriteGraphNode {
 		children: undefined,
 		models: {
 			coreDefault: entityDefaults,
-			appliedStyleClasses: new ArrayDataSource(),
-			entityTypeDefault: {
-				width: new DataSource('auto'),
-				height: new DataSource('auto'),
-				tint: new DataSource(undefined),
-				drawDistanceX: new DataSource(undefined),
-				drawDistanceY: new DataSource(undefined),
-				drawOffsetX: new DataSource(undefined),
-				drawOffsetY: new DataSource(undefined)
-			},
+			appliedStyleClasses: props.class instanceof ArrayDataSource ? props.class : new ArrayDataSource(props.class),
+			entityTypeDefault: spriteDefaultModel,
 			userSpecified: {
 				...propsToModel(props),
 				texture: toSourceIfDefined(props.texture),
@@ -55,3 +49,13 @@ export function Sprite(props: SpriteEntityProps): SpriteGraphNode {
 		onDetach: props.onDetach
 	});
 }
+
+export const spriteDefaultModel: SpriteEntity = {
+	width: new DataSource('auto'),
+	height: new DataSource('auto'),
+	tint: new DataSource(undefined),
+	drawDistanceX: new DataSource(undefined),
+	drawDistanceY: new DataSource(undefined),
+	drawOffsetX: new DataSource(undefined),
+	drawOffsetY: new DataSource(undefined)
+};

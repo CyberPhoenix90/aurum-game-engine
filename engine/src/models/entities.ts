@@ -40,7 +40,7 @@ export interface CommonEntityProps {
 	visible?: Data<boolean>;
 	alpha?: Data<number>;
 	components?: MapDataSource<Constructor<AbstractComponent>, AbstractComponent> | AbstractComponent[];
-	class?: string[] | ArrayDataSource<string>;
+	class?: CommonEntity[] | ArrayDataSource<CommonEntity>;
 	name?: string;
 	layout?: AbstractLayout | DataSource<AbstractLayout>;
 	onAttach?(node: SceneGraphNode<CommonEntity>): void;
@@ -57,6 +57,7 @@ export interface CommonEntity {
 	marginRight?: DataSource<number>;
 	marginBottom?: DataSource<number>;
 	marginLeft?: DataSource<number>;
+	layout?: DataSource<AbstractLayout>;
 	ignoreLayout?: DataSource<boolean>;
 	spreadLayout?: DataSource<boolean>;
 	zIndex?: DataSource<number>;

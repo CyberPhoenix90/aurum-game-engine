@@ -5,6 +5,7 @@ import { CommonEntity } from '../../../models/entities';
 
 export interface CanvasEntity extends CommonEntity {
 	paintOperations?: ArrayDataSource<PaintOperation>;
+	class?: CanvasEntity[] | ArrayDataSource<CanvasEntity>;
 }
 
 export interface CanvasEntityRenderModel extends EntityRenderModel {

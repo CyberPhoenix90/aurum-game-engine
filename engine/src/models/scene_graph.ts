@@ -92,7 +92,39 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 					}
 					break;
 			}
+			this.recomputeLayout();
 		});
+
+		this.resolvedModel.layout.listen(() => {
+			this.recomputeLayout();
+		});
+
+		DataSource.fromMultipleSources([this.renderState.sizeX, this.renderState.sizeY]).listen(() => {
+			if (this.parent && this.parent.resolvedModel.layout.value && this.parent.resolvedModel.layout.value.isSizeSensitive()) {
+				this.parent.recomputeLayout();
+			}
+		});
+	}
+
+	public recomputeLayout() {
+		if (this.resolvedModel.layout.value && this.stageId) {
+			this.resolvedModel.layout.value.positionChildren(this.getLayoutNodes(), this);
+		}
+	}
+
+	private getLayoutNodes(): SceneGraphNode<CommonEntity>[] {
+		const result = [];
+		for (const child of this.processedChildren.getData()) {
+			if (child.resolvedModel.ignoreLayout.value) {
+				continue;
+			} else if (child.resolvedModel.spreadLayout.value) {
+				result.push(...child.getLayoutNodes());
+			} else {
+				result.push(child);
+			}
+		}
+
+		return result;
 	}
 
 	protected processChild(c: SceneGraphNode<CommonEntity> | DataSource<Renderable> | ArrayDataSource<Renderable>): SceneGraphNode<CommonEntity> {
@@ -127,6 +159,7 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		for (const component of this.components.values()) {
 			component.onAttach(this);
 		}
+		this.recomputeLayout();
 	}
 
 	public dispose(): void {
@@ -224,7 +257,8 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 			width: this.getModelSourceWithFallbackBase('width'),
 			x: this.getModelSourceWithFallbackBase('x'),
 			y: this.getModelSourceWithFallbackBase('y'),
-			zIndex: this.getModelSourceWithFallbackBase('zIndex')
+			zIndex: this.getModelSourceWithFallbackBase('zIndex'),
+			layout: this.getModelSourceWithFallbackBase('layout')
 		};
 	}
 

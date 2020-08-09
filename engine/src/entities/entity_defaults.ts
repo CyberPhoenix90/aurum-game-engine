@@ -9,6 +9,7 @@ export const entityDefaults: CommonEntity = {
 	y: new DataSource(0),
 	width: new DataSource(0),
 	height: new DataSource(0),
+	layout: new DataSource(undefined),
 	ignoreLayout: new DataSource(false),
 	marginBottom: new DataSource(0),
 	marginTop: new DataSource(0),

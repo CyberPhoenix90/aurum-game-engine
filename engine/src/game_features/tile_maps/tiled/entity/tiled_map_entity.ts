@@ -20,6 +20,7 @@ import {
 import { Tileset } from '../tileset';
 import { TiledMapGraphNode } from './api';
 import { toSourceIfDefined } from '../../../../utilities/data/to_source';
+import { TiledMapEntity } from './model';
 
 export interface EntityFactory {
 	[type: string]: (position: PointLike, props: TiledMapCustomProperties[], shape: AbstractShape) => Renderable;
@@ -37,6 +38,7 @@ export interface TiledMapProps extends CommonEntityProps {
 	onAttach?(node: TiledMapGraphNode): void;
 	onDetach?(node: TiledMapGraphNode): void;
 	entityFactory?: Readonly<EntityFactory>;
+	class?: TiledMapEntity[] | ArrayDataSource<TiledMapEntity>;
 }
 
 export function TiledMap(props: TiledMapProps, children: Renderable[], api: AurumComponentAPI): TiledMapGraphNode {
@@ -60,12 +62,8 @@ export function TiledMap(props: TiledMapProps, children: Renderable[], api: Auru
 		children: undefined,
 		models: {
 			coreDefault: entityDefaults,
-			appliedStyleClasses: new ArrayDataSource(),
-			entityTypeDefault: {
-				resourceRootUrl: new DataSource('/'),
-				tilesets: new ArrayDataSource([]),
-				entityFactory: new DataSource(undefined)
-			},
+			appliedStyleClasses: props.class instanceof ArrayDataSource ? props.class : new ArrayDataSource(props.class),
+			entityTypeDefault: tilemapDefaultModel,
 			userSpecified: {
 				...propsToModel(props),
 				tilesets: new ArrayDataSource(props.tilesets),
@@ -215,3 +213,9 @@ function shapeFactory(position: PointLike, shapeData: TiledObjectShapeData): Abs
 // 		return this.children.findIndex((c) => c.name === layerName);
 // 	}
 // }
+
+export const tilemapDefaultModel: TiledMapEntity = {
+	resourceRootUrl: new DataSource('/'),
+	tilesets: new ArrayDataSource([]),
+	entityFactory: new DataSource(undefined)
+};

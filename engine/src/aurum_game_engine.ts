@@ -70,6 +70,12 @@ export * from './graphics/color_vectors/rgba_vector';
 export * from './sound/active_sound_effect';
 export * from './sound/sound';
 
+export * from './layouts/abstract_layout';
+export * from './layouts/grid_layout';
+export * from './layouts/linear_layout';
+export * from './layouts/stack_layout';
+export * from './layouts/tabular_layout';
+
 export * from './game_features/building/construction_grid';
 export * from './game_features/number_formatter';
 export * from './game_features/path_finding/a_star';

@@ -5,6 +5,7 @@ import { AbstractShape } from '../../../math/shapes/abstract_shape';
 import { Data } from '../../../models/input_data';
 import { normalizeComponents, propsToModel } from '../../shared';
 import { entityDefaults } from '../../entity_defaults';
+import { CanvasEntity } from './model';
 
 export interface PaintOperation {
 	shape?: AbstractShape;
@@ -26,8 +27,8 @@ export function Canvas(props: CanvasEntityProps): CanvasGraphNode {
 		children: undefined,
 		models: {
 			coreDefault: entityDefaults,
-			appliedStyleClasses: new ArrayDataSource(),
-			entityTypeDefault: {},
+			appliedStyleClasses: props.class instanceof ArrayDataSource ? props.class : new ArrayDataSource(props.class),
+			entityTypeDefault: canvasDefaultModel,
 			userSpecified: {
 				...propsToModel(props),
 				paintOperations: props.paintOperations
@@ -41,3 +42,5 @@ export function Canvas(props: CanvasEntityProps): CanvasGraphNode {
 		onDetach: props.onDetach
 	});
 }
+
+export const canvasDefaultModel: CanvasEntity = {};
