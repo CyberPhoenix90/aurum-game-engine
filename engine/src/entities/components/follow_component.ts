@@ -46,8 +46,8 @@ export class FollowComponent extends AbstractMovementComponent {
 				this.moveTowardsTarget(
 					entity,
 					{
-						x: this.config.target.getAbsolutePositionX() - entity.parent?.getAbsolutePositionX() ?? 0,
-						y: this.config.target.getAbsolutePositionY() - entity.parent?.getAbsolutePositionY() ?? 0
+						x: this.config.target.getAbsolutePositionX() - entity.parent.value?.getAbsolutePositionX() ?? 0,
+						y: this.config.target.getAbsolutePositionY() - entity.parent.value?.getAbsolutePositionY() ?? 0
 					},
 					delta
 				);

@@ -28,7 +28,7 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 	public readonly renderState: EntityRenderModel;
 	public name?: string;
 	public readonly components?: MapDataSource<Constructor<AbstractComponent>, AbstractComponent>;
-	public parent?: SceneGraphNode<CommonEntity>;
+	public parent?: DataSource<SceneGraphNode<CommonEntity>>;
 	public readonly uid: number;
 	public readonly resolvedModel: T;
 	public readonly models: {
@@ -54,6 +54,7 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		this.components = config.components;
 		this.models = config.models;
 		this.uid = _.getUId();
+		this.parent = new DataSource();
 		this.resolvedModel = this.createResolvedModel();
 		this.renderState = this.createRenderModel();
 		this.cancellationToken.addCancelable(() => {
@@ -100,8 +101,8 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		});
 
 		DataSource.fromMultipleSources([this.renderState.sizeX, this.renderState.sizeY]).listen(() => {
-			if (this.parent && this.parent.resolvedModel.layout.value && this.parent.resolvedModel.layout.value.isSizeSensitive()) {
-				this.parent.recomputeLayout();
+			if (this.parent.value && this.parent.value.resolvedModel.layout.value && this.parent.value.resolvedModel.layout.value.isSizeSensitive()) {
+				this.parent.value.recomputeLayout();
 			}
 		});
 	}
@@ -110,8 +111,8 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		if (this.resolvedModel.layout.value && this.stageId) {
 			this.resolvedModel.layout.value.positionChildren(this.getLayoutNodes(), this);
 		}
-		if (this.parent && this.resolvedModel.spreadLayout.value) {
-			this.parent.recomputeLayout();
+		if (this.parent.value && this.resolvedModel.spreadLayout.value) {
+			this.parent.value.recomputeLayout();
 		}
 	}
 
@@ -141,11 +142,11 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 	}
 
 	public attachParent(parent: SceneGraphNode<CommonEntity>) {
-		if (this.parent !== undefined) {
+		if (this.parent.value !== undefined) {
 			throw new Error(`Node ${this.name} already has a parent`);
 		}
 
-		this.parent = parent;
+		this.parent.update(parent);
 		if (parent.stageId) {
 			this.attachToStage(parent.renderPlugin, parent.stageId);
 		}
@@ -166,11 +167,11 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 	}
 
 	public dispose(): void {
-		if (this.parent) {
-			if (!this.parent.cancellationToken.isCanceled) {
-				this.parent.children.remove(this);
+		if (this.parent.value) {
+			if (!this.parent.value.cancellationToken.isCanceled) {
+				this.parent.value.children.remove(this);
 			}
-			this.parent = undefined;
+			this.parent.update(undefined);
 		}
 		if (this.stageId) {
 			this.renderPlugin.removeNode(this.uid, this.stageId);
@@ -270,20 +271,20 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 
 	public getAbsolutePositionX(): number {
 		let x = this.renderState.positionX.value;
-		let ptr = this.parent;
+		let ptr = this.parent.value;
 		while (ptr) {
 			x += ptr.renderState.positionX.value;
-			ptr = ptr.parent;
+			ptr = ptr.parent.value;
 		}
 		return x;
 	}
 
 	public getAbsolutePositionY(): number {
 		let y = this.renderState.positionY.value;
-		let ptr = this.parent;
+		let ptr = this.parent.value;
 		while (ptr) {
 			y += ptr.renderState.positionY.value;
-			ptr = ptr.parent;
+			ptr = ptr.parent.value;
 		}
 		return y;
 	}
@@ -349,11 +350,15 @@ export class ContainerGraphNode extends SceneGraphNode<ContainerEntity> {
 }
 
 export const dataSourceDefaultModel: ContainerEntity = {
-	spreadLayout: new DataSource(true)
+	spreadLayout: new DataSource(true),
+	width: new DataSource('100%'),
+	height: new DataSource('100%')
 };
 
 export const arrayDataSourceDefaultModel: ContainerEntity = {
-	spreadLayout: new DataSource(true)
+	spreadLayout: new DataSource(true),
+	width: new DataSource('100%'),
+	height: new DataSource('100%')
 };
 
 export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {

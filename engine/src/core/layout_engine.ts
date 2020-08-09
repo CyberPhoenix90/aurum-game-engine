@@ -1,4 +1,4 @@
-import { DataSource } from 'aurumjs';
+import { DataSource, CancellationToken } from 'aurumjs';
 import { Calculation } from '../math/calculation';
 import { Unit } from '../math/unit';
 import { Position } from '../models/common';
@@ -23,29 +23,46 @@ export function layoutAlgorithm(node: SceneGraphNode<any>): LayoutData {
 	let y: DataSource<number>;
 
 	if (node instanceof SpriteGraphNode) {
-		sizeX = node.resolvedModel.width.map((v) => (v === 'auto' ? undefined : computeSize(v)));
-		sizeY = node.resolvedModel.height.map((v) => (v === 'auto' ? undefined : computeSize(v)));
+		sizeX = node.resolvedModel.width.map((v) => (v === 'auto' ? undefined : computeSize(v, node.parent.value?.renderState.sizeX.value ?? 0, 0)));
+		sizeY = node.resolvedModel.height.map((v) => (v === 'auto' ? undefined : computeSize(v, node.parent.value?.renderState.sizeY.value ?? 0, 0)));
 	} else if (node instanceof LabelGraphNode) {
 		sizeX = node.resolvedModel.width.aggregateFive(
 			node.resolvedModel.text,
 			node.resolvedModel.fontSize,
 			node.resolvedModel.fontFamily,
 			node.resolvedModel.fontWeight,
-			(size, text, fs, ff, fw) => (size === 'auto' ? measureStringWidth(text, fw, fs, ff) : computeSize(size))
+			(size, text, fs, ff, fw) =>
+				size === 'auto' ? measureStringWidth(text, fw, fs, ff) : computeSize(size, node.parent.value?.renderState.sizeX.value ?? 0, 0)
 		);
 
-		sizeY = node.resolvedModel.height.map((v) => (v === 'auto' ? node.resolvedModel.fontSize.value : computeSize(v)));
+		sizeY = node.resolvedModel.height.map((v) =>
+			v === 'auto' ? node.resolvedModel.fontSize.value : computeSize(v, node.parent.value?.renderState.sizeY.value ?? 0, 0)
+		);
 	} else {
-		sizeX = node.resolvedModel.width.map((v) => computeSize(v));
-		sizeY = node.resolvedModel.height.map((v) => computeSize(v));
+		sizeX = node.resolvedModel.width.map((v) => computeSize(v, node.parent.value?.renderState.sizeX.value ?? 0, 0));
+		sizeY = node.resolvedModel.height.map((v) => computeSize(v, node.parent.value?.renderState.sizeY.value ?? 0, 0));
 	}
 
 	x = node.resolvedModel.x.map((v) => {
-		return computePosition(node, v, sizeX, node.resolvedModel.originX, node.resolvedModel.scaleX, node.parent?.renderState?.sizeX ?? new DataSource(0));
+		return computePosition(
+			node,
+			v,
+			sizeX,
+			node.resolvedModel.originX,
+			node.resolvedModel.scaleX,
+			node.parent.value?.renderState?.sizeX ?? new DataSource(0)
+		);
 	});
 
 	y = node.resolvedModel.y.map((v) => {
-		return computePosition(node, v, sizeY, node.resolvedModel.originY, node.resolvedModel.scaleY, node.parent?.renderState?.sizeY ?? new DataSource(0));
+		return computePosition(
+			node,
+			v,
+			sizeY,
+			node.resolvedModel.originY,
+			node.resolvedModel.scaleY,
+			node.parent.value?.renderState?.sizeY ?? new DataSource(0)
+		);
 	});
 
 	const result: LayoutData = {
@@ -55,14 +72,50 @@ export function layoutAlgorithm(node: SceneGraphNode<any>): LayoutData {
 		sizeY
 	};
 
+	let parentToken: CancellationToken;
+	node.parent.listen((p) => {
+		if (parentToken) {
+			parentToken.cancel();
+			parentToken = undefined;
+		}
+		if (p) {
+			parentToken = new CancellationToken();
+			p.renderState.sizeX.listen(() => {
+				refreshLayout();
+			}, parentToken);
+			p.renderState.sizeY.listen(() => {
+				refreshLayout();
+			}, parentToken);
+		}
+		refreshLayout();
+	});
+
 	return result;
+
+	function refreshLayout() {
+		node.resolvedModel.width.repeatLast();
+		node.resolvedModel.height.repeatLast();
+		node.resolvedModel.x.repeatLast();
+		node.resolvedModel.y.repeatLast();
+	}
 }
 
-function computeSize(value: Position) {
-	if (value === 'content') {
+function computeSize(value: Position, parentSize: number, distanceToEdge: number) {
+	if (value === 'inherit') {
+		value = '100%';
+	}
+	if (value === 'remainder') {
+		return distanceToEdge;
+	} else if (value === 'content') {
 		return 0;
 	} else {
-		return value === undefined ? undefined : parseInt(value.toString());
+		if (typeof value === 'number') {
+			return value;
+		} else if (value.startsWith('calc(')) {
+			return new Calculation(value).toPixels(96, parentSize, distanceToEdge);
+		} else {
+			return new Unit(value).toPixels(96, parentSize);
+		}
 	}
 }
 
