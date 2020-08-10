@@ -47,7 +47,9 @@ export class RenderSpriteEntity extends NoRenderEntity {
 	private handleTextureReady(texture: ReadOnlyDataSource<string>, img: HTMLImageElement, model: SpriteEntityRenderModel) {
 		pendingTextureMap.delete(texture.value);
 		const bt = new BaseTexture(img);
-		this.displayObject.texture = this.wrapTexture(bt, model);
+		if (!this.token.isCanceled) {
+			this.displayObject.texture = this.wrapTexture(bt, model);
+		}
 		textureMap.set(texture.value, bt);
 	}
 

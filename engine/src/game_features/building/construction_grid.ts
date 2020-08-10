@@ -95,8 +95,8 @@ export class ConstructionGrid<T extends BuildingModel> {
 			throw new Error('Cannot place building here');
 		} else {
 			const p = this.projector(point);
-			this.buildings.push(building);
 			building.gridPosition = p;
+			this.buildings.push(building);
 			for (let x = 0; x < building.size.x; x++) {
 				for (let y = 0; y < building.size.y; y++) {
 					this.data.set(p.x + x, p.y + y, building);

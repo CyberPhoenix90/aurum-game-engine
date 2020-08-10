@@ -96,7 +96,11 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 						item.attachParent(this);
 					}
 					break;
-
+				case 'swap':
+					if (this.stageId) {
+						this.renderPlugin.swapNodes(this.processedChildren.get(change.index).uid, this.processedChildren.get(change.index2).uid);
+					}
+					break;
 				case 'remove':
 				case 'removeLeft':
 				case 'removeRight':
@@ -442,6 +446,41 @@ export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 					dynamicRenderKeys.set(change.items[0], node);
 					this.children.set(change.index, node);
 					break;
+				case 'merge':
+					const source = change.previousState.slice();
+					if (this.children.length.value < change.newState.length) {
+						for (let i = 0; i < change.newState.length; i++) {
+							if (!source.includes(change.newState[i])) {
+								const item = change.newState[i];
+								source.push(item);
+								const node = this.renderableToNode(item);
+								this.children.push(node);
+								dynamicRenderKeys.set(item, node);
+							}
+						}
+					}
+					for (let i = 0; i < change.newState.length; i++) {
+						if (source[i] !== change.newState[i]) {
+							const index = source.indexOf(change.newState[i]);
+							if (index !== -1) {
+								this.children.swap(i, index);
+								const c = source[i];
+								const d = source[index];
+								source[i] = d;
+								source[index] = c;
+							} else {
+								this.children.remove(dynamicRenderKeys.get(source[i]));
+								this.children.insertAt(i, this.renderableToNode(change.newState[i]));
+								source.splice(i, 0, change.newState[i]);
+							}
+						}
+					}
+					if (this.children.length.value > change.newState.length) {
+						this.children.removeRight(this.children.length.value - change.newState.length);
+					}
+					break;
+				default:
+					throw new Error(`operation ${change.operationDetailed} not implemented`);
 			}
 		});
 	}
