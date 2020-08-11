@@ -67,10 +67,10 @@ export class RenderSpriteEntity extends NoRenderEntity {
 		if (model.drawOffsetY.value !== undefined) {
 			result.frame.y = model.drawOffsetY.value;
 		}
-		if (model.sizeX.value === undefined) {
+		if (this.displayObject && model.sizeX.value === undefined) {
 			this.displayObject.width = bt.width * model.scaleX.value;
 		}
-		if (model.sizeY.value === undefined) {
+		if (this.displayObject && model.sizeY.value === undefined) {
 			this.displayObject.height = bt.height * model.scaleY.value;
 		}
 		result.updateUvs();
@@ -78,6 +78,13 @@ export class RenderSpriteEntity extends NoRenderEntity {
 	}
 
 	public bind(model: SpriteGraphNode) {
+		if (model.renderState.sizeX.value === undefined) {
+			this.displayObject.width = this.displayObject.width * model.renderState.scaleX.value;
+		}
+		if (model.renderState.sizeY.value === undefined) {
+			this.displayObject.height = this.displayObject.height * model.renderState.scaleY.value;
+		}
+
 		model.renderState.tint.listenAndRepeat((v) => {
 			if (v) {
 				this.displayObject.tint = Color.fromString(v).toRGBNumber();
