@@ -40,7 +40,7 @@ export class CameraGraphNode extends SceneGraphNode<CameraEntity> {
 		};
 	}
 
-	public projectMouseCoordinates(e: MouseEvent) {
+	public projectMouseCoordinates(e: MouseEvent):PointLike {
 		return this.projectPoint({
 			x: e.clientX,
 			y: e.clientY

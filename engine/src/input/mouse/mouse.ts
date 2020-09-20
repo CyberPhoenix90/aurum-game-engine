@@ -1,6 +1,6 @@
 // import { CancellationToken } from 'aurumjs';
 
-import { CancellationToken, DataSource } from 'aurumjs';
+import { CancellationToken, DataSource, dsFilter } from 'aurumjs';
 
 export enum MouseButtons {
 	LEFT = 0,
@@ -53,7 +53,7 @@ export class AurumMouse {
 
 		this.mouseDown.unshift(result);
 
-		return result.filter((e) => e.button === key);
+		return result.transform(dsFilter((e) => e.button === key));
 	}
 
 	public listenMouseMove(): DataSource<MouseEvent> {
@@ -77,7 +77,7 @@ export class AurumMouse {
 
 		this.mouseUp.unshift(result);
 
-		return result.filter((e) => e.button === key);
+		return result.transform(dsFilter((e) => e.button === key));
 	}
 
 	public getMouseX(): number {

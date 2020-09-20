@@ -1,7 +1,7 @@
 import { AbstractComponent } from './abstract_component';
 import { CommonEntity } from '../../models/entities';
 import { PointLike } from '../../models/point';
-import { DataSource, TransientDataSource, CancellationToken } from 'aurumjs';
+import { DataSource, CancellationToken } from 'aurumjs';
 import { Vector2D } from '../../math/vectors/vector2d';
 import { Clock } from '../../game_features/time/clock';
 import { SceneGraphNode } from '../../models/scene_graph';
@@ -35,9 +35,9 @@ export abstract class AbstractMovementComponent extends AbstractComponent {
 		this.pause = false;
 	}
 
-	public listenMovement(cancellationToken?: CancellationToken): TransientDataSource<PointLike> {
+	public listenMovement(cancellationToken?: CancellationToken): DataSource<PointLike> {
 		const token = cancellationToken ?? new CancellationToken();
-		const result = new TransientDataSource<PointLike>(token);
+		const result = new DataSource<PointLike>();
 
 		this.movementListeners.pipe(result, token);
 

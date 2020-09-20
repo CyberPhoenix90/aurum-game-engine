@@ -1,4 +1,4 @@
-import { ArrayDataSource, AurumComponentAPI, DataSource, Renderable } from 'aurumjs';
+import { ArrayDataSource, AurumComponentAPI, DataSource, dsUnique, Renderable } from 'aurumjs';
 import { CommonEntityProps } from '../../../models/entities';
 import { toSourceIfDefined } from '../../../utilities/data/to_source';
 import { entityDefaults } from '../../entity_defaults';
@@ -18,9 +18,9 @@ export function Label(props: LabelEntityProps, children: Renderable[], api: Auru
 
 	for (const i of content as Array<string | DataSource<string>>) {
 		if (i instanceof DataSource) {
-			i.unique().listen((v) => {
+			i.transform(dsUnique()).listen((v) => {
 				updateText(text, content as any);
-			});
+			}, api.cancellationToken);
 		}
 	}
 	updateText(text, content as any);

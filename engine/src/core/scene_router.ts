@@ -1,4 +1,4 @@
-import { Renderable, AurumComponentAPI, aurumElementModelIdentitiy, AurumElementModel, DataSource, GenericDataSource } from 'aurumjs';
+import { Renderable, AurumComponentAPI, aurumElementModelIdentitiy, AurumElementModel, DataSource, GenericDataSource, dsUnique, dsMap } from 'aurumjs';
 
 export interface SceneRouterProps {
 	sceneRoute: GenericDataSource<string>;
@@ -24,7 +24,11 @@ export function SceneRouter(props: SceneRouterProps, children: Renderable[], api
 
 	const routeDataSource = new DataSource<string>();
 
-	const result = routeDataSource.unique(api.cancellationToken).map((p) => selectRoute(p, children as any));
+	const result = routeDataSource.transform(
+		dsUnique(),
+		dsMap((p) => selectRoute(p, children as any)),
+		api.cancellationToken
+	);
 
 	props.sceneRoute.listenAndRepeat((route) => {
 		routeDataSource.update(route);
