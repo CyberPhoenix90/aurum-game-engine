@@ -1,4 +1,4 @@
-import { Aurum, AurumComponentAPI, DataSource, EventEmitter, Renderable, Webcomponent, ArrayDataSource } from 'aurumjs';
+import { Aurum, AurumComponentAPI, DataSource, EventEmitter, Renderable, Webcomponent, ArrayDataSource, createLifeCycle } from 'aurumjs';
 import { CameraGraphNode } from '../entities/types/camera/api';
 import { Clock } from '../game_features/time/clock';
 import { SceneGraphNode, DataSourceSceneGraphNode, ArrayDataSourceSceneGraphNode } from '../models/scene_graph';
@@ -86,7 +86,9 @@ export const onBeforeRender: EventEmitter<number> = new EventEmitter();
 export const onAfterRender: EventEmitter<number> = new EventEmitter();
 
 export function Stage(props: StageProps, children: Renderable[], api: AurumComponentAPI): Renderable {
-	const nodes = api.prerender(children);
+	const lc = createLifeCycle();
+	api.synchronizeLifeCycle(lc);
+	const nodes = api.prerender(children, lc);
 	props.clock?.stop();
 	return (
 		<StageComponent

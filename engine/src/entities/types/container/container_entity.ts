@@ -1,4 +1,4 @@
-import { ArrayDataSource, AurumComponentAPI, DataSource, Renderable } from 'aurumjs';
+import { ArrayDataSource, AurumComponentAPI, createLifeCycle, DataSource, Renderable } from 'aurumjs';
 import { CommonEntityProps, CommonEntity } from '../../../models/entities';
 import { ContainerGraphNode } from '../../../models/scene_graph';
 import { entityDefaults } from '../../entity_defaults';
@@ -12,7 +12,9 @@ export interface ContainerEntityProps extends CommonEntityProps {
 }
 
 export function Container(props: ContainerEntityProps, children: Renderable[], api: AurumComponentAPI): ContainerGraphNode {
-	const content = api.prerender(children);
+	const lc = createLifeCycle();
+	api.synchronizeLifeCycle(lc);
+	const content = api.prerender(children, lc);
 	return new ContainerGraphNode({
 		name: props.name ?? ContainerGraphNode.name,
 		components: normalizeComponents(props.components),

@@ -1,4 +1,4 @@
-import { ArrayDataSource, AurumComponentAPI, DataSource, dsUnique, Renderable } from 'aurumjs';
+import { ArrayDataSource, AurumComponentAPI, createLifeCycle, DataSource, dsUnique, Renderable } from 'aurumjs';
 import { CommonEntityProps } from '../../../models/entities';
 import { toSourceIfDefined } from '../../../utilities/data/to_source';
 import { entityDefaults } from '../../entity_defaults';
@@ -13,7 +13,10 @@ export interface LabelEntityProps extends CommonEntityProps, LabelEntityStyle {
 }
 
 export function Label(props: LabelEntityProps, children: Renderable[], api: AurumComponentAPI): LabelGraphNode {
-	const content = api.prerender(children);
+	const lc = createLifeCycle();
+	api.synchronizeLifeCycle(lc);
+
+	const content = api.prerender(children, lc);
 	const text = new DataSource('');
 
 	for (const i of content as Array<string | DataSource<string>>) {

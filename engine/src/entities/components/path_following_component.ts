@@ -1,5 +1,5 @@
 import { CancellationToken, DataSource } from 'aurumjs';
-import { Callback } from 'aurumjs/dist/utilities/common';
+import { Callback } from 'aurumjs/prebuilt/esnext/utilities/common';
 import { Polygon } from '../../aurum_game_engine';
 import { onBeforeRender } from '../../core/stage';
 import { CommonEntity } from '../../models/entities';

@@ -1,9 +1,8 @@
 import { ArrayDataSource, DataSource, MapDataSource } from 'aurumjs';
 import { AbstractComponent } from '../entities/components/abstract_component';
-import { MapLike, Position } from '../models/common';
+import { Constructor, MapLike, Position } from '../models/common';
 import { Data } from '../models/input_data';
 import { SceneGraphNode } from './scene_graph';
-import { Constructor } from 'aurumjs/dist/utilities/common';
 import { AbstractLayout } from '../layouts/abstract_layout';
 
 export interface Shader {
