@@ -8,7 +8,7 @@ import { SpriteGraphNode } from './api';
 import { SpriteEntity } from './model';
 
 export interface SpriteEntityProps extends CommonEntityProps {
-	texture?: Data<string>;
+	texture?: Data<string | HTMLCanvasElement>;
 	tint?: Data<string>;
 	/**
 	 * Offset from the texture at which drawing begins

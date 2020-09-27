@@ -3,7 +3,7 @@ import { ReadOnlyDataSource } from 'aurumjs';
 import { BaseTexture, Sprite, Texture as PixiTexture } from 'pixi.js';
 import { NoRenderEntity } from './pixi_no_render_entity';
 
-export const textureMap: Map<string, BaseTexture> = new Map();
+export const textureMap: Map<string | HTMLCanvasElement, BaseTexture> = new Map();
 export const pendingTextureMap: Map<string, HTMLImageElement> = new Map();
 
 export class RenderSpriteEntity extends NoRenderEntity {
@@ -19,38 +19,46 @@ export class RenderSpriteEntity extends NoRenderEntity {
 		return new Sprite(texture);
 	}
 
-	protected createTexture(texture: ReadOnlyDataSource<string>, model: SpriteEntityRenderModel): PixiTexture {
+	protected createTexture(texture: ReadOnlyDataSource<string | HTMLCanvasElement>, model: SpriteEntityRenderModel): PixiTexture {
 		if (!texture.value) {
 			return RenderSpriteEntity.voidTexture;
 		}
 
-		if (!textureMap.has(texture.value)) {
-			if (pendingTextureMap.has(texture.value)) {
-				const img = pendingTextureMap.get(texture.value);
-				img.addEventListener('load', () => {
-					this.handleTextureReady(texture, img, model);
-				});
-			} else {
-				const img = document.createElement('img');
-				pendingTextureMap.set(texture.value, img);
-				img.addEventListener('load', () => {
-					this.handleTextureReady(texture, img, model);
-				});
-				img.src = texture.value;
+		const value = texture.value;
+
+		if (typeof value === 'string') {
+			if (!textureMap.has(value)) {
+				if (pendingTextureMap.has(value)) {
+					const img = pendingTextureMap.get(value);
+					img.addEventListener('load', () => {
+						this.handleTextureReady(value, img, model);
+					});
+				} else {
+					const img = document.createElement('img');
+					pendingTextureMap.set(value, img);
+					img.addEventListener('load', () => {
+						this.handleTextureReady(value, img, model);
+					});
+					img.src = value;
+				}
+				return RenderSpriteEntity.voidTexture;
 			}
-			return RenderSpriteEntity.voidTexture;
+		} else {
+			if (!textureMap.has(value)) {
+				textureMap.set(value, new BaseTexture(value));
+			}
 		}
 
 		return this.wrapTexture(textureMap.get(texture.value), model);
 	}
 
-	private handleTextureReady(texture: ReadOnlyDataSource<string>, img: HTMLImageElement, model: SpriteEntityRenderModel) {
-		pendingTextureMap.delete(texture.value);
+	private handleTextureReady(texture: string, img: HTMLImageElement, model: SpriteEntityRenderModel) {
+		pendingTextureMap.delete(texture);
 		const bt = new BaseTexture(img);
 		if (!this.token.isCanceled) {
 			this.displayObject.texture = this.wrapTexture(bt, model);
 		}
-		textureMap.set(texture.value, bt);
+		textureMap.set(texture, bt);
 	}
 
 	private wrapTexture(bt: BaseTexture, model: SpriteEntityRenderModel): PixiTexture {

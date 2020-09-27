@@ -3,7 +3,7 @@ import { ReadOnlyDataSource, DataSource, ArrayDataSource } from 'aurumjs';
 import { CommonEntity } from '../../../models/entities';
 
 export interface SpriteEntityRenderModel extends EntityRenderModel {
-	texture: ReadOnlyDataSource<string>;
+	texture: ReadOnlyDataSource<string | HTMLCanvasElement>;
 	tint: ReadOnlyDataSource<string>;
 	/**
 	 * Offset from the texture at which drawing begins
@@ -18,7 +18,7 @@ export interface SpriteEntityRenderModel extends EntityRenderModel {
 }
 
 export interface SpriteEntity extends CommonEntity {
-	texture?: DataSource<string>;
+	texture?: DataSource<string | HTMLCanvasElement>;
 	tint?: DataSource<string>;
 	/**
 	 * Offset from the texture at which drawing begins
