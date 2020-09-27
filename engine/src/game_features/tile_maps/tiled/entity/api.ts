@@ -30,6 +30,7 @@ export class TiledMapGraphNode extends SceneGraphNode<TiledMapEntity> {
 		const { x, y, sizeX, sizeY } = layoutAlgorithm(this);
 		return {
 			alpha: this.resolvedModel.alpha,
+			rotation: this.resolvedModel.rotation,
 			clip: this.resolvedModel.clip,
 			renderableType: RenderableType.TILE_MAP,
 			positionX: x,

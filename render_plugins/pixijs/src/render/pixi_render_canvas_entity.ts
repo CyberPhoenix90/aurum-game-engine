@@ -1,4 +1,4 @@
-import { AbstractShape, CanvasGraphNode, Circle, Color, ComposedShape, PaintOperation, Polygon, Rectangle } from 'aurum-game-engine';
+import { AbstractShape, CanvasGraphNode, Circle, Color, ComposedShape, PaintOperation, Polygon, Rectangle, RegularPolygon, Vector2D } from 'aurum-game-engine';
 import { ArrayDataSource, CancellationToken, DataSource } from 'aurumjs';
 import { Graphics } from 'pixi.js';
 import { NoRenderEntity } from './pixi_no_render_entity';
@@ -74,6 +74,13 @@ export class RenderCanvasEntity extends NoRenderEntity {
 			this.displayObject.drawRect(shape.x + offsetX, shape.y + offsetY, shape.width, shape.height);
 		} else if (shape instanceof Circle) {
 			this.displayObject.drawCircle(shape.x + offsetX, shape.y + offsetY, shape.radius);
+		} else if (shape instanceof RegularPolygon) {
+			const point = new Vector2D(0, -shape.radius);
+			this.displayObject.moveTo(shape.x + shape.radius, shape.y);
+			for (let i = 0; i < shape.sides; i++) {
+				point.rotateBy(Math.PI / (shape.sides / 2));
+				this.displayObject.lineTo(point.x + shape.radius + shape.x, point.y + shape.radius + shape.y);
+			}
 		} else if (shape instanceof Polygon) {
 			for (const point of shape.points) {
 				if (point === shape.points[0]) {

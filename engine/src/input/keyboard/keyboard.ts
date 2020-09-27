@@ -138,15 +138,22 @@ export class AurumKeyboard {
 		this.cancelationToken.addCancelable(() => (this.listeners.length = 0));
 	}
 
-	public listenKey(key: KeyboardButtons): DataSource<boolean> {
+	public listenKey(key: KeyboardButtons, cancellationToken?: CancellationToken): DataSource<boolean> {
 		const result = new DataSource<boolean>();
 
-		this.listeners.push(() => {
+		const cb = () => {
 			const value = this.heldDownKeys[key];
 			if (result.value !== value) {
 				result.update(value);
 			}
-		});
+		};
+		this.listeners.push(cb);
+
+		if (cancellationToken) {
+			cancellationToken.addCancelable(() => {
+				this.listeners.splice(this.listeners.indexOf(cb), 1);
+			});
+		}
 
 		return result;
 	}

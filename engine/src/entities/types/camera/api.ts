@@ -24,6 +24,7 @@ export class CameraGraphNode extends SceneGraphNode<CameraEntity> {
 		return {
 			view: undefined,
 			alpha: this.resolvedModel.alpha,
+			rotation: this.resolvedModel.rotation,
 			clip: this.resolvedModel.clip,
 			renderableType: RenderableType.CAMERA,
 			positionX: x,
@@ -40,7 +41,7 @@ export class CameraGraphNode extends SceneGraphNode<CameraEntity> {
 		};
 	}
 
-	public projectMouseCoordinates(e: MouseEvent):PointLike {
+	public projectMouseCoordinates(e: MouseEvent): PointLike {
 		return this.projectPoint({
 			x: e.clientX,
 			y: e.clientY

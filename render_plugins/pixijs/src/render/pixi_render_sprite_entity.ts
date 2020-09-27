@@ -69,6 +69,9 @@ export class RenderSpriteEntity extends NoRenderEntity {
 		if (model.drawDistanceY.value !== undefined) {
 			result.frame.height = model.drawDistanceY.value;
 		}
+		if (model.rotation.value !== undefined) {
+			result.rotate = model.rotation.value;
+		}
 		if (model.drawOffsetX.value !== undefined) {
 			result.frame.x = model.drawOffsetX.value;
 		}
@@ -86,6 +89,20 @@ export class RenderSpriteEntity extends NoRenderEntity {
 	}
 
 	public bind(model: SpriteGraphNode) {
+		model.resolvedModel.width.listenAndRepeat((v) => {
+			if (v === 'auto') {
+				this.displayObject.width = this.displayObject.texture.baseTexture.realWidth;
+				model.renderState.sizeX.update(this.displayObject.texture.baseTexture.realWidth);
+			}
+		});
+
+		model.resolvedModel.height.listenAndRepeat((v) => {
+			if (v === 'auto') {
+				this.displayObject.height = this.displayObject.texture.baseTexture.realHeight;
+				model.renderState.sizeY.update(this.displayObject.texture.baseTexture.realHeight);
+			}
+		});
+
 		if (model.renderState.sizeX.value === undefined) {
 			this.displayObject.width = this.displayObject.width * model.renderState.scaleX.value;
 		}

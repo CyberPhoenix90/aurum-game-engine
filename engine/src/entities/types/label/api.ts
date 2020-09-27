@@ -36,6 +36,7 @@ export class LabelGraphNode extends SceneGraphNode<LabelEntity> {
 		const { x, y, sizeX, sizeY } = layoutAlgorithm(this);
 		return {
 			alpha: this.resolvedModel.alpha,
+			rotation: this.resolvedModel.rotation,
 			clip: this.resolvedModel.clip,
 			renderableType: RenderableType.LABEL,
 			positionX: x,

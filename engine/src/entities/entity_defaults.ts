@@ -3,6 +3,7 @@ import { DataSource, ArrayDataSource } from 'aurumjs';
 
 export const entityDefaults: CommonEntity = {
 	alpha: new DataSource(1),
+	rotation: new DataSource(0),
 	blendMode: new DataSource(undefined),
 	clip: new DataSource(false),
 	x: new DataSource(0),
@@ -22,9 +23,5 @@ export const entityDefaults: CommonEntity = {
 	shaders: new ArrayDataSource([]),
 	visible: new DataSource(true),
 	spreadLayout: new DataSource(false),
-	maxHeight: new DataSource(undefined),
-	maxWidth: new DataSource(undefined),
-	minHeight: new DataSource(undefined),
-	minWidth: new DataSource(undefined),
 	zIndex: new DataSource(undefined)
 };

@@ -28,16 +28,13 @@ export interface CommonEntityProps {
 	marginRight?: Data<number>;
 	marginBottom?: Data<number>;
 	marginLeft?: Data<number>;
-	minWidth?: Data<Position | 'content' | 'inherit' | 'remainder'>;
-	minHeight?: Data<Position | 'content' | 'inherit' | 'remainder'>;
 	width?: Data<Position | 'content' | 'inherit' | 'remainder'>;
-	maxWidth?: Data<Position | 'content' | 'inherit' | 'remainder'>;
-	maxHeight?: Data<Position | 'content' | 'inherit' | 'remainder'>;
 	height?: Data<Position | 'content' | 'inherit' | 'remainder'>;
 	scaleX?: Data<number>;
 	scaleY?: Data<number>;
 	visible?: Data<boolean>;
 	alpha?: Data<number>;
+	rotation?: Data<number>;
 	components?: MapDataSource<Constructor<AbstractComponent>, AbstractComponent> | AbstractComponent[];
 	class?: CommonEntity[] | ArrayDataSource<CommonEntity>;
 	name?: string;
@@ -64,15 +61,11 @@ export interface CommonEntity {
 	scaleY?: DataSource<number>;
 	shaders?: ArrayDataSource<Shader>;
 	blendMode?: DataSource<BlendModes>;
-	minWidth?: DataSource<Position | 'content' | 'inherit' | 'remainder'>;
-	minHeight?: DataSource<Position | 'content' | 'inherit' | 'remainder'>;
 	width?: DataSource<Position | 'content' | 'inherit' | 'remainder'>;
-	maxWidth?: DataSource<Position | 'content' | 'inherit' | 'remainder'>;
-	maxHeight?: DataSource<Position | 'content' | 'inherit' | 'remainder'>;
 	height?: DataSource<Position | 'content' | 'inherit' | 'remainder'>;
 	visible?: DataSource<boolean>;
 	alpha?: DataSource<number>;
-	//layout?: ReadonlyData<AbstractLayout>;
+	rotation?: DataSource<number>;
 }
 
 export enum RenderableType {

@@ -20,6 +20,7 @@ export class CanvasGraphNode extends SceneGraphNode<CanvasEntity> {
 		const { x, y, sizeX, sizeY } = layoutAlgorithm(this);
 		return {
 			alpha: this.resolvedModel.alpha,
+			rotation: this.resolvedModel.rotation,
 			clip: this.resolvedModel.clip,
 			renderableType: RenderableType.CANVAS,
 			positionX: x,

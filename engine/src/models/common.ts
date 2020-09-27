@@ -15,6 +15,18 @@ export enum DIRECTION4 {
 	LEFT = 'LEFT'
 }
 
+export enum CARDINAL4 {
+	NORTH = 'NORTH',
+	EAST = 'EAST',
+	SOUTH = 'SOUTH',
+	WEST = 'WEST'
+}
+
+export enum DIRECTION2 {
+	HORIZONTAL = 'HORIZONTAL',
+	VERTICAL = 'VERTICAL'
+}
+
 export enum SIDE {
 	TOP = 'TOP',
 	RIGHT = 'RIGHT',

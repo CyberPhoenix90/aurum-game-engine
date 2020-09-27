@@ -13,6 +13,7 @@ export interface EntityRenderModel {
 	clip: ReadOnlyDataSource<boolean>;
 	visible: ReadOnlyDataSource<boolean>;
 	alpha: ReadOnlyDataSource<number>;
+	rotation: ReadOnlyDataSource<number>;
 	blendMode?: ReadOnlyDataSource<BlendModes>;
 	shader: ArrayDataSource<Shader>;
 }

@@ -34,12 +34,14 @@ export * from './math/vectors/abstract_vector';
 export * from './math/vectors/vector2d';
 export * from './math/vectors/vector3d';
 export * from './math/vectors/vector4d';
+export * from './math/vectors/point_utils';
 export * from './math/shapes/abstract_shape';
 export * from './math/shapes/circle';
 export * from './math/shapes/collision_calculator';
 export * from './math/shapes/composed_shape';
 export * from './math/shapes/point';
 export * from './math/shapes/polygon';
+export * from './math/shapes/regular_polygon';
 export * from './math/shapes/rectangle';
 
 export * from './models/common';
@@ -60,6 +62,7 @@ export * from './rendering/model';
 export * from './input/gamepad/gamepad';
 export * from './input/keyboard/keyboard';
 export * from './input/mouse/mouse';
+export * from './input/touch/touch';
 
 export * from './graphics/color';
 export * from './graphics/color_vectors/hsla_vector';
@@ -74,6 +77,7 @@ export * from './layouts/abstract_layout';
 export * from './layouts/grid_layout';
 export * from './layouts/linear_layout';
 export * from './layouts/stack_layout';
+export * from './layouts/space_around_layout';
 export * from './layouts/tabular_layout';
 
 export * from './game_features/building/construction_grid';

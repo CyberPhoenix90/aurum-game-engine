@@ -50,14 +50,28 @@ export class NoRenderEntity {
 			}
 		});
 
+		model.renderState.rotation.listenAndRepeat((v) => {
+			this.displayObject.rotation = v;
+			if (v) {
+				this.displayObject.pivot.x = this.displayObject.height / 2;
+				this.displayObject.pivot.y = this.displayObject.height / 2;
+			}
+		}, this.token);
+
 		model.renderState.positionX.listenAndRepeat((v) => {
 			if (v !== undefined) {
+				if (this.displayObject.rotation !== 0) {
+					this.displayObject.pivot.x = this.displayObject.width / 2;
+				}
 				this.displayObject.x = v;
 			}
 		}, this.token);
 
 		model.renderState.positionY.listenAndRepeat((v) => {
 			if (v !== undefined) {
+				if (this.displayObject.rotation !== 0) {
+					this.displayObject.pivot.y = this.displayObject.height / 2;
+				}
 				this.displayObject.y = v;
 			}
 		}, this.token);

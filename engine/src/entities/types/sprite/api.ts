@@ -27,6 +27,7 @@ export class SpriteGraphNode extends SceneGraphNode<SpriteEntity> {
 		const { x, y, sizeX, sizeY } = layoutAlgorithm(this);
 		return {
 			alpha: this.resolvedModel.alpha,
+			rotation: this.resolvedModel.rotation,
 			clip: this.resolvedModel.clip,
 			renderableType: RenderableType.SPRITE,
 			positionX: x,

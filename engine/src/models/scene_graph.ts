@@ -289,6 +289,7 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 	protected createBaseResolvedModel(): CommonEntity {
 		return {
 			alpha: this.getModelSourceWithFallbackBase('alpha'),
+			rotation: this.getModelSourceWithFallbackBase('rotation'),
 			blendMode: this.getModelSourceWithFallbackBase('blendMode'),
 			clip: this.getModelSourceWithFallbackBase('clip'),
 			height: this.getModelSourceWithFallbackBase('height'),
@@ -297,10 +298,6 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 			marginLeft: this.getModelSourceWithFallbackBase('marginLeft'),
 			marginRight: this.getModelSourceWithFallbackBase('marginRight'),
 			marginTop: this.getModelSourceWithFallbackBase('marginTop'),
-			maxHeight: this.getModelSourceWithFallbackBase('maxHeight'),
-			maxWidth: this.getModelSourceWithFallbackBase('maxWidth'),
-			minHeight: this.getModelSourceWithFallbackBase('minHeight'),
-			minWidth: this.getModelSourceWithFallbackBase('minWidth'),
 			originX: this.getModelSourceWithFallbackBase('originX'),
 			originY: this.getModelSourceWithFallbackBase('originY'),
 			scaleX: this.getModelSourceWithFallbackBase('scaleX'),
@@ -393,6 +390,7 @@ export class ContainerGraphNode extends SceneGraphNode<ContainerEntity> {
 			scaleY: this.resolvedModel.scaleY,
 			visible: this.resolvedModel.visible,
 			zIndex: this.resolvedModel.zIndex,
+			rotation: this.resolvedModel.rotation,
 			blendMode: this.resolvedModel.blendMode,
 			shader: this.resolvedModel.shaders
 		};

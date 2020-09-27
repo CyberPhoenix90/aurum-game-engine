@@ -12,14 +12,17 @@ export class PathFollowingComponent extends AbstractMovementComponent {
 	private pendingMovementPromise: Callback<void>;
 	private entity: SceneGraphNode<CommonEntity>;
 
-	public predictPosition(inMs: number): PointLike {
+	/**
+	 * Lower granularity means higher precision but also more CPU intensive
+	 */
+	public predictPosition(inMs: number, granularity: number = 33): PointLike {
 		if (this.pause) {
 			return { x: this.entity.renderState.positionX.value, y: this.entity.renderState.positionY.value };
 		} else {
 			const positionX = new DataSource(this.entity.renderState.positionX.value);
 			const positionY = new DataSource(this.entity.renderState.positionY.value);
 			while (inMs > 0) {
-				const chunk = Math.min(inMs, 33);
+				const chunk = Math.min(inMs, granularity);
 				if (this.config.euclideanMovement) {
 					this.approachEuclidean(this.currentTarget, positionX, positionY, chunk);
 				} else {
