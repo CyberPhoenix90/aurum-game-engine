@@ -16,14 +16,9 @@ export class ConstructionGrid<T> {
 	private validPlacementDelegate: (point: PointLike) => boolean;
 	private maxHeight: number;
 
-	constructor(
-		gridArea: SquaredArray<BuildingModel<T>>,
-		validPlacementDelegate?: (point: PointLike) => boolean,
-		coordinatesProjector?: Projector,
-		maxHeight?: number
-	) {
+	constructor(width: number, validPlacementDelegate?: (point: PointLike) => boolean, coordinatesProjector?: Projector, maxHeight?: number) {
 		this.buildings = new ArrayDataSource([]);
-		this.data = gridArea;
+		this.data = new SquaredArray(width);
 		this.projector = coordinatesProjector ?? ((p: PointLike) => p);
 		this.validPlacementDelegate = validPlacementDelegate ?? (() => true);
 		this.maxHeight = maxHeight;

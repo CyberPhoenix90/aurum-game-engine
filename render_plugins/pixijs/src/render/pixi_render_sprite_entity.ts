@@ -1,30 +1,31 @@
-import { Color, SpriteEntityRenderModel, SpriteGraphNode } from 'aurum-game-engine';
-import { ReadOnlyDataSource } from 'aurumjs';
+import { Color, SpriteGraphNode } from 'aurum-game-engine';
 import { BaseTexture, Sprite, Texture as PixiTexture } from 'pixi.js';
 import { NoRenderEntity } from './pixi_no_render_entity';
 
 export const textureMap: Map<string | HTMLCanvasElement, BaseTexture> = new Map();
 export const pendingTextureMap: Map<string, HTMLImageElement> = new Map();
-
+const c = document.createElement('canvas');
+c.width = 1;
+c.height = 1;
 export class RenderSpriteEntity extends NoRenderEntity {
 	public displayObject: Sprite;
-	public static voidTexture: PixiTexture = new PixiTexture(new BaseTexture(document.createElement('canvas')));
+	public static voidTexture: PixiTexture = new PixiTexture(new BaseTexture(c));
 
 	constructor(config: SpriteGraphNode) {
 		super(config);
 	}
 
 	protected createDisplayObject(model: SpriteGraphNode) {
-		const texture = this.createTexture(model.renderState.texture, model.renderState);
+		const texture = this.createTexture(model);
 		return new Sprite(texture);
 	}
 
-	protected createTexture(texture: ReadOnlyDataSource<string | HTMLCanvasElement>, model: SpriteEntityRenderModel): PixiTexture {
-		if (!texture.value) {
+	protected createTexture(model: SpriteGraphNode): PixiTexture {
+		if (!model.resolvedModel.texture.value) {
 			return RenderSpriteEntity.voidTexture;
 		}
 
-		const value = texture.value;
+		const value = model.resolvedModel.texture.value;
 
 		if (typeof value === 'string') {
 			if (!textureMap.has(value)) {
@@ -49,10 +50,10 @@ export class RenderSpriteEntity extends NoRenderEntity {
 			}
 		}
 
-		return this.wrapTexture(textureMap.get(texture.value), model);
+		return this.wrapTexture(textureMap.get(model.resolvedModel.texture.value), model);
 	}
 
-	private handleTextureReady(texture: string, img: HTMLImageElement, model: SpriteEntityRenderModel) {
+	private handleTextureReady(texture: string, img: HTMLImageElement, model: SpriteGraphNode) {
 		pendingTextureMap.delete(texture);
 		const bt = new BaseTexture(img);
 		if (!this.token.isCanceled) {
@@ -61,29 +62,32 @@ export class RenderSpriteEntity extends NoRenderEntity {
 		textureMap.set(texture, bt);
 	}
 
-	private wrapTexture(bt: BaseTexture, model: SpriteEntityRenderModel): PixiTexture {
+	private wrapTexture(bt: BaseTexture, model: SpriteGraphNode): PixiTexture {
+		const renderState = model.renderState;
 		const result = new PixiTexture(bt);
-		if (model.drawDistanceX.value !== undefined) {
-			result.frame.width = model.drawDistanceX.value;
+		if (renderState.drawDistanceX.value !== undefined) {
+			result.frame.width = renderState.drawDistanceX.value;
 		}
-		if (model.drawDistanceY.value !== undefined) {
-			result.frame.height = model.drawDistanceY.value;
+		if (renderState.drawDistanceY.value !== undefined) {
+			result.frame.height = renderState.drawDistanceY.value;
 		}
-		if (model.rotation.value !== undefined) {
-			result.rotate = model.rotation.value;
+		if (renderState.rotation.value) {
+			result.rotate = renderState.rotation.value;
 		}
-		if (model.drawOffsetX.value !== undefined) {
-			result.frame.x = model.drawOffsetX.value;
+		if (renderState.drawOffsetX.value !== undefined) {
+			result.frame.x = renderState.drawOffsetX.value;
 		}
-		if (model.drawOffsetY.value !== undefined) {
-			result.frame.y = model.drawOffsetY.value;
+		if (renderState.drawOffsetY.value !== undefined) {
+			result.frame.y = renderState.drawOffsetY.value;
 		}
-		if (this.displayObject && model.sizeX.value === undefined) {
-			this.displayObject.width = bt.width * model.scaleX.value;
+		if (this.displayObject && (renderState.sizeX.value === undefined || model.resolvedModel.width.value === 'auto')) {
+			this.displayObject.width = bt.width * renderState.scaleX.value;
 		}
-		if (this.displayObject && model.sizeY.value === undefined) {
-			this.displayObject.height = bt.height * model.scaleY.value;
+
+		if (this.displayObject && (renderState.sizeY.value === undefined || model.resolvedModel.height.value === 'auto')) {
+			this.displayObject.height = bt.height * renderState.scaleY.value;
 		}
+
 		result.updateUvs();
 		return result;
 	}
