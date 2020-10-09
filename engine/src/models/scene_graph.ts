@@ -522,7 +522,11 @@ export class DataSourceSceneGraphNode extends ContainerGraphNode {
 				sessionToken: cleanUp,
 				tokens: []
 			};
-			const subNodes = render(v, s);
+			let subNodes = render(v, s);
+
+			if (!Array.isArray(subNodes)) {
+				subNodes = [subNodes];
+			}
 
 			for (const n of subNodes) {
 				if (n.cancellationToken) {
