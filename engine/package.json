@@ -2,11 +2,12 @@
 	"name": "aurum-game-engine",
 	"version": "0.0.0",
 	"description": "Stream based modular game engine for 2D Games",
-	"main": "dist/aurum_game_engine.js",
-	"typings": "dist/aurum_game_engine.d.ts",
+	"main": "prebuilt/cjs/aurum-game-engine.js",
+	"typings": "prebuilt/esnext/aurum-game-engine.d.ts",
 	"scripts": {
 		"build": "tsc",
-		"watch": "tsc -w"
+		"watch": "tsc -w",
+		"deploy": "npm run build && tsc -p tsconfig.amd.json && tsc -p tsconfig.cjs.json"
 	},
 	"homepage": "https://aurumjs.org/",
 	"repository": {
@@ -21,15 +22,5 @@
 	],
 	"author": "Joao Santos (CyberPhoenix)",
 	"license": "MIT",
-	"devDependencies": {
-		"@types/chai": "^4.2.5",
-		"@types/jest": "^24.0.23",
-		"chai": "^4.2.0",
-		"jest": "^24.9.0",
-		"microbundle": "^0.12.0",
-		"prettier": "^1.19.1",
-		"ts-jest": "^24.1.0",
-		"typedoc": "^0.15.4",
-		"typescript": "^3.9.5"
-	}
+	"devDependencies": {}
 }

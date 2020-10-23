@@ -3,7 +3,7 @@ import { PointLike } from '../models/point';
 import { pointUtils } from '../math/vectors/point_utils';
 import { CommonEntity } from '../models/entities';
 import { SceneGraphNode } from '../models/scene_graph';
-import { Vector2D } from '../aurum_game_engine';
+import { Vector2D } from '../math/vectors/vector2d';
 
 export interface TabularLayoutConfiguration {
 	initialOffset?: PointLike;

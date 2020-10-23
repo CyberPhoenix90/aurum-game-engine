@@ -1,5 +1,5 @@
-import { SceneGraphNode } from '../aurum_game_engine';
 import { CommonEntity } from '../models/entities';
+import { SceneGraphNode } from '../models/scene_graph';
 
 export abstract class AbstractLayout {
 	public positionChildren(children: ReadonlyArray<SceneGraphNode<CommonEntity>>, parent: SceneGraphNode<CommonEntity>): void {

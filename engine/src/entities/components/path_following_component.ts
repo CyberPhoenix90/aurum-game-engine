@@ -1,7 +1,7 @@
 import { CancellationToken, DataSource } from 'aurumjs';
 import { Callback } from 'aurumjs/prebuilt/esnext/utilities/common';
-import { Polygon } from '../../aurum_game_engine';
 import { onBeforeRender } from '../../core/stage';
+import { Polygon } from '../../math/shapes/polygon';
 import { CommonEntity } from '../../models/entities';
 import { PointLike } from '../../models/point';
 import { SceneGraphNode } from '../../models/scene_graph';

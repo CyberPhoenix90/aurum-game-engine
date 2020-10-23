@@ -2,9 +2,9 @@
 	"compilerOptions": {
 		"allowUnusedLabels": false,
 		"alwaysStrict": true,
-		"module": "AMD",
+		"module": "amd",
 		"newLine": "LF",
-		"target": "es2017",
+		"target": "es2019",
 		"noUnusedLocals": true,
 		"declarationMap": true,
 		"jsx": "react",
@@ -17,7 +17,7 @@
 		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
 		"noEmitOnError": true,
-		"outFile": "dist/test/aurum.test.js",
+		"outFile": "prebuilt/amd/aurum-game-engine.js",
 		"noFallthroughCasesInSwitch": true,
 		"moduleResolution": "node"
 	},

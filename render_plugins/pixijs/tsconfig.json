@@ -4,7 +4,7 @@
 		"alwaysStrict": true,
 		"module": "esnext",
 		"newLine": "LF",
-		"target": "es2017",
+		"target": "esnext",
 		"noUnusedLocals": true,
 		"declarationMap": true,
 		"jsx": "react",
@@ -17,7 +17,7 @@
 		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
 		"noEmitOnError": true,
-		"outDir": "dist",
+		"outDir": "prebuilt/esnext",
 		"noFallthroughCasesInSwitch": true,
 		"moduleResolution": "node"
 	},

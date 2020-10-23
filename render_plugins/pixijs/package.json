@@ -2,36 +2,16 @@
 	"name": "aurum-pixijs-renderer",
 	"version": "1.0.0",
 	"description": "",
-	"main": "dist/pixijs_render_adapter.js",
-	"typings": "dist/pixijs_render_adapter.d.ts",
-	"config": {
-		"projectType": "typescript",
-		"type": "browserLibrary",
-		"groups": [
-			"libraries",
-			"illusion_all"
-		],
-		"link": {
-			"include": [
-				"src/**/*.ts",
-				"src/**/*.tsx"
-			],
-			"assets": [
-				"pixi"
-			],
-			"internalDependencies": [
-				"illusion_engine"
-			],
-			"manualTypings": []
-		},
-		"output": {
-			"declaration": true,
-			"outFile": "{{library}}\\{{name}}\\browser\\{{name}}.js"
-		}
-	},
+	"main": "prebuilt/cjs/aurum-pixijs-renderer.js",
+	"typings": "prebuilt/esnext/aurum-pixijs-renderer.d.ts",
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
+	"scripts": {
+		"build": "tsc",
+		"watch": "tsc -w",
+		"deploy": "npm run build && tsc -p tsconfig.amd.json && tsc -p tsconfig.cjs.json"
+	},
 	"devDependencies": {},
 	"dependencies": {
 		"@types/pixi.js": "^5.0.0",

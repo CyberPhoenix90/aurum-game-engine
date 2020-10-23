@@ -1,8 +1,8 @@
 import { ArrayDataSource, AurumComponentAPI, DataSource, render, Renderable } from 'aurumjs';
-import { toSourceIfDefined } from '../../../aurum_game_engine';
 import { CommonEntityProps } from '../../../models/entities';
 import { Data } from '../../../models/input_data';
 import { SceneGraphNode } from '../../../models/scene_graph';
+import { toSourceIfDefined } from '../../../utilities/data/to_source';
 import { entityDefaults } from '../../entity_defaults';
 import { normalizeComponents, propsToModel } from '../../shared';
 import { CameraGraphNode } from './api';
