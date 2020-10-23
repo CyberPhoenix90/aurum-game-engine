@@ -1,4 +1,4 @@
-import { ArrayDataSource, DataSource } from 'aurumjs';
+import { ArrayDataSource, AurumComponentAPI, DataSource } from 'aurumjs';
 import { CommonEntityProps } from '../../../models/entities';
 import { Data } from '../../../models/input_data';
 import { toSourceIfDefined } from '../../../utilities/data/to_source';
@@ -26,10 +26,11 @@ export interface SpriteEntityProps extends CommonEntityProps {
 	class?: SpriteEntity[] | ArrayDataSource<SpriteEntity>;
 }
 
-export function Sprite(props: SpriteEntityProps): SpriteGraphNode {
+export function Sprite(props: SpriteEntityProps, _, api: AurumComponentAPI): SpriteGraphNode {
 	return new SpriteGraphNode({
 		name: props.name ?? SpriteGraphNode.name,
 		components: normalizeComponents(props.components),
+		cancellationToken: api.cancellationToken,
 		children: undefined,
 		models: {
 			coreDefault: entityDefaults,

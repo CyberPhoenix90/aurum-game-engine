@@ -60,6 +60,7 @@ export function TiledMap(props: TiledMapProps, children: Renderable[], api: Auru
 		name: props.name ?? TiledMapGraphNode.name,
 		components: normalizeComponents(props.components),
 		children: undefined,
+		cancellationToken: api.cancellationToken,
 		models: {
 			coreDefault: entityDefaults,
 			appliedStyleClasses: props.class instanceof ArrayDataSource ? props.class : new ArrayDataSource(props.class),

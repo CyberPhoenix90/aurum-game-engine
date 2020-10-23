@@ -17,6 +17,7 @@ export function Container(props: ContainerEntityProps, children: Renderable[], a
 	const content = api.prerender(children, lc);
 	return new ContainerGraphNode({
 		name: props.name ?? ContainerGraphNode.name,
+		cancellationToken: api.cancellationToken,
 		components: normalizeComponents(props.components),
 		children: new ArrayDataSource(content),
 		models: {

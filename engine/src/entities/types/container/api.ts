@@ -1,4 +1,4 @@
-import { ArrayDataSource, MapDataSource } from 'aurumjs';
+import { ArrayDataSource, CancellationToken, MapDataSource } from 'aurumjs';
 import { Constructor } from '../../../models/common';
 import { SceneGraphNode, ContainerGraphNode } from '../../../models/scene_graph';
 import { AbstractComponent } from '../../components/abstract_component';
@@ -7,6 +7,7 @@ import { CommonEntity } from '../../../models/entities';
 
 export interface ContainerGraphNodeModel {
 	name?: string;
+	cancellationToken: CancellationToken;
 	components?: MapDataSource<Constructor<AbstractComponent>, AbstractComponent>;
 	children?: ArrayDataSource<SceneGraphNode<any>>;
 	models: {

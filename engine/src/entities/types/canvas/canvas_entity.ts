@@ -1,4 +1,4 @@
-import { ArrayDataSource, DataSource } from 'aurumjs';
+import { ArrayDataSource, AurumComponentAPI, DataSource } from 'aurumjs';
 import { CommonEntityProps } from '../../../models/entities';
 import { CanvasGraphNode } from './api';
 import { AbstractShape } from '../../../math/shapes/abstract_shape';
@@ -20,11 +20,12 @@ export interface CanvasEntityProps extends CommonEntityProps {
 	onDetach?(node: CanvasGraphNode): void;
 }
 
-export function Canvas(props: CanvasEntityProps): CanvasGraphNode {
+export function Canvas(props: CanvasEntityProps, _, api: AurumComponentAPI): CanvasGraphNode {
 	return new CanvasGraphNode({
 		name: props.name ?? CanvasGraphNode.name,
 		components: normalizeComponents(props.components),
 		children: undefined,
+		cancellationToken: api.cancellationToken,
 		models: {
 			coreDefault: entityDefaults,
 			appliedStyleClasses: props.class instanceof ArrayDataSource ? props.class : new ArrayDataSource(props.class),

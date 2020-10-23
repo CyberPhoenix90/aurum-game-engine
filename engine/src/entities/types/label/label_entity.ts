@@ -32,6 +32,7 @@ export function Label(props: LabelEntityProps, children: Renderable[], api: Auru
 		name: props.name ?? LabelGraphNode.name,
 		components: normalizeComponents(props.components),
 		children: undefined,
+		cancellationToken: api.cancellationToken,
 		models: {
 			coreDefault: entityDefaults,
 			appliedStyleClasses: props.class instanceof ArrayDataSource ? props.class : new ArrayDataSource(props.class),

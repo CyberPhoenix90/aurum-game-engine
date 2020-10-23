@@ -14,6 +14,7 @@ export interface SceneGraphNodeModel<T> {
 	name?: string;
 	components?: MapDataSource<Constructor<AbstractComponent>, AbstractComponent>;
 	children: ArrayDataSource<SceneGraphNode<CommonEntity> | ArrayDataSource<Renderable> | DataSource<Renderable>>;
+	cancellationToken: CancellationToken;
 	models: {
 		coreDefault: CommonEntity;
 		entityTypeDefault: T;
@@ -52,7 +53,7 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		this.onRequestNodeLayoutRefresh = new DataSource();
 		this.name = config.name;
 		this.children = config.children ?? new ArrayDataSource([]);
-		this.cancellationToken = new CancellationToken();
+		this.cancellationToken = config.cancellationToken;
 		this.components = config.components;
 		this.models = config.models;
 		this.uid = _.getUId();
@@ -71,6 +72,7 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 			}
 		});
 		this.cancellationToken.addCancelable(() => {
+			this.parent?.value?.children.remove(this);
 			config.onDetach?.(this);
 		});
 
@@ -358,6 +360,7 @@ export class ContainerGraphNode extends SceneGraphNode<ContainerEntity> {
 	constructor(config: ContainerGraphNodeModel) {
 		super({
 			children: config.children ?? new ArrayDataSource(),
+			cancellationToken: config.cancellationToken,
 			models: {
 				appliedStyleClasses: config.models.appliedStyleClasses,
 				coreDefault: config.models.coreDefault,
@@ -414,6 +417,7 @@ export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 		super({
 			children: new ArrayDataSource(),
 			name: ArrayDataSourceSceneGraphNode.name,
+			cancellationToken: new CancellationToken(),
 			models: {
 				coreDefault: entityDefaults,
 				entityTypeDefault: arrayDataSourceDefaultModel,
@@ -501,6 +505,7 @@ export class DataSourceSceneGraphNode extends ContainerGraphNode {
 		super({
 			children: new ArrayDataSource(),
 			name: DataSourceSceneGraphNode.name,
+			cancellationToken: new CancellationToken(),
 			models: {
 				coreDefault: entityDefaults,
 				entityTypeDefault: dataSourceDefaultModel,

@@ -1,4 +1,4 @@
-import { ArrayDataSource, DataSource, render, Renderable } from 'aurumjs';
+import { ArrayDataSource, AurumComponentAPI, DataSource, render, Renderable } from 'aurumjs';
 import { toSourceIfDefined } from '../../../aurum_game_engine';
 import { CommonEntityProps } from '../../../models/entities';
 import { Data } from '../../../models/input_data';
@@ -17,10 +17,11 @@ export interface CameraProps extends CommonEntityProps {
 	class?: CameraEntity[] | ArrayDataSource<CameraEntity>;
 }
 
-export function Camera(props: CameraProps, children?: Renderable[]): SceneGraphNode<CameraEntity> {
+export function Camera(props: CameraProps, children: Renderable[], api: AurumComponentAPI): SceneGraphNode<CameraEntity> {
 	return new CameraGraphNode({
 		name: props.name ?? CameraGraphNode.name,
 		components: normalizeComponents(props.components),
+		cancellationToken: api.cancellationToken,
 		children: new ArrayDataSource(
 			render(children, {
 				attachCalls: [],
