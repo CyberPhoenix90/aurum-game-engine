@@ -29,6 +29,10 @@ export class NoRenderEntity {
 	}
 
 	public dispose(): void {
+		if (this.token.isCanceled) {
+			return;
+		}
+
 		this.token.cancel();
 		this.children.forEach((c) => c.dispose());
 		this.displayObject.parent.removeChild(this.displayObject);

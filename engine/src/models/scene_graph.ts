@@ -9,6 +9,7 @@ import { EntityRenderModel } from '../rendering/model';
 import { _ } from '../utilities/other/streamline';
 import { Constructor } from './common';
 import { CommonEntity, RenderableType } from './entities';
+import { PointLike } from './point';
 
 export interface SceneGraphNodeModel<T> {
 	name?: string;
@@ -318,6 +319,10 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 	protected abstract createResolvedModel(): T;
 	protected abstract createRenderModel(): EntityRenderModel;
 
+	public getAbsolutePosition(): PointLike {
+		return { x: this.getAbsolutePositionX(), y: this.getAbsolutePositionY() };
+	}
+
 	public getAbsolutePositionX(): number {
 		let x = this.renderState.positionX.value;
 		let ptr = this.parent.value;
@@ -542,7 +547,9 @@ export class DataSourceSceneGraphNode extends ContainerGraphNode {
 				}
 			}
 			this.children.appendArray(subNodes);
-			s.attachCalls.forEach((ac) => ac());
+			for (const ac of s.attachCalls) {
+				ac();
+			}
 		});
 	}
 }
