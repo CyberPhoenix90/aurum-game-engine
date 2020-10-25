@@ -1,8 +1,9 @@
-import { Aurum } from 'aurumjs';
-import { Camera, CameraGraphNode, Container, Stage } from 'aurum-game-engine';
+import { Aurum, DataSource } from 'aurumjs';
+import { Camera, CameraGraphNode, Container, Stage, SceneGraphNode } from 'aurum-game-engine';
 import { PixiJsRenderAdapter } from 'aurum-pixijs-renderer';
 
 export let camera: CameraGraphNode;
+export const renderRoot: DataSource<SceneGraphNode<any>> = new DataSource();
 
 export function start() {
 	Aurum.attach(
@@ -15,7 +16,7 @@ export function start() {
 						camera = c;
 					}}
 				></Camera>
-				<Container name="target"></Container>
+				<Container name="target">{renderRoot}</Container>
 			</Stage>
 		</div>,
 		document.body

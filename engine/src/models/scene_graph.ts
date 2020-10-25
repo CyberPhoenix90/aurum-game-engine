@@ -522,6 +522,9 @@ export class DataSourceSceneGraphNode extends ContainerGraphNode {
 			}
 			cleanUp = new CancellationToken();
 
+			if (v === undefined || v === null || (Array.isArray(v) && v.length === 0)) {
+				return;
+			}
 			const s = {
 				attachCalls: [],
 				sessionToken: cleanUp,
