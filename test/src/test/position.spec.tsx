@@ -8,19 +8,6 @@ describe('position', () => {
 		renderRoot.update(undefined);
 	});
 
-	it('synchronous attach', () => {
-		let attached = false;
-		renderRoot.update(
-			<Container
-				onAttach={(c) => {
-					attached = true;
-				}}
-			></Container>
-		);
-
-		assert(attached);
-	});
-
 	it('default position', () => {
 		renderRoot.update(
 			<Container

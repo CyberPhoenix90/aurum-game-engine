@@ -436,10 +436,12 @@ export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 		dataSource.listenAndRepeat((change) => {
 			switch (change.operation) {
 				case 'add':
+					let i = 0;
 					for (const item of change.items) {
 						const node = this.renderableToNode(item);
 						dynamicRenderKeys.set(item, node);
-						this.children.insertAt(change.index, node);
+						this.children.insertAt(change.index + i, node);
+						i++;
 					}
 					break;
 				case 'remove':
@@ -452,6 +454,9 @@ export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 					const node = this.renderableToNode(change.items[0]);
 					dynamicRenderKeys.set(change.items[0], node);
 					this.children.set(change.index, node);
+					break;
+				case 'swap':
+					this.children.swap(change.index, change.index2);
 					break;
 				case 'merge':
 					const source = change.previousState.slice();
