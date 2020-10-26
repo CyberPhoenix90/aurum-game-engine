@@ -1,6 +1,6 @@
 const { assert } = chai;
 import { Container } from 'aurum-game-engine';
-import { Aurum } from 'aurumjs';
+import { Aurum, DataSource } from 'aurumjs';
 import { renderRoot } from '../main';
 
 describe('position', () => {
@@ -117,6 +117,47 @@ describe('position', () => {
 						assert.deepEqual(c.getAbsolutePosition(), { x: 21, y: 0 });
 						assert.deepEqual(c.renderState.positionX.value, 15);
 						assert.deepEqual(c.renderState.positionY.value, -10);
+					}}
+				></Container>
+			</Container>
+		);
+	});
+
+	it('relative position with percent and change', () => {
+		const w = new DataSource(20);
+		const h = new DataSource(10);
+		renderRoot.update(
+			<Container x={6} y={10} width={w} height={h}>
+				<Container
+					x="50%"
+					y="50%"
+					onAttach={(c) => {
+						assert.deepEqual(c.getAbsolutePosition(), { x: 16, y: 15 });
+						assert.deepEqual(c.renderState.positionX.value, 10);
+						assert.deepEqual(c.renderState.positionY.value, 5);
+
+						w.update(50);
+						h.update(20);
+
+						assert.deepEqual(c.getAbsolutePosition(), { x: 31, y: 20 });
+						assert.deepEqual(c.renderState.positionX.value, 25);
+						assert.deepEqual(c.renderState.positionY.value, 10);
+					}}
+				></Container>
+			</Container>
+		);
+	});
+
+	it('relative position with percent and origin', () => {
+		renderRoot.update(
+			<Container x={6} y={10} width={50} height={20} originX={0.5} originY={0.5}>
+				<Container
+					x="50%"
+					y="50%"
+					onAttach={(c) => {
+						assert.deepEqual(c.getAbsolutePosition(), { x: 6, y: 10 });
+						assert.deepEqual(c.renderState.positionX.value, 25);
+						assert.deepEqual(c.renderState.positionY.value, 10);
 					}}
 				></Container>
 			</Container>

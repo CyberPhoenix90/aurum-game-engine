@@ -197,11 +197,11 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		}
 		this.renderPlugin = renderPlugin;
 		this.stageId = stageId;
-		this.onAttach?.(this);
+		this.recomputeLayout();
 		for (const component of this.components.values()) {
 			component.onAttach(this);
 		}
-		this.recomputeLayout();
+		this.onAttach?.(this);
 	}
 
 	public dispose(): void {
