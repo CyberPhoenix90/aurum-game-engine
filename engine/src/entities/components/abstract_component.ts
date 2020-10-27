@@ -2,18 +2,38 @@ import { CancellationToken } from 'aurumjs';
 import { CommonEntity } from '../../models/entities';
 import { SceneGraphNode } from '../../models/scene_graph';
 
-export class AbstractComponent {
-	protected cancellationToken: CancellationToken;
+export abstract class AbstractComponent {
+	private token: CancellationToken;
 
-	constructor() {
-		this.cancellationToken = new CancellationToken();
+	protected onAttach(entity: SceneGraphNode<CommonEntity>) {}
+
+	protected onDetach() {}
+
+	protected get cancellationToken(): CancellationToken {
+		if (!this.token) {
+			throw new Error(`Trying to use cancellation token before on attach was called`);
+		}
+		if (this.token.isCanceled) {
+			console.warn(`Using cancellation token that was already cancelled`);
+		}
+		return this.token;
 	}
 
-	public onAttach(entity: SceneGraphNode<CommonEntity>) {}
+	protected set cancellationToken(token: CancellationToken) {
+		if (this.token) {
+			throw new Error(`Cancellation token was already set`);
+		}
 
-	public onDetach() {}
+		this.token = token;
+	}
 
-	public dispose(): void {
+	public triggerOnAttach(entity: SceneGraphNode<CommonEntity>) {
+		this.cancellationToken = new CancellationToken();
+		this.onAttach(entity);
+	}
+
+	public triggerOnDetach() {
 		this.cancellationToken.cancel();
+		this.onDetach();
 	}
 }

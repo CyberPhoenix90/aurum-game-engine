@@ -80,11 +80,11 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		this.components.listen((change) => {
 			if (change.deleted) {
 				if (this.stageId) {
-					change.oldValue.onDetach();
+					change.oldValue.triggerOnDetach();
 				}
 			} else {
 				if (this.stageId) {
-					change.newValue.onAttach(this);
+					change.newValue.triggerOnAttach(this);
 				}
 			}
 		}, this.cancellationToken);
@@ -199,7 +199,7 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		this.stageId = stageId;
 		this.recomputeLayout();
 		for (const component of this.components.values()) {
-			component.onAttach(this);
+			component.triggerOnAttach(this);
 		}
 		this.onAttach?.(this);
 	}
@@ -215,7 +215,7 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 			this.renderPlugin.removeNode(this.uid, this.stageId);
 			this.onDetach?.(this);
 			for (const component of this.components.values()) {
-				component.onDetach();
+				component.triggerOnDetach();
 			}
 			this.stageId = undefined;
 		}
