@@ -130,10 +130,15 @@ export class MouseInteractionComponent extends AbstractComponent {
 			if (e.propagationStopped) {
 				return;
 			}
-			if (this.onMouseUp.hasSubscriptions() && entity.renderState.visible.value && !entity.cancellationToken.isCanceled) {
+			if (
+				(this.onMouseUp.hasSubscriptions() || this.onClick.hasSubscriptions()) &&
+				entity.renderState.visible.value &&
+				!entity.cancellationToken.isCanceled
+			) {
 				for (const camera of this.config.cameras instanceof ArrayDataSource ? this.config.cameras.getData() : this.config.cameras) {
 					if (collisionCalculator.isOverlapping(new Point(camera.projectMouseCoordinates(e)), boundingBox)) {
 						this.onMouseUp.fire({ e: e, source: entity });
+						this.onClick.fire({ e: e, source: entity });
 					}
 				}
 			}
