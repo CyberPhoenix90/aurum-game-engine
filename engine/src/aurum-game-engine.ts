@@ -30,6 +30,7 @@ export * from './entities/components/mouse_interaction_component';
 export * from './math/calculation';
 export * from './math/unit';
 export * from './math/math_utils';
+export * from './math/aspect_ratio_calculator';
 export * from './math/vectors/abstract_vector';
 export * from './math/vectors/vector2d';
 export * from './math/vectors/vector3d';
