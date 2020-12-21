@@ -4,8 +4,8 @@ import { RGBAVector } from './color_vectors/rgba_vector';
 import { HSLAVector } from './color_vectors/hsla_vector';
 import { HSVAVector } from './color_vectors/hsva_vector';
 
-const PARSE_RBGA = /rgba\((\d\d?\d?)\s*,\s*(\d\d?\d?)\s*,\s*(\d\d?\d?)\s*,\s*(\d\.?[\d]*)\)/i;
-const PARSE_RBG = /rgb\((\d\d?\d?)\s*,\s*(\d\d?\d?)\s*,\s*(\d\d?\d?)\)/i;
+const PARSE_RGBA = /rgba\((\d\d?\d?)\s*,\s*(\d\d?\d?)\s*,\s*(\d\d?\d?)\s*,\s*(\d\.?[\d]*)\)/i;
+const PARSE_RGB = /rgb\((\d\d?\d?)\s*,\s*(\d\d?\d?)\s*,\s*(\d\d?\d?)\)/i;
 const PARSE_HSLA = /hsla\(([-]{0,1}[\d]+\.?[\d]*)\s*,\s*(\d\d?\d?%)\s*,\s*(\d\d?\d?%)\s*,\s*(\d\.?[\d]*)\)/i;
 const PARSE_HSL = /hsl\(([-]{0,1}[\d]+\.?[\d]*)\s*,\s*(\d\d?\d?%)\s*,\s*(\d\d?\d?%)\)/i;
 const PARSE_HSVA = /hsva\(([-]{0,1}[\d]+\.?[\d]*)\s*,\s*(\d\d?\d?%)\s*,\s*(\d\d?\d?%)\s*,\s*(\d\.?[\d]*)\)/i;
@@ -183,19 +183,19 @@ export class Color {
 			return Color.fromHex(input);
 		}
 
-		if (trimmed.match(PARSE_RBGA)) {
-			const [, r, g, b, a] = PARSE_RBGA.exec(trimmed);
-			return Color.fromRGBA(parseInt(r), parseInt(g), parseInt(b), parseFloat(a));
+		if (trimmed.match(PARSE_RGBA)) {
+			const [, r, g, b, a] = PARSE_RGBA.exec(trimmed);
+			return Color.fromRGBA(parseInt(r), parseInt(g), parseInt(b), Math.floor(parseFloat(a) * 256));
 		}
 
-		if (trimmed.match(PARSE_RBG)) {
-			const [, r, g, b] = PARSE_RBG.exec(trimmed);
+		if (trimmed.match(PARSE_RGB)) {
+			const [, r, g, b] = PARSE_RGB.exec(trimmed);
 			return Color.fromRGB(parseInt(r), parseInt(g), parseInt(b));
 		}
 
 		if (trimmed.match(PARSE_HSVA)) {
 			const [, h, s, v, a] = PARSE_HSVA.exec(trimmed);
-			return Color.fromHSVA(parseInt(h), parseFloat(s) / 100, parseFloat(v) / 100, parseFloat(a));
+			return Color.fromHSVA(parseInt(h), parseFloat(s) / 100, parseFloat(v) / 100, Math.floor(parseFloat(a) * 256));
 		}
 
 		if (trimmed.match(PARSE_HSV)) {
@@ -205,7 +205,7 @@ export class Color {
 
 		if (trimmed.match(PARSE_HSLA)) {
 			const [, h, s, l, a] = PARSE_HSLA.exec(trimmed);
-			return Color.fromHSLA(parseInt(h), parseFloat(s) / 100, parseFloat(l) / 100, parseFloat(a));
+			return Color.fromHSLA(parseInt(h), parseFloat(s) / 100, parseFloat(l) / 100, Math.floor(parseFloat(a) * 256));
 		}
 
 		if (trimmed.match(PARSE_HSL)) {

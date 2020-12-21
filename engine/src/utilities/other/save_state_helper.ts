@@ -34,6 +34,10 @@ class SaveStateHelper {
 		localStorage.setItem(key, this.serializeState());
 	}
 
+	public hasState(key: string): boolean {
+		return key in localStorage;
+	}
+
 	public loadState(key: string): boolean {
 		const item = localStorage.getItem(key);
 		if (item) {
