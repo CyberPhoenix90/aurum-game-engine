@@ -24,41 +24,38 @@ export function layoutAlgorithm(node: SceneGraphNode<CommonEntity>): LayoutData 
 	let y: DataSource<number>;
 
 	if (node instanceof SpriteGraphNode || node instanceof CanvasGraphNode) {
-		sizeX = node.resolvedModel.width.aggregate(node.onRequestNodeLayoutRefresh, (v) =>
+		sizeX = node.resolvedModel.width.aggregate([node.onRequestNodeLayoutRefresh], (v) =>
 			v === 'auto' ? undefined : computeSize(v, getParentWidth(node), 0, 'x', node.processedChildren?.getData() ?? [])
 		);
-		sizeY = node.resolvedModel.height.aggregate(node.onRequestNodeLayoutRefresh, (v) =>
+		sizeY = node.resolvedModel.height.aggregate([node.onRequestNodeLayoutRefresh], (v) =>
 			v === 'auto' ? undefined : computeSize(v, getParentHeight(node), 0, 'y', node.processedChildren?.getData() ?? [])
 		);
 	} else if (node instanceof LabelGraphNode) {
-		sizeX = node.resolvedModel.width.aggregateFive(
-			node.resolvedModel.text,
-			node.resolvedModel.fontSize,
-			node.resolvedModel.fontFamily,
-			node.resolvedModel.fontWeight,
+		sizeX = node.resolvedModel.width.aggregate(
+			[node.resolvedModel.text, node.resolvedModel.fontSize, node.resolvedModel.fontFamily, node.resolvedModel.fontWeight],
 			(size, text, fs, ff, fw) =>
 				size === 'auto'
 					? measureStringWidth(text, fw, fs, ff)
 					: computeSize(size, getParentWidth(node), 0, 'x', node.processedChildren?.getData() ?? [])
 		);
 
-		sizeY = node.resolvedModel.height.aggregate(node.onRequestNodeLayoutRefresh, (v) =>
+		sizeY = node.resolvedModel.height.aggregate([node.onRequestNodeLayoutRefresh], (v) =>
 			v === 'auto' ? node.resolvedModel.fontSize.value : computeSize(v, getParentHeight(node), 0, 'y', node.processedChildren?.getData() ?? [])
 		);
 	} else {
-		sizeX = node.resolvedModel.width.aggregate(node.onRequestNodeLayoutRefresh, (v) =>
+		sizeX = node.resolvedModel.width.aggregate([node.onRequestNodeLayoutRefresh], (v) =>
 			computeSize(v, getParentWidth(node), 0, 'x', node.processedChildren?.getData() ?? [])
 		);
-		sizeY = node.resolvedModel.height.aggregate(node.onRequestNodeLayoutRefresh, (v) =>
+		sizeY = node.resolvedModel.height.aggregate([node.onRequestNodeLayoutRefresh], (v) =>
 			computeSize(v, getParentHeight(node), 0, 'y', node.processedChildren?.getData() ?? [])
 		);
 	}
 
-	x = node.resolvedModel.x.aggregate(node.onRequestNodeLayoutRefresh, (v) => {
+	x = node.resolvedModel.x.aggregate([node.onRequestNodeLayoutRefresh], (v) => {
 		return computePosition(v, sizeX.value, node.resolvedModel.originX.value, node.resolvedModel.scaleX.value, getParentWidth(node));
 	});
 
-	y = node.resolvedModel.y.aggregate(node.onRequestNodeLayoutRefresh, (v) => {
+	y = node.resolvedModel.y.aggregate([node.onRequestNodeLayoutRefresh], (v) => {
 		return computePosition(v, sizeY.value, node.resolvedModel.originY.value, node.resolvedModel.scaleY.value, getParentHeight(node));
 	});
 
