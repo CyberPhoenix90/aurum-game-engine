@@ -1,9 +1,10 @@
 import { EntityRenderModel } from '../../../rendering/model';
 import { ReadOnlyDataSource, DataSource, ArrayDataSource } from 'aurumjs';
 import { CommonEntity } from '../../../models/entities';
+import { ResourceWrapper } from '../../../resources/abstract_resource_manager';
 
 export interface SpriteEntityRenderModel extends EntityRenderModel {
-	texture: ReadOnlyDataSource<string | HTMLCanvasElement>;
+	texture: ReadOnlyDataSource<string | HTMLCanvasElement | HTMLImageElement | ResourceWrapper<HTMLImageElement, string>>;
 	tint: ReadOnlyDataSource<string>;
 	/**
 	 * Offset from the texture at which drawing begins
@@ -18,7 +19,7 @@ export interface SpriteEntityRenderModel extends EntityRenderModel {
 }
 
 export interface SpriteEntity extends CommonEntity {
-	texture?: DataSource<string | HTMLCanvasElement>;
+	texture?: DataSource<string | HTMLCanvasElement | HTMLImageElement | ResourceWrapper<HTMLImageElement, string>>;
 	tint?: DataSource<string>;
 	/**
 	 * Offset from the texture at which drawing begins

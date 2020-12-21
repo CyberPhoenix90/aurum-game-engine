@@ -24,6 +24,9 @@ class SaveStateHelper {
 	}
 
 	public registerDataSource(uuid: string | number, source: DataSource<Serializable> | ArrayDataSource<Serializable> | DuplexDataSource<Serializable>): void {
+		if (uuid in this.streams) {
+			throw new Error(`Duplicate stream uuid ${uuid}`);
+		}
 		this.streams[uuid] = source;
 	}
 

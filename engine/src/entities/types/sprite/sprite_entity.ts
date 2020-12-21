@@ -1,6 +1,7 @@
 import { ArrayDataSource, AurumComponentAPI, DataSource } from 'aurumjs';
 import { CommonEntityProps } from '../../../models/entities';
 import { Data } from '../../../models/input_data';
+import { ResourceWrapper } from '../../../resources/abstract_resource_manager';
 import { toSourceIfDefined } from '../../../utilities/data/to_source';
 import { entityDefaults } from '../../entity_defaults';
 import { normalizeComponents, propsToModel } from '../../shared';
@@ -8,7 +9,7 @@ import { SpriteGraphNode } from './api';
 import { SpriteEntity } from './model';
 
 export interface SpriteEntityProps extends CommonEntityProps {
-	texture?: Data<string | HTMLCanvasElement>;
+	texture?: Data<string | HTMLCanvasElement | HTMLImageElement | ResourceWrapper<HTMLImageElement, string>>;
 	tint?: Data<string>;
 	/**
 	 * Offset from the texture at which drawing begins

@@ -1,9 +1,9 @@
-import { Color, SpriteGraphNode } from 'aurum-game-engine';
+import { Color, ResourceWrapper, SpriteGraphNode } from 'aurum-game-engine';
 import { BaseTexture, Sprite, Texture as PixiTexture } from 'pixi.js';
 import { NoRenderEntity } from './pixi_no_render_entity';
 
-export const textureMap: Map<string | HTMLCanvasElement, BaseTexture> = new Map();
-export const pendingTextureMap: Map<string, HTMLImageElement> = new Map();
+export const textureMap: Map<string | HTMLCanvasElement | HTMLImageElement | ResourceWrapper<HTMLImageElement, string>, BaseTexture> = new Map();
+export const pendingTextureMap: Map<string | ResourceWrapper<HTMLImageElement, string>, Promise<HTMLImageElement>> = new Map();
 const c = document.createElement('canvas');
 c.width = 1;
 c.height = 1;
@@ -30,30 +30,58 @@ export class RenderSpriteEntity extends NoRenderEntity {
 		if (typeof value === 'string') {
 			if (!textureMap.has(value)) {
 				if (pendingTextureMap.has(value)) {
-					const img = pendingTextureMap.get(value);
-					img.addEventListener('load', () => {
+					pendingTextureMap.get(value).then((img) => {
 						this.handleTextureReady(value, img, model);
 					});
 				} else {
 					const img = document.createElement('img');
-					pendingTextureMap.set(value, img);
-					img.addEventListener('load', () => {
-						this.handleTextureReady(value, img, model);
-					});
+					pendingTextureMap.set(
+						value,
+						new Promise((resolve, reject) => {
+							img.addEventListener('load', () => {
+								resolve(img);
+								this.handleTextureReady(value, img, model);
+							});
+							img.addEventListener('error', (e) => {
+								reject(e);
+							});
+						})
+					);
 					img.src = value;
 				}
 				return RenderSpriteEntity.voidTexture;
 			}
-		} else {
+		} else if (value instanceof HTMLCanvasElement || value instanceof HTMLImageElement) {
 			if (!textureMap.has(value)) {
 				textureMap.set(value, new BaseTexture(value));
+			}
+		} else {
+			if (!textureMap.has(value)) {
+				if (pendingTextureMap.has(value)) {
+					pendingTextureMap.get(value).then((img) => {
+						this.handleTextureReady(value, img, model);
+					});
+				} else {
+					if (value.isLoaded) {
+						textureMap.set(value, new BaseTexture(value.resource));
+					} else {
+						pendingTextureMap.set(
+							value,
+							value.load().then((img) => {
+								this.handleTextureReady(value, img, model);
+								return img;
+							})
+						);
+					}
+				}
+				return RenderSpriteEntity.voidTexture;
 			}
 		}
 
 		return this.wrapTexture(textureMap.get(model.resolvedModel.texture.value), model);
 	}
 
-	private handleTextureReady(texture: string, img: HTMLImageElement, model: SpriteGraphNode) {
+	private handleTextureReady(texture: string | ResourceWrapper<HTMLImageElement, string>, img: HTMLImageElement, model: SpriteGraphNode) {
 		pendingTextureMap.delete(texture);
 		const bt = new BaseTexture(img);
 		if (!this.token.isCanceled) {

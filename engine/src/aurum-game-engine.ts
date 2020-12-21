@@ -74,6 +74,9 @@ export * from './graphics/color_vectors/rgba_vector';
 export * from './sound/active_sound_effect';
 export * from './sound/sound';
 
+export * from './resources/abstract_resource_manager';
+export * from './resources/texture_manager';
+
 export * from './layouts/abstract_layout';
 export * from './layouts/grid_layout';
 export * from './layouts/linear_layout';
