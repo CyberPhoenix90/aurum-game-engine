@@ -11,8 +11,8 @@ export class RenderCameraEntity extends NoRenderEntity {
 		this.model = model;
 		const view: HTMLCanvasElement = document.createElement('canvas');
 		model.renderState.view = view;
-		view.width = model.renderState.sizeX.value;
-		view.height = model.renderState.sizeY.value;
+		view.width = model.resolvedModel.resolutionX.value ?? model.renderState.sizeX.value;
+		view.height = model.resolvedModel.resolutionY.value ?? model.renderState.sizeY.value;
 		stageNode.appendChild(view);
 
 		this.renderer = autoDetectRenderer({
@@ -21,14 +21,25 @@ export class RenderCameraEntity extends NoRenderEntity {
 		});
 
 		this.view = view;
+
+		const { resolutionX, resolutionY } = model.resolvedModel;
+		resolutionX.aggregate([resolutionY, model.renderState.sizeX, model.renderState.sizeY], (resolutionX, resolutionY, sizeX, sizeY) => {
+			const effectiveSizeX = resolutionX ?? sizeX;
+			const effectiveSizeY = resolutionY ?? sizeY;
+
+			if (this.renderer.view.width !== effectiveSizeX || this.renderer.view.height !== effectiveSizeY) {
+				this.renderer.resize(effectiveSizeX, effectiveSizeY);
+			}
+			this.renderer.view.style.width = `${sizeX}px`;
+			this.renderer.view.style.height = `${sizeY}px`;
+		});
+		this.renderer.view.style.width = `${model.renderState.sizeX.value}px`;
+		this.renderer.view.style.height = `${model.renderState.sizeY.value}px`;
 	}
 
 	public renderView(node: DisplayObject) {
 		//@ts-ignore
 		this.view.node = node;
-		if (this.renderer.view.width !== this.model.renderState.sizeX.value || this.renderer.view.height !== this.model.renderState.sizeY.value) {
-			this.renderer.resize(this.model.renderState.sizeX.value, this.model.renderState.sizeY.value);
-		}
 		this.renderer.render(node);
 	}
 }

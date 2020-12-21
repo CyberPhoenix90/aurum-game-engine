@@ -61,6 +61,7 @@ export class RenderSpriteEntity extends NoRenderEntity {
 					pendingTextureMap.get(value).then((img) => {
 						this.handleTextureReady(value, img, model);
 					});
+					return RenderSpriteEntity.voidTexture;
 				} else {
 					if (value.isLoaded) {
 						textureMap.set(value, new BaseTexture(value.resource));
@@ -72,9 +73,9 @@ export class RenderSpriteEntity extends NoRenderEntity {
 								return img;
 							})
 						);
+						return RenderSpriteEntity.voidTexture;
 					}
 				}
-				return RenderSpriteEntity.voidTexture;
 			}
 		}
 
@@ -138,6 +139,7 @@ export class RenderSpriteEntity extends NoRenderEntity {
 		if (model.renderState.sizeX.value === undefined) {
 			this.displayObject.width = this.displayObject.width * model.renderState.scaleX.value;
 		}
+
 		if (model.renderState.sizeY.value === undefined) {
 			this.displayObject.height = this.displayObject.height * model.renderState.scaleY.value;
 		}
