@@ -1,14 +1,13 @@
-import { DataSource, CancellationToken } from 'aurumjs';
+import { CancellationToken, DataSource, dsMap } from 'aurumjs';
+import { CanvasGraphNode } from '../entities/types/canvas/api';
+import { LabelGraphNode } from '../entities/types/label/api';
+import { SpriteGraphNode } from '../entities/types/sprite/api';
 import { Calculation } from '../math/calculation';
 import { Unit } from '../math/unit';
 import { Position } from '../models/common';
 import { CommonEntity } from '../models/entities';
 import { SceneGraphNode } from '../models/scene_graph';
 import { ScreenHelper } from '../utilities/other/screen_helper';
-import { LabelGraphNode } from '../entities/types/label/api';
-import { measureStringWidth } from '../entities/types/label/label_entity';
-import { SpriteGraphNode } from '../entities/types/sprite/api';
-import { CanvasGraphNode } from '../entities/types/canvas/api';
 
 export interface LayoutData {
 	x: DataSource<number>;
@@ -31,16 +30,11 @@ export function layoutAlgorithm(node: SceneGraphNode<CommonEntity>): LayoutData 
 			v === 'auto' ? undefined : computeSize(v, getParentHeight(node), 0, 'y', node.processedChildren?.getData() ?? [])
 		);
 	} else if (node instanceof LabelGraphNode) {
-		sizeX = node.resolvedModel.width.aggregate(
-			[node.resolvedModel.text, node.resolvedModel.fontSize, node.resolvedModel.fontFamily, node.resolvedModel.fontWeight],
-			(size, text, fs, ff, fw) =>
-				size === 'auto'
-					? measureStringWidth(text, fw, fs, ff)
-					: computeSize(size, getParentWidth(node), 0, 'x', node.processedChildren?.getData() ?? [])
+		sizeX = node.resolvedModel.width.transform(
+			dsMap((size) => (size === 'auto' ? undefined : computeSize(size, getParentWidth(node), 0, 'x', node.processedChildren?.getData() ?? [])))
 		);
-
-		sizeY = node.resolvedModel.height.aggregate([node.onRequestNodeLayoutRefresh], (v) =>
-			v === 'auto' ? node.resolvedModel.fontSize.value : computeSize(v, getParentHeight(node), 0, 'y', node.processedChildren?.getData() ?? [])
+		sizeY = node.resolvedModel.height.transform(
+			dsMap((size) => (size === 'auto' ? undefined : computeSize(size, getParentHeight(node), 0, 'y', node.processedChildren?.getData() ?? [])))
 		);
 	} else {
 		sizeX = node.resolvedModel.width.aggregate([node.onRequestNodeLayoutRefresh], (v) =>

@@ -16,8 +16,29 @@ export class RenderLabelEntity extends NoRenderEntity {
 	}
 
 	public bind(model: LabelGraphNode) {
+		model.resolvedModel.width.listenAndRepeat((v) => {
+			if (v === 'auto') {
+				model.renderState.sizeX.update(this.displayObject.width);
+			}
+		});
+
+		model.resolvedModel.height.listenAndRepeat((v) => {
+			if (v === 'auto') {
+				model.renderState.sizeY.update(this.displayObject.height);
+			}
+		});
+
 		model.renderState.text.listenAndRepeat((v) => {
 			updateText.call(this, v.substring(0, model.renderState.renderCharCount.value));
+			if (model.resolvedModel.width.value === 'auto') {
+				model.renderState.sizeX.update(this.displayObject.width);
+				model.onRequestNodeLayoutRefresh.update();
+			}
+
+			if (model.resolvedModel.height.value === 'auto') {
+				model.renderState.sizeY.update(this.displayObject.height);
+				model.onRequestNodeLayoutRefresh.update();
+			}
 		}, this.token);
 
 		model.renderState.renderCharCount.listenAndRepeat((v) => {
