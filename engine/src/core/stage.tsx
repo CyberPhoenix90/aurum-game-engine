@@ -4,6 +4,7 @@ import { Clock } from '../game_features/time/clock';
 import { SceneGraphNode, DataSourceSceneGraphNode, ArrayDataSourceSceneGraphNode } from '../models/scene_graph';
 import { AbstractRenderPlugin } from '../rendering/abstract_render_plugin';
 import { _ } from '../utilities/other/streamline';
+import { activeCameras } from './active_cameras';
 
 export let engineRootTime: DataSource<number> = new DataSource(0);
 
@@ -49,6 +50,7 @@ const StageComponent = Webcomponent(
 		return (
 			<div
 				onAttach={(stageNode) => {
+					activeCameras.appendArray(cameras);
 					props.renderPlugin.addStage(stageId, stageNode);
 					attachNodes(props.renderPlugin, props.nodes);
 					let lastBefore = clock.timestamp;

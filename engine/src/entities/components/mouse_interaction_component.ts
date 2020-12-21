@@ -1,4 +1,4 @@
-import { EventEmitter } from 'aurumjs';
+import { ArrayDataSource, EventEmitter } from 'aurumjs';
 import { AurumMouse, MouseButtons } from '../../input/mouse/mouse';
 import { collisionCalculator } from '../../math/shapes/collision_calculator';
 import { Point } from '../../math/shapes/point';
@@ -7,10 +7,11 @@ import { CommonEntity } from '../../models/entities';
 import { SceneGraphNode } from '../../models/scene_graph';
 import { AbstractComponent } from './abstract_component';
 import { CameraGraphNode } from '../types/camera/api';
+import { activeCameras } from '../../core/active_cameras';
 
 export interface MouseInteractionConfig {
 	mouse: AurumMouse;
-	cameras: CameraGraphNode[];
+	cameras?: CameraGraphNode[] | ArrayDataSource<CameraGraphNode>;
 	onClick?(e: { e: MouseEvent; source: SceneGraphNode<CommonEntity> }): void;
 	onMouseDown?(e: { e: MouseEvent; source: SceneGraphNode<CommonEntity> }): void;
 	onMouseUp?(e: { e: MouseEvent; source: SceneGraphNode<CommonEntity> }): void;
@@ -34,6 +35,7 @@ export class MouseInteractionComponent extends AbstractComponent {
 	constructor(config: MouseInteractionConfig) {
 		super();
 		this.config = config;
+		this.config.cameras = this.config.cameras ?? activeCameras;
 		this.isMouseOver = false;
 
 		this.onClick = new EventEmitter<{ e: MouseEvent; source: SceneGraphNode<CommonEntity> }>();
@@ -82,7 +84,7 @@ export class MouseInteractionComponent extends AbstractComponent {
 				return;
 			}
 			if (this.onScroll.hasSubscriptions() && entity.renderState.visible.value && !entity.cancellationToken.isCanceled) {
-				for (const camera of this.config.cameras) {
+				for (const camera of this.config.cameras instanceof ArrayDataSource ? this.config.cameras.getData() : this.config.cameras) {
 					if (collisionCalculator.isOverlapping(new Point(camera.projectMouseCoordinates(e)), boundingBox)) {
 						this.onScroll.fire({ e, source: entity });
 					}
@@ -114,7 +116,7 @@ export class MouseInteractionComponent extends AbstractComponent {
 				return;
 			}
 			if (this.onMouseDown.hasSubscriptions() && entity.renderState.visible.value && !entity.cancellationToken.isCanceled) {
-				for (const camera of this.config.cameras) {
+				for (const camera of this.config.cameras instanceof ArrayDataSource ? this.config.cameras.getData() : this.config.cameras) {
 					if (collisionCalculator.isOverlapping(new Point(camera.projectMouseCoordinates(e)), boundingBox)) {
 						this.onMouseDown.fire({ e: e, source: entity });
 					}
@@ -129,7 +131,7 @@ export class MouseInteractionComponent extends AbstractComponent {
 				return;
 			}
 			if (this.onMouseUp.hasSubscriptions() && entity.renderState.visible.value && !entity.cancellationToken.isCanceled) {
-				for (const camera of this.config.cameras) {
+				for (const camera of this.config.cameras instanceof ArrayDataSource ? this.config.cameras.getData() : this.config.cameras) {
 					if (collisionCalculator.isOverlapping(new Point(camera.projectMouseCoordinates(e)), boundingBox)) {
 						this.onMouseUp.fire({ e: e, source: entity });
 					}
@@ -147,7 +149,7 @@ export class MouseInteractionComponent extends AbstractComponent {
 
 	private checkMouseEnterOrLeave(e: MouseEvent, entity: SceneGraphNode<CommonEntity>, boundinBox: Rectangle): void {
 		let isOnTop: boolean;
-		for (const camera of this.config.cameras) {
+		for (const camera of this.config.cameras instanceof ArrayDataSource ? this.config.cameras.getData() : this.config.cameras) {
 			if (entity.renderState.visible.value && collisionCalculator.isOverlapping(new Point(camera.projectMouseCoordinates(e)), boundinBox)) {
 				isOnTop = true;
 			}

@@ -50,13 +50,12 @@ export class CameraGraphNode extends SceneGraphNode<CameraEntity> {
 
 	public projectPoint(point: PointLike): PointLike {
 		const rect = this.renderState.view.getBoundingClientRect();
+		const resX = this.getModelValueWithFallback('resolutionX') || this.renderState.sizeX.value;
+		const resY = this.getModelValueWithFallback('resolutionY') || this.renderState.sizeY.value;
+
 		return {
-			x:
-				((point.x - rect.left + this.renderState.positionX.value) * this.renderState.sizeX.value) /
-				(this.getModelValueWithFallback('resolutionX') || this.renderState.sizeX.value),
-			y:
-				((point.y - rect.top + this.renderState.positionY.value) * this.renderState.sizeY.value) /
-				(this.getModelValueWithFallback('resolutionY') || this.renderState.sizeY.value)
+			x: ((point.x - rect.left + this.renderState.positionX.value) * resX) / this.renderState.sizeX.value,
+			y: ((point.y - rect.top + this.renderState.positionY.value) * resY) / this.renderState.sizeY.value
 		};
 	}
 }
