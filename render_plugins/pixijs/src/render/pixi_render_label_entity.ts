@@ -30,19 +30,12 @@ export class RenderLabelEntity extends NoRenderEntity {
 
 		model.renderState.text.listenAndRepeat((v) => {
 			updateText.call(this, v.substring(0, model.renderState.renderCharCount.value));
-			if (model.resolvedModel.width.value === 'auto') {
-				model.renderState.sizeX.update(this.displayObject.width);
-				model.onRequestNodeLayoutRefresh.update();
-			}
-
-			if (model.resolvedModel.height.value === 'auto') {
-				model.renderState.sizeY.update(this.displayObject.height);
-				model.onRequestNodeLayoutRefresh.update();
-			}
+			this.updateSize(model);
 		}, this.token);
 
 		model.renderState.renderCharCount.listenAndRepeat((v) => {
 			updateText.call(this, model.renderState.text.value.substring(0, v));
+			this.updateSize(model);
 		}, this.token);
 
 		model.renderState.color.listenAndRepeat((v) => {
@@ -51,18 +44,22 @@ export class RenderLabelEntity extends NoRenderEntity {
 
 		model.renderState.fontSize.listenAndRepeat((v) => {
 			this.displayObject.style.fontSize = v === undefined ? 16 : v;
+			this.updateSize(model);
 		}, this.token);
 
 		model.renderState.fontFamily.listenAndRepeat((v) => {
 			this.displayObject.style.fontFamily = v === undefined ? 'Arial' : v;
+			this.updateSize(model);
 		}, this.token);
 
 		model.renderState.fontWeight.listenAndRepeat((v) => {
 			this.displayObject.style.fontWeight = v ? v : '';
+			this.updateSize(model);
 		}, this.token);
 
 		model.renderState.fontStyle.listenAndRepeat((v) => {
 			this.displayObject.style.fontStyle = v ? v : '';
+			this.updateSize(model);
 		}, this.token);
 
 		model.renderState.dropShadow.listenAndRepeat((v) => {
@@ -95,6 +92,7 @@ export class RenderLabelEntity extends NoRenderEntity {
 
 		model.renderState.strokeThickness.listenAndRepeat((v) => {
 			this.displayObject.style.strokeThickness = v === undefined ? 1 : v;
+			this.updateSize(model);
 		}, this.token);
 
 		function updateText(text: string): void {
@@ -102,5 +100,17 @@ export class RenderLabelEntity extends NoRenderEntity {
 		}
 
 		super.bind(model);
+	}
+
+	private updateSize(model: LabelGraphNode) {
+		if (model.resolvedModel.width.value === 'auto') {
+			model.renderState.sizeX.update(this.displayObject.width);
+			model.onRequestNodeLayoutRefresh.update();
+		}
+
+		if (model.resolvedModel.height.value === 'auto') {
+			model.renderState.sizeY.update(this.displayObject.height);
+			model.onRequestNodeLayoutRefresh.update();
+		}
 	}
 }

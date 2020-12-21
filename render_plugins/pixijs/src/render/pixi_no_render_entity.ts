@@ -82,26 +82,30 @@ export class NoRenderEntity {
 
 		if (Object.getPrototypeOf(this.displayObject).constructor !== Container) {
 			model.renderState.sizeX.listenAndRepeat((v) => {
-				if (v !== undefined) {
+				if (v !== undefined && model.resolvedModel.width.value !== 'auto') {
 					this.displayObject.width = v * model.renderState.scaleX.value;
 				}
 			}, this.token);
 
 			model.renderState.sizeY.listenAndRepeat((v) => {
-				if (v !== undefined) {
+				if (v !== undefined && model.resolvedModel.height.value !== 'auto') {
 					this.displayObject.height = v * model.renderState.scaleY.value;
 				}
 			}, this.token);
 
 			model.renderState.scaleX.listenAndRepeat((v) => {
-				if (model.renderState.sizeX.value !== undefined) {
+				if (model.renderState.sizeX.value !== undefined && model.resolvedModel.width.value !== 'auto') {
 					this.displayObject.width = model.renderState.sizeX.value * v;
+				} else {
+					this.displayObject.scale.x = v;
 				}
 			}, this.token);
 
 			model.renderState.scaleY.listenAndRepeat((v) => {
-				if (model.renderState.sizeY.value !== undefined) {
+				if (model.renderState.sizeY.value !== undefined && model.resolvedModel.height.value !== 'auto') {
 					this.displayObject.height = model.renderState.sizeY.value * v;
+				} else {
+					this.displayObject.scale.y = v;
 				}
 			}, this.token);
 		}
