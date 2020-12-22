@@ -120,7 +120,7 @@ export function Panel(props: PanelProps, children: Renderable[], api: AurumCompo
 				}}
 			>
 				<Canvas width={0} height={0} name="PanelBackground" paintOperations={drawing}></Canvas>
-				<Container spreadLayout={true} name="PanelContent" x={marginLeft} y={marginTop} {...props}>
+				<Container name="PanelContent" x={marginLeft} y={marginTop} {...props}>
 					{children}
 				</Container>
 			</Container>
