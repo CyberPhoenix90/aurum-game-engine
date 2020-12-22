@@ -24,10 +24,6 @@ export interface CommonEntityProps {
 	zIndex?: Data<number>;
 	shaders?: Shader[] | ArrayDataSource<Shader>;
 	blendMode?: Data<BlendModes>;
-	marginTop?: Data<number>;
-	marginRight?: Data<number>;
-	marginBottom?: Data<number>;
-	marginLeft?: Data<number>;
 	width?: Data<Position | 'content' | 'inherit' | 'remainder'>;
 	height?: Data<Position | 'content' | 'inherit' | 'remainder'>;
 	scaleX?: Data<number>;
@@ -49,10 +45,6 @@ export interface CommonEntity {
 	originX?: DataSource<number>;
 	originY?: DataSource<number>;
 	clip?: DataSource<boolean>;
-	marginTop?: DataSource<number>;
-	marginRight?: DataSource<number>;
-	marginBottom?: DataSource<number>;
-	marginLeft?: DataSource<number>;
 	layout?: DataSource<AbstractLayout>;
 	ignoreLayout?: DataSource<boolean>;
 	spreadLayout?: DataSource<boolean>;

@@ -81,29 +81,29 @@ export class NoRenderEntity {
 		}, this.token);
 
 		if (Object.getPrototypeOf(this.displayObject).constructor !== Container) {
-			model.renderState.sizeX.listenAndRepeat((v) => {
+			model.renderState.width.listenAndRepeat((v) => {
 				if (v !== undefined && model.resolvedModel.width.value !== 'auto') {
 					this.displayObject.width = v * model.renderState.scaleX.value;
 				}
 			}, this.token);
 
-			model.renderState.sizeY.listenAndRepeat((v) => {
+			model.renderState.height.listenAndRepeat((v) => {
 				if (v !== undefined && model.resolvedModel.height.value !== 'auto') {
 					this.displayObject.height = v * model.renderState.scaleY.value;
 				}
 			}, this.token);
 
 			model.renderState.scaleX.listenAndRepeat((v) => {
-				if (model.renderState.sizeX.value !== undefined && model.resolvedModel.width.value !== 'auto') {
-					this.displayObject.width = model.renderState.sizeX.value * v;
+				if (model.renderState.width.value !== undefined && model.resolvedModel.width.value !== 'auto') {
+					this.displayObject.width = model.renderState.width.value * v;
 				} else {
 					this.displayObject.scale.x = v;
 				}
 			}, this.token);
 
 			model.renderState.scaleY.listenAndRepeat((v) => {
-				if (model.renderState.sizeY.value !== undefined && model.resolvedModel.height.value !== 'auto') {
-					this.displayObject.height = model.renderState.sizeY.value * v;
+				if (model.renderState.height.value !== undefined && model.resolvedModel.height.value !== 'auto') {
+					this.displayObject.height = model.renderState.height.value * v;
 				} else {
 					this.displayObject.scale.y = v;
 				}
@@ -115,7 +115,7 @@ export class NoRenderEntity {
 				const mask = new PIXI.Graphics();
 				mask.lineStyle(5, 0xff0000);
 				mask.beginFill(0x880000);
-				mask.drawRect(0, 0, model.renderState.sizeX.value, model.renderState.sizeY.value);
+				mask.drawRect(0, 0, model.renderState.width.value, model.renderState.height.value);
 				mask.endFill();
 
 				this.displayObject.mask = mask;

@@ -46,10 +46,10 @@ export class SpaceAroundLayout extends AbstractLayout {
 			}
 		}
 
-		const space = (this.config.layoutDirection === DIRECTION2.HORIZONTAL ? parent.renderState.sizeX.value : parent.renderState.sizeY.value) ?? 0;
+		const space = (this.config.layoutDirection === DIRECTION2.HORIZONTAL ? parent.renderState.width.value : parent.renderState.height.value) ?? 0;
 		let size = 0;
 		for (let i = 0; i < entities.length; i++) {
-			size += (this.config.layoutDirection === DIRECTION2.HORIZONTAL ? entities[i].renderState.sizeX.value : entities[i].renderState.sizeY.value) ?? 0;
+			size += (this.config.layoutDirection === DIRECTION2.HORIZONTAL ? entities[i].renderState.width.value : entities[i].renderState.height.value) ?? 0;
 		}
 		let totalMargin = space - size;
 		let finalMargin = 0;
@@ -59,10 +59,10 @@ export class SpaceAroundLayout extends AbstractLayout {
 			for (let i = 0; i < entities.length; i++) {
 				if (this.config.layoutDirection === DIRECTION2.HORIZONTAL) {
 					entities[i].models.userSpecified.x.update((i + 1) * finalMargin + offset);
-					offset += entities[i].renderState.sizeX.value ?? 0;
+					offset += entities[i].renderState.width.value ?? 0;
 				} else {
 					entities[i].models.userSpecified.y.update((i + 1) * finalMargin + offset);
-					offset += entities[i].renderState.sizeY.value ?? 0;
+					offset += entities[i].renderState.height.value ?? 0;
 				}
 			}
 		} else {
@@ -70,10 +70,10 @@ export class SpaceAroundLayout extends AbstractLayout {
 			for (let i = 0; i < entities.length; i++) {
 				if (this.config.layoutDirection === DIRECTION2.HORIZONTAL) {
 					entities[i].models.userSpecified.x.update(i * finalMargin + offset);
-					offset += entities[i].renderState.sizeX.value ?? 0;
+					offset += entities[i].renderState.width.value ?? 0;
 				} else {
 					entities[i].models.userSpecified.y.update(i * finalMargin + offset);
-					offset += entities[i].renderState.sizeY.value ?? 0;
+					offset += entities[i].renderState.height.value ?? 0;
 				}
 			}
 		}

@@ -33,7 +33,7 @@ export class LabelGraphNode extends SceneGraphNode<LabelEntity> {
 	}
 
 	protected createRenderModel(): LabelEntityRenderModel {
-		const { x, y, sizeX, sizeY } = layoutAlgorithm(this);
+		const { x, y, width, height } = layoutAlgorithm(this);
 		return {
 			alpha: this.resolvedModel.alpha,
 			rotation: this.resolvedModel.rotation,
@@ -41,8 +41,8 @@ export class LabelGraphNode extends SceneGraphNode<LabelEntity> {
 			renderableType: RenderableType.LABEL,
 			positionX: x,
 			positionY: y,
-			sizeX: sizeX,
-			sizeY: sizeY,
+			width: width,
+			height: height,
 			scaleX: this.resolvedModel.scaleX,
 			scaleY: this.resolvedModel.scaleY,
 			visible: this.resolvedModel.visible,

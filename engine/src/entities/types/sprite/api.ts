@@ -24,7 +24,7 @@ export class SpriteGraphNode extends SceneGraphNode<SpriteEntity> {
 	}
 
 	protected createRenderModel(): SpriteEntityRenderModel {
-		const { x, y, sizeX, sizeY } = layoutAlgorithm(this);
+		const { x, y, width, height } = layoutAlgorithm(this);
 		return {
 			alpha: this.resolvedModel.alpha,
 			rotation: this.resolvedModel.rotation,
@@ -32,8 +32,8 @@ export class SpriteGraphNode extends SceneGraphNode<SpriteEntity> {
 			renderableType: RenderableType.SPRITE,
 			positionX: x,
 			positionY: y,
-			sizeX: sizeX,
-			sizeY: sizeY,
+			width: width,
+			height: height,
 			scaleX: this.resolvedModel.scaleX,
 			scaleY: this.resolvedModel.scaleY,
 			visible: this.resolvedModel.visible,

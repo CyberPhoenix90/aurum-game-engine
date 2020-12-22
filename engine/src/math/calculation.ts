@@ -6,7 +6,7 @@ export enum Operators {
 }
 
 export class Calculation {
-	public operands: Array<Unit | 'inherit' | 'remainder'>;
+	public operands: Array<Unit | 'inherit' | 'remainder' | 'content'>;
 	public operators: Operators[];
 
 	constructor(value: string) {
@@ -34,7 +34,7 @@ export class Calculation {
 				}
 
 				op = op.trim();
-				if (op === 'inherit' || op === 'remainder') {
+				if (op === 'inherit' || op === 'remainder' || op === 'content') {
 					this.operands.push(op);
 				} else {
 					this.operands.push(new Unit(op));
@@ -46,10 +46,16 @@ export class Calculation {
 		}
 	}
 
-	public toPixels(dpi: number, parentSize: number, distanceToEdge: number): number {
+	public toPixels(dpi: number, parentSize: number, distanceToEdge: number, computeContentSize?: () => number): number {
 		return this.operands
 			.map((p) => {
 				switch (p) {
+					case 'content':
+						if (computeContentSize) {
+							return computeContentSize();
+						} else {
+							throw new Error('content in calculation is not supported in this context');
+						}
 					case 'inherit':
 						return parentSize;
 					case 'remainder':

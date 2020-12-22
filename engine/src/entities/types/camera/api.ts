@@ -20,7 +20,7 @@ export class CameraGraphNode extends SceneGraphNode<CameraEntity> {
 	}
 
 	protected createRenderModel(): CameraEntityRenderModel {
-		const { x, y, sizeX, sizeY } = layoutAlgorithm(this);
+		const { x, y, width, height } = layoutAlgorithm(this);
 		return {
 			view: undefined,
 			alpha: this.resolvedModel.alpha,
@@ -29,8 +29,8 @@ export class CameraGraphNode extends SceneGraphNode<CameraEntity> {
 			renderableType: RenderableType.CAMERA,
 			positionX: x,
 			positionY: y,
-			sizeX: sizeX,
-			sizeY: sizeY,
+			width: width,
+			height: height,
 			scaleX: this.resolvedModel.scaleX,
 			scaleY: this.resolvedModel.scaleY,
 			visible: this.resolvedModel.visible,
@@ -50,12 +50,12 @@ export class CameraGraphNode extends SceneGraphNode<CameraEntity> {
 
 	public projectPoint(point: PointLike): PointLike {
 		const rect = this.renderState.view.getBoundingClientRect();
-		const resX = this.getModelValueWithFallback('resolutionX') || this.renderState.sizeX.value;
-		const resY = this.getModelValueWithFallback('resolutionY') || this.renderState.sizeY.value;
+		const resX = this.getModelValueWithFallback('resolutionX') || this.renderState.width.value;
+		const resY = this.getModelValueWithFallback('resolutionY') || this.renderState.height.value;
 
 		return {
-			x: ((point.x - rect.left + this.renderState.positionX.value) * resX) / this.renderState.sizeX.value,
-			y: ((point.y - rect.top + this.renderState.positionY.value) * resY) / this.renderState.sizeY.value
+			x: ((point.x - rect.left + this.renderState.positionX.value) * resX) / this.renderState.width.value,
+			y: ((point.y - rect.top + this.renderState.positionY.value) * resY) / this.renderState.height.value
 		};
 	}
 }

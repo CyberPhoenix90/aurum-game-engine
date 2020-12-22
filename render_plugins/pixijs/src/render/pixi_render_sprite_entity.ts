@@ -109,11 +109,11 @@ export class RenderSpriteEntity extends NoRenderEntity {
 		if (renderState.drawOffsetY.value !== undefined) {
 			result.frame.y = renderState.drawOffsetY.value;
 		}
-		if (this.displayObject && (renderState.sizeX.value === undefined || model.resolvedModel.width.value === 'auto')) {
+		if (this.displayObject && (renderState.width.value === undefined || model.resolvedModel.width.value === 'auto')) {
 			this.displayObject.width = bt.width * renderState.scaleX.value;
 		}
 
-		if (this.displayObject && (renderState.sizeY.value === undefined || model.resolvedModel.height.value === 'auto')) {
+		if (this.displayObject && (renderState.height.value === undefined || model.resolvedModel.height.value === 'auto')) {
 			this.displayObject.height = bt.height * renderState.scaleY.value;
 		}
 
@@ -125,22 +125,22 @@ export class RenderSpriteEntity extends NoRenderEntity {
 		model.resolvedModel.width.listenAndRepeat((v) => {
 			if (v === 'auto') {
 				this.displayObject.width = this.displayObject.texture.baseTexture.realWidth;
-				model.renderState.sizeX.update(this.displayObject.texture.baseTexture.realWidth);
+				model.renderState.width.update(this.displayObject.texture.baseTexture.realWidth);
 			}
 		});
 
 		model.resolvedModel.height.listenAndRepeat((v) => {
 			if (v === 'auto') {
 				this.displayObject.height = this.displayObject.texture.baseTexture.realHeight;
-				model.renderState.sizeY.update(this.displayObject.texture.baseTexture.realHeight);
+				model.renderState.height.update(this.displayObject.texture.baseTexture.realHeight);
 			}
 		});
 
-		if (model.renderState.sizeX.value === undefined) {
+		if (model.renderState.width.value === undefined) {
 			this.displayObject.width = this.displayObject.width * model.renderState.scaleX.value;
 		}
 
-		if (model.renderState.sizeY.value === undefined) {
+		if (model.renderState.height.value === undefined) {
 			this.displayObject.height = this.displayObject.height * model.renderState.scaleY.value;
 		}
 

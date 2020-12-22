@@ -11,8 +11,8 @@ export class RenderCameraEntity extends NoRenderEntity {
 		this.model = model;
 		const view: HTMLCanvasElement = document.createElement('canvas');
 		model.renderState.view = view;
-		view.width = model.resolvedModel.resolutionX.value ?? model.renderState.sizeX.value;
-		view.height = model.resolvedModel.resolutionY.value ?? model.renderState.sizeY.value;
+		view.width = model.resolvedModel.resolutionX.value ?? model.renderState.width.value;
+		view.height = model.resolvedModel.resolutionY.value ?? model.renderState.height.value;
 		stageNode.appendChild(view);
 
 		this.renderer = autoDetectRenderer({
@@ -23,18 +23,18 @@ export class RenderCameraEntity extends NoRenderEntity {
 		this.view = view;
 
 		const { resolutionX, resolutionY } = model.resolvedModel;
-		resolutionX.aggregate([resolutionY, model.renderState.sizeX, model.renderState.sizeY], (resolutionX, resolutionY, sizeX, sizeY) => {
-			const effectiveSizeX = resolutionX ?? sizeX;
-			const effectiveSizeY = resolutionY ?? sizeY;
+		resolutionX.aggregate([resolutionY, model.renderState.width, model.renderState.height], (resolutionX, resolutionY, width, height) => {
+			const effectivewidth = resolutionX ?? width;
+			const effectiveheight = resolutionY ?? height;
 
-			if (this.renderer.view.width !== effectiveSizeX || this.renderer.view.height !== effectiveSizeY) {
-				this.renderer.resize(effectiveSizeX, effectiveSizeY);
+			if (this.renderer.view.width !== effectivewidth || this.renderer.view.height !== effectiveheight) {
+				this.renderer.resize(effectivewidth, effectiveheight);
 			}
-			this.renderer.view.style.width = `${sizeX}px`;
-			this.renderer.view.style.height = `${sizeY}px`;
+			this.renderer.view.style.width = `${width}px`;
+			this.renderer.view.style.height = `${height}px`;
 		});
-		this.renderer.view.style.width = `${model.renderState.sizeX.value}px`;
-		this.renderer.view.style.height = `${model.renderState.sizeY.value}px`;
+		this.renderer.view.style.width = `${model.renderState.width.value}px`;
+		this.renderer.view.style.height = `${model.renderState.height.value}px`;
 	}
 
 	public renderView(node: DisplayObject) {

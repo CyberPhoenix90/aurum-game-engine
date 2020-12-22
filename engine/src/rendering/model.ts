@@ -5,8 +5,8 @@ export interface EntityRenderModel {
 	renderableType: RenderableType;
 	positionX: ReadOnlyDataSource<number>;
 	positionY: ReadOnlyDataSource<number>;
-	sizeX: DataSource<number>;
-	sizeY: DataSource<number>;
+	width: DataSource<number>;
+	height: DataSource<number>;
 	scaleX: DataSource<number>;
 	scaleY: DataSource<number>;
 	zIndex: ReadOnlyDataSource<number>;

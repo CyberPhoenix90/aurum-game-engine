@@ -45,12 +45,12 @@ export class StackLayout extends AbstractLayout {
 			entities[i].models.userSpecified.x.update(offset.x);
 			entities[i].models.userSpecified.y.update(offset.y);
 
-			const sizeX = entities[i].renderState.sizeX.value;
-			const sizeY = entities[i].renderState.sizeY.value;
+			const width = entities[i].renderState.width.value;
+			const height = entities[i].renderState.height.value;
 
 			switch (this.config.stackDirection) {
 				case DIRECTION4.RIGHT:
-					offset.x += sizeX;
+					offset.x += width;
 					if (this.config.gutter) {
 						offset.x += this.config.gutter.x;
 					}
@@ -58,7 +58,7 @@ export class StackLayout extends AbstractLayout {
 				case DIRECTION4.LEFT:
 					throw new Error('not implemented');
 				case DIRECTION4.DOWN:
-					offset.y += sizeY;
+					offset.y += height;
 					if (this.config.gutter) {
 						offset.y += this.config.gutter.y;
 					}

@@ -27,7 +27,7 @@ export class TiledMapGraphNode extends SceneGraphNode<TiledMapEntity> {
 	}
 
 	protected createRenderModel(): TiledMapRenderModel {
-		const { x, y, sizeX, sizeY } = layoutAlgorithm(this);
+		const { x, y, width, height } = layoutAlgorithm(this);
 		return {
 			alpha: this.resolvedModel.alpha,
 			rotation: this.resolvedModel.rotation,
@@ -35,8 +35,8 @@ export class TiledMapGraphNode extends SceneGraphNode<TiledMapEntity> {
 			renderableType: RenderableType.TILE_MAP,
 			positionX: x,
 			positionY: y,
-			sizeX: sizeX,
-			sizeY: sizeY,
+			width: width,
+			height: height,
 			scaleX: this.resolvedModel.scaleX,
 			scaleY: this.resolvedModel.scaleY,
 			visible: this.resolvedModel.visible,

@@ -31,10 +31,10 @@ export class RenderCanvasEntity extends NoRenderEntity {
 		}
 
 		if (this.model.resolvedModel.width.value === 'auto') {
-			this.model.renderState.sizeX.update(this.displayObject.width);
+			this.model.renderState.width.update(this.displayObject.width);
 		}
 		if (this.model.resolvedModel.height.value === 'auto') {
-			this.model.renderState.sizeY.update(this.displayObject.height);
+			this.model.renderState.height.update(this.displayObject.height);
 		}
 	}
 

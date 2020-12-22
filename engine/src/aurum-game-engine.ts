@@ -103,3 +103,5 @@ export * from './game_features/tile_maps/tiled/tileset';
 export * from './game_features/tile_maps/tiled/entity/api';
 export * from './game_features/tile_maps/tiled/entity/model';
 export * from './game_features/tile_maps/tiled/entity/tiled_map_entity';
+
+export * from './ui/panel';

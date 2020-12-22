@@ -17,7 +17,7 @@ export class CanvasGraphNode extends SceneGraphNode<CanvasEntity> {
 	}
 
 	protected createRenderModel(): CanvasEntityRenderModel {
-		const { x, y, sizeX, sizeY } = layoutAlgorithm(this);
+		const { x, y, width, height } = layoutAlgorithm(this);
 		return {
 			alpha: this.resolvedModel.alpha,
 			rotation: this.resolvedModel.rotation,
@@ -25,8 +25,8 @@ export class CanvasGraphNode extends SceneGraphNode<CanvasEntity> {
 			renderableType: RenderableType.CANVAS,
 			positionX: x,
 			positionY: y,
-			sizeX: sizeX,
-			sizeY: sizeY,
+			width: width,
+			height: height,
 			scaleX: this.resolvedModel.scaleX,
 			scaleY: this.resolvedModel.scaleY,
 			visible: this.resolvedModel.visible,

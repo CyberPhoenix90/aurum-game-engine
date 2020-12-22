@@ -18,7 +18,7 @@ export interface MouseInteractionConfig {
 	onMouseMove?(e: { e: MouseEvent; source: SceneGraphNode<CommonEntity> }): void;
 	onMouseEnter?(e: { e: MouseEvent; source: SceneGraphNode<CommonEntity> }): void;
 	onMouseLeave?(e: { e: MouseEvent; source: SceneGraphNode<CommonEntity> }): void;
-	onScroll?(e: { e: MouseWheelEvent; source: SceneGraphNode<CommonEntity> }): void;
+	onScroll?(e: { e: WheelEvent; source: SceneGraphNode<CommonEntity> }): void;
 }
 
 export class MouseInteractionComponent extends AbstractComponent {
@@ -148,14 +148,14 @@ export class MouseInteractionComponent extends AbstractComponent {
 	private makeBoundingBox(node: SceneGraphNode<CommonEntity>) {
 		return new Rectangle(
 			{ x: node.getAbsolutePositionX(), y: node.getAbsolutePositionY() },
-			{ x: node.renderState.sizeX.value, y: node.renderState.sizeY.value }
+			{ x: node.renderState.width.value, y: node.renderState.height.value }
 		);
 	}
 
-	private checkMouseEnterOrLeave(e: MouseEvent, entity: SceneGraphNode<CommonEntity>, boundinBox: Rectangle): void {
+	private checkMouseEnterOrLeave(e: MouseEvent, entity: SceneGraphNode<CommonEntity>, boundingBox: Rectangle): void {
 		let isOnTop: boolean;
 		for (const camera of this.config.cameras instanceof ArrayDataSource ? this.config.cameras.getData() : this.config.cameras) {
-			if (entity.renderState.visible.value && collisionCalculator.isOverlapping(new Point(camera.projectMouseCoordinates(e)), boundinBox)) {
+			if (entity.renderState.visible.value && collisionCalculator.isOverlapping(new Point(camera.projectMouseCoordinates(e)), boundingBox)) {
 				isOnTop = true;
 			}
 			if (isOnTop) {
