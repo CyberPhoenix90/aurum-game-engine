@@ -62,13 +62,13 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		this.processedChildren = this.children.map(this.processChild);
 		this.resolvedModel = this.createResolvedModel();
 		this.renderState = this.createRenderModel();
-		this.renderState.positionX.transform(dsUnique()).listen(() => {
+		this.renderState.x.transform(dsUnique()).listen(() => {
 			if (this.parent.value && this.parent.value.resolvedModel.width.value === 'content') {
 				this.parent.value.refreshNodeLayout();
 			}
 		});
 
-		this.renderState.positionY.transform(dsUnique()).listen(() => {
+		this.renderState.y.transform(dsUnique()).listen(() => {
 			if (this.parent.value && this.parent.value.resolvedModel.height.value === 'content') {
 				this.parent.value.refreshNodeLayout();
 			}
@@ -331,20 +331,20 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 	}
 
 	public getAbsolutePositionX(): number {
-		let x = this.renderState.positionX.value;
+		let x = this.renderState.x.value;
 		let ptr = this.parent.value;
 		while (ptr) {
-			x += ptr.renderState.positionX.value;
+			x += ptr.renderState.x.value;
 			ptr = ptr.parent.value;
 		}
 		return x;
 	}
 
 	public getAbsolutePositionY(): number {
-		let y = this.renderState.positionY.value;
+		let y = this.renderState.y.value;
 		let ptr = this.parent.value;
 		while (ptr) {
-			y += ptr.renderState.positionY.value;
+			y += ptr.renderState.y.value;
 			ptr = ptr.parent.value;
 		}
 		return y;
@@ -397,8 +397,8 @@ export class ContainerGraphNode extends SceneGraphNode<ContainerEntity> {
 			alpha: this.resolvedModel.alpha,
 			clip: this.resolvedModel.clip,
 			renderableType: RenderableType.NO_RENDER,
-			positionX: x,
-			positionY: y,
+			x: x,
+			y: y,
 			width: width,
 			height: height,
 			scaleX: this.resolvedModel.scaleX,

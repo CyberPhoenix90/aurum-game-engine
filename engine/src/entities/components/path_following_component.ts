@@ -17,10 +17,10 @@ export class PathFollowingComponent extends AbstractMovementComponent {
 	 */
 	public predictPosition(inMs: number, granularity: number = 33): PointLike {
 		if (this.pause) {
-			return { x: this.entity.renderState.positionX.value, y: this.entity.renderState.positionY.value };
+			return { x: this.entity.renderState.x.value, y: this.entity.renderState.y.value };
 		} else {
-			const positionX = new DataSource(this.entity.renderState.positionX.value);
-			const positionY = new DataSource(this.entity.renderState.positionY.value);
+			const positionX = new DataSource(this.entity.renderState.x.value);
+			const positionY = new DataSource(this.entity.renderState.y.value);
 			while (inMs > 0) {
 				const chunk = Math.min(inMs, granularity);
 				if (this.config.euclideanMovement) {

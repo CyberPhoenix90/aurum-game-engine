@@ -18,22 +18,22 @@ export class BoundsComponent extends AbstractComponent {
 	}
 
 	public onAttach(entity: SceneGraphNode<CommonEntity>) {
-		entity.renderState.positionX.listen(() => {
+		entity.renderState.x.listen(() => {
 			const { bounds } = this.config;
-			if (entity.renderState.positionX.value < bounds.x) {
+			if (entity.renderState.x.value < bounds.x) {
 				this.config.onOutOfBounds(SIDE.LEFT, entity);
 			}
-			if (entity.renderState.positionX.value > bounds.x + bounds.width) {
+			if (entity.renderState.x.value > bounds.x + bounds.width) {
 				this.config.onOutOfBounds(SIDE.RIGHT, entity);
 			}
 		});
 
-		entity.renderState.positionY.listen(() => {
+		entity.renderState.y.listen(() => {
 			const { bounds } = this.config;
-			if (entity.renderState.positionY.value < bounds.y) {
+			if (entity.renderState.y.value < bounds.y) {
 				this.config.onOutOfBounds(SIDE.TOP, entity);
 			}
-			if (entity.renderState.positionY.value > bounds.y + bounds.height) {
+			if (entity.renderState.y.value > bounds.y + bounds.height) {
 				this.config.onOutOfBounds(SIDE.BOTTOM, entity);
 			}
 		});

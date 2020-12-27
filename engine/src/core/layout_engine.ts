@@ -137,13 +137,13 @@ function computeContentSize(children: readonly SceneGraphNode<CommonEntity>[], c
 			if (c.isWidthRelative()) {
 				return 0;
 			} else {
-				return c.renderState.positionX.value + (c.renderState.width.value ?? 0);
+				return c.renderState.x.value + (c.renderState.width.value ?? 0);
 			}
 		} else {
 			if (c.isHeightRelative()) {
 				return 0;
 			} else {
-				return c.renderState.positionY.value + (c.renderState.height.value ?? 0);
+				return c.renderState.y.value + (c.renderState.height.value ?? 0);
 			}
 		}
 	});

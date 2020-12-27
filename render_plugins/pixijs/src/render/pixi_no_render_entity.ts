@@ -62,7 +62,7 @@ export class NoRenderEntity {
 			}
 		}, this.token);
 
-		model.renderState.positionX.listenAndRepeat((v) => {
+		model.renderState.x.listenAndRepeat((v) => {
 			if (v !== undefined) {
 				if (this.displayObject.rotation !== 0) {
 					this.displayObject.pivot.x = this.displayObject.width / 2;
@@ -71,7 +71,7 @@ export class NoRenderEntity {
 			}
 		}, this.token);
 
-		model.renderState.positionY.listenAndRepeat((v) => {
+		model.renderState.y.listenAndRepeat((v) => {
 			if (v !== undefined) {
 				if (this.displayObject.rotation !== 0) {
 					this.displayObject.pivot.y = this.displayObject.height / 2;

@@ -3,8 +3,8 @@ import { RenderableType, BlendModes, Shader } from '../models/entities';
 
 export interface EntityRenderModel {
 	renderableType: RenderableType;
-	positionX: ReadOnlyDataSource<number>;
-	positionY: ReadOnlyDataSource<number>;
+	x: ReadOnlyDataSource<number>;
+	y: ReadOnlyDataSource<number>;
 	width: DataSource<number>;
 	height: DataSource<number>;
 	scaleX: DataSource<number>;

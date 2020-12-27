@@ -27,8 +27,8 @@ export class CameraGraphNode extends SceneGraphNode<CameraEntity> {
 			rotation: this.resolvedModel.rotation,
 			clip: this.resolvedModel.clip,
 			renderableType: RenderableType.CAMERA,
-			positionX: x,
-			positionY: y,
+			x: x,
+			y: y,
 			width: width,
 			height: height,
 			scaleX: this.resolvedModel.scaleX,
@@ -54,8 +54,8 @@ export class CameraGraphNode extends SceneGraphNode<CameraEntity> {
 		const resY = this.getModelValueWithFallback('resolutionY') || this.renderState.height.value;
 
 		return {
-			x: ((point.x - rect.left + this.renderState.positionX.value) * resX) / this.renderState.width.value,
-			y: ((point.y - rect.top + this.renderState.positionY.value) * resY) / this.renderState.height.value
+			x: ((point.x - rect.left + this.renderState.x.value) * resX) / this.renderState.width.value,
+			y: ((point.y - rect.top + this.renderState.y.value) * resY) / this.renderState.height.value
 		};
 	}
 }

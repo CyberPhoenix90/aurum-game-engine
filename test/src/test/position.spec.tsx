@@ -86,8 +86,8 @@ describe('position', () => {
 					y="50%"
 					onAttach={(c) => {
 						assert.deepEqual(c.getAbsolutePosition(), { x: 31, y: 20 });
-						assert.deepEqual(c.renderState.positionX.value, 25);
-						assert.deepEqual(c.renderState.positionY.value, 10);
+						assert.deepEqual(c.renderState.x.value, 25);
+						assert.deepEqual(c.renderState.y.value, 10);
 					}}
 				></Container>
 			</Container>
@@ -102,8 +102,8 @@ describe('position', () => {
 					y="(50% - 20px)"
 					onAttach={(c) => {
 						assert.deepEqual(c.getAbsolutePosition(), { x: 21, y: 0 });
-						assert.deepEqual(c.renderState.positionX.value, 15);
-						assert.deepEqual(c.renderState.positionY.value, -10);
+						assert.deepEqual(c.renderState.x.value, 15);
+						assert.deepEqual(c.renderState.y.value, -10);
 					}}
 				></Container>
 			</Container>
@@ -120,15 +120,15 @@ describe('position', () => {
 					y="50%"
 					onAttach={(c) => {
 						assert.deepEqual(c.getAbsolutePosition(), { x: 16, y: 15 });
-						assert.deepEqual(c.renderState.positionX.value, 10);
-						assert.deepEqual(c.renderState.positionY.value, 5);
+						assert.deepEqual(c.renderState.x.value, 10);
+						assert.deepEqual(c.renderState.y.value, 5);
 
 						w.update(50);
 						h.update(20);
 
 						assert.deepEqual(c.getAbsolutePosition(), { x: 31, y: 20 });
-						assert.deepEqual(c.renderState.positionX.value, 25);
-						assert.deepEqual(c.renderState.positionY.value, 10);
+						assert.deepEqual(c.renderState.x.value, 25);
+						assert.deepEqual(c.renderState.y.value, 10);
 					}}
 				></Container>
 			</Container>
@@ -143,8 +143,8 @@ describe('position', () => {
 					y="50%"
 					onAttach={(c) => {
 						assert.deepEqual(c.getAbsolutePosition(), { x: 6, y: 10 });
-						assert.deepEqual(c.renderState.positionX.value, 25);
-						assert.deepEqual(c.renderState.positionY.value, 10);
+						assert.deepEqual(c.renderState.x.value, 25);
+						assert.deepEqual(c.renderState.y.value, 10);
 					}}
 				></Container>
 			</Container>
