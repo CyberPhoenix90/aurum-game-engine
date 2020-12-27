@@ -1,5 +1,5 @@
 import { ArrayDataSource, EventEmitter } from 'aurumjs';
-import { AurumMouse, MouseButtons } from '../../input/mouse/mouse';
+import { aurumMouse, MouseButtons } from '../../input/mouse/mouse';
 import { collisionCalculator } from '../../math/shapes/collision_calculator';
 import { Point } from '../../math/shapes/point';
 import { Rectangle } from '../../math/shapes/rectangle';
@@ -10,7 +10,6 @@ import { CameraGraphNode } from '../types/camera/api';
 import { activeCameras } from '../../core/active_cameras';
 
 export interface MouseInteractionConfig {
-	mouse: AurumMouse;
 	cameras?: CameraGraphNode[] | ArrayDataSource<CameraGraphNode>;
 	onClick?(e: { e: MouseEvent; source: SceneGraphNode<CommonEntity> }): void;
 	onMouseDown?(e: { e: MouseEvent; source: SceneGraphNode<CommonEntity> }): void;
@@ -76,7 +75,7 @@ export class MouseInteractionComponent extends AbstractComponent {
 	}
 
 	public onAttach(entity: SceneGraphNode<CommonEntity>) {
-		this.config.mouse.listenMouseScroll().listen((e) => {
+		aurumMouse.listenMouseScroll().listen((e) => {
 			const boundingBox = this.makeBoundingBox(entity);
 
 			//@ts-ignore
@@ -92,7 +91,7 @@ export class MouseInteractionComponent extends AbstractComponent {
 			}
 		}, entity.cancellationToken);
 
-		this.config.mouse.listenMouseMove().listen((e) => {
+		aurumMouse.listenMouseMove().listen((e) => {
 			const boundingBox = this.makeBoundingBox(entity);
 			//@ts-ignore
 			if (e.propagationStopped) {
@@ -109,7 +108,7 @@ export class MouseInteractionComponent extends AbstractComponent {
 			}
 		}, entity.cancellationToken);
 
-		this.config.mouse.listenMouseDown(MouseButtons.LEFT).listen((e) => {
+		aurumMouse.listenMouseDown(MouseButtons.LEFT).listen((e) => {
 			const boundingBox = this.makeBoundingBox(entity);
 			//@ts-ignore
 			if (e.propagationStopped) {
@@ -124,7 +123,7 @@ export class MouseInteractionComponent extends AbstractComponent {
 			}
 		}, entity.cancellationToken);
 
-		this.config.mouse.listenMouseUp(MouseButtons.LEFT).listen((e) => {
+		aurumMouse.listenMouseUp(MouseButtons.LEFT).listen((e) => {
 			const boundingBox = this.makeBoundingBox(entity);
 			//@ts-ignore
 			if (e.propagationStopped) {

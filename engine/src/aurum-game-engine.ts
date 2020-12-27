@@ -53,6 +53,7 @@ export * from './models/scene_graph';
 
 export * from './utilities/other/save_state_helper';
 export * from './utilities/other/streamline';
+export * from './utilities/other/screen_helper';
 export * from './utilities/data/to_source';
 export * from './utilities/data_structures/squared_array';
 export * from './utilities/data_structures/virtual_union_array';
@@ -105,3 +106,4 @@ export * from './game_features/tile_maps/tiled/entity/model';
 export * from './game_features/tile_maps/tiled/entity/tiled_map_entity';
 
 export * from './ui/panel';
+export * from './ui/gauge';

@@ -1,4 +1,4 @@
-import { Color, ResourceWrapper, SpriteGraphNode } from 'aurum-game-engine';
+import { Color, ResourceWrapper, ScreenHelper, SpriteGraphNode } from 'aurum-game-engine';
 import { BaseTexture, Sprite, Texture as PixiTexture } from 'pixi.js';
 import { NoRenderEntity } from './pixi_no_render_entity';
 
@@ -87,41 +87,34 @@ export class RenderSpriteEntity extends NoRenderEntity {
 		const bt = new BaseTexture(img);
 		if (!this.token.isCanceled) {
 			this.displayObject.texture = this.wrapTexture(bt, model);
+			model.renderState.width.repeatLast();
 		}
 		textureMap.set(texture, bt);
 	}
 
-	private wrapTexture(bt: BaseTexture, model: SpriteGraphNode): PixiTexture {
-		const renderState = model.renderState;
-		const result = new PixiTexture(bt);
-		if (renderState.drawDistanceX.value !== undefined) {
-			result.frame.width = renderState.drawDistanceX.value;
-		}
-		if (renderState.drawDistanceY.value !== undefined) {
-			result.frame.height = renderState.drawDistanceY.value;
-		}
-		if (renderState.rotation.value) {
-			result.rotate = renderState.rotation.value;
-		}
-		if (renderState.drawOffsetX.value !== undefined) {
-			result.frame.x = renderState.drawOffsetX.value;
-		}
-		if (renderState.drawOffsetY.value !== undefined) {
-			result.frame.y = renderState.drawOffsetY.value;
-		}
-		if (this.displayObject && (renderState.width.value === undefined || model.resolvedModel.width.value === 'auto')) {
-			this.displayObject.width = bt.width * renderState.scaleX.value;
-		}
+	private wrapTexture(baseTexture: BaseTexture, model: SpriteGraphNode): PixiTexture {
+		const result = new PixiTexture(baseTexture);
 
-		if (this.displayObject && (renderState.height.value === undefined || model.resolvedModel.height.value === 'auto')) {
-			this.displayObject.height = bt.height * renderState.scaleY.value;
-		}
+		model.resolvedModel.width.listenAndRepeat((v) => {
+			if (v === 'auto') {
+				this.displayObject.width = baseTexture.realWidth;
+				model.renderState.width.update(baseTexture.realWidth);
+			}
+		});
 
-		result.updateUvs();
+		model.resolvedModel.height.listenAndRepeat((v) => {
+			if (v === 'auto') {
+				this.displayObject.height = baseTexture.realHeight;
+				model.renderState.height.update(baseTexture.realHeight);
+			}
+		});
+
 		return result;
 	}
 
 	public bind(model: SpriteGraphNode) {
+		const { width, height, drawOffsetX, drawOffsetY, drawDistanceX, drawDistanceY, scaleX, scaleY } = model.renderState;
+
 		model.resolvedModel.width.listenAndRepeat((v) => {
 			if (v === 'auto') {
 				this.displayObject.width = this.displayObject.texture.baseTexture.realWidth;
@@ -136,13 +129,57 @@ export class RenderSpriteEntity extends NoRenderEntity {
 			}
 		});
 
-		if (model.renderState.width.value === undefined) {
-			this.displayObject.width = this.displayObject.width * model.renderState.scaleX.value;
-		}
+		width.aggregate(
+			[height, drawDistanceX, drawDistanceY, drawOffsetX, drawOffsetY, scaleX, scaleY],
+			(w, h, ddx, ddy, dox, doy, sx, sy) => {
+				if (!w || !h) {
+					return;
+				}
 
-		if (model.renderState.height.value === undefined) {
-			this.displayObject.height = this.displayObject.height * model.renderState.scaleY.value;
-		}
+				if (dox === undefined) {
+					this.displayObject.texture.frame.x = 0;
+				} else {
+					this.displayObject.texture.frame.x = dox;
+				}
+
+				if (doy === undefined) {
+					this.displayObject.texture.frame.y = 0;
+				} else {
+					this.displayObject.texture.frame.y = doy;
+				}
+
+				if (ddx === undefined) {
+					this.displayObject.texture.frame.width = this.displayObject.texture.baseTexture.realWidth;
+				} else {
+					if (typeof ddx === 'number') {
+						this.displayObject.texture.frame.width = ddx;
+					} else {
+						this.displayObject.texture.frame.width = ddx.toPixels(ScreenHelper.PPI, this.displayObject.texture.baseTexture.realWidth);
+					}
+				}
+
+				if (ddy === undefined) {
+					this.displayObject.texture.frame.height = this.displayObject.texture.baseTexture.realHeight;
+				} else {
+					if (typeof ddy === 'number') {
+						this.displayObject.texture.frame.height = ddy;
+					} else {
+						this.displayObject.texture.frame.height = ddy.toPixels(ScreenHelper.PPI, this.displayObject.texture.baseTexture.realHeight);
+					}
+				}
+				this.displayObject.width =
+					this.displayObject.texture.frame.width *
+					(sx ?? 1) *
+					((w ?? this.displayObject.texture.baseTexture.realHeight) / this.displayObject.texture.baseTexture.realWidth);
+				this.displayObject.height =
+					this.displayObject.texture.frame.height *
+					(sy ?? 1) *
+					((h ?? this.displayObject.texture.baseTexture.realHeight) / this.displayObject.texture.baseTexture.realHeight);
+
+				this.displayObject.texture.updateUvs();
+			},
+			this.token
+		);
 
 		model.renderState.tint.listenAndRepeat((v) => {
 			if (v) {
@@ -150,42 +187,6 @@ export class RenderSpriteEntity extends NoRenderEntity {
 			} else {
 				this.displayObject.tint = 0xffffffff;
 			}
-		}, this.token);
-
-		model.renderState.drawOffsetX.listenAndRepeat((v) => {
-			if (v === undefined) {
-				this.displayObject.texture.frame.x = 0;
-			} else {
-				this.displayObject.texture.frame.x = v;
-			}
-			this.displayObject.texture.updateUvs();
-		}, this.token);
-
-		model.renderState.drawOffsetY.listenAndRepeat((v) => {
-			if (v === undefined) {
-				this.displayObject.texture.frame.y = 0;
-			} else {
-				this.displayObject.texture.frame.y = v;
-			}
-			this.displayObject.texture.updateUvs();
-		}, this.token);
-
-		model.renderState.drawDistanceX.listenAndRepeat((v) => {
-			if (v === undefined) {
-				this.displayObject.texture.frame.width = this.displayObject.texture.baseTexture.realWidth;
-			} else {
-				this.displayObject.texture.frame.width = v;
-			}
-			this.displayObject.texture.updateUvs();
-		}, this.token);
-
-		model.renderState.drawDistanceY.listenAndRepeat((v) => {
-			if (v === undefined) {
-				this.displayObject.texture.frame.height = this.displayObject.texture.baseTexture.realHeight;
-			} else {
-				this.displayObject.texture.frame.height = v;
-			}
-			this.displayObject.texture.updateUvs();
 		}, this.token);
 
 		super.bind(model);

@@ -6,7 +6,7 @@ export enum MouseButtons {
 	MIDDLE = 3
 }
 
-export class AurumMouse {
+class AurumMouse {
 	private heldDownButtons: { [key: number]: boolean };
 	private lastPositionX: number;
 	private lastPositionY: number;
@@ -107,3 +107,5 @@ export class AurumMouse {
 		};
 	}
 }
+
+export const aurumMouse: AurumMouse = new AurumMouse();

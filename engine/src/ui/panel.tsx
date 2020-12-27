@@ -5,12 +5,10 @@ import { MouseInteractionComponent } from '../entities/components/mouse_interact
 import { Canvas, PaintOperation } from '../entities/types/canvas/canvas_entity';
 import { Container } from '../entities/types/container/container_entity';
 import { Color } from '../graphics/color';
-import { AurumMouse } from '../input/mouse/mouse';
 import { Rectangle } from '../math/shapes/rectangle';
 import { toSourceIfDefined } from '../utilities/data/to_source';
 
 export interface PanelProps extends ContainerEntityProps {
-	mouse: AurumMouse;
 	hover?: {
 		background?: Data<string | Color>;
 		border?: {
@@ -152,7 +150,6 @@ export function Panel(props: PanelProps, children: Renderable[], api: AurumCompo
 }
 function createMouseComponent(props: PanelProps, hover: DataSource<boolean>): AbstractComponent {
 	return new MouseInteractionComponent({
-		mouse: props.mouse,
 		onClick: props.onClick,
 		onMouseDown: props.onMouseDown,
 		onMouseEnter: (e) => {

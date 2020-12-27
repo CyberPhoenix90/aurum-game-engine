@@ -1,4 +1,5 @@
 import { ArrayDataSource, AurumComponentAPI, DataSource } from 'aurumjs';
+import { Unit } from '../../../math/unit';
 import { CommonEntityProps } from '../../../models/entities';
 import { Data } from '../../../models/input_data';
 import { ResourceWrapper } from '../../../resources/abstract_resource_manager';
@@ -8,8 +9,10 @@ import { normalizeComponents, propsToModel } from '../../shared';
 import { SpriteGraphNode } from './api';
 import { SpriteEntity } from './model';
 
+export type Texture = Data<string | HTMLCanvasElement | HTMLImageElement | ResourceWrapper<HTMLImageElement, string>>;
+
 export interface SpriteEntityProps extends CommonEntityProps {
-	texture?: Data<string | HTMLCanvasElement | HTMLImageElement | ResourceWrapper<HTMLImageElement, string>>;
+	texture?: Texture;
 	tint?: Data<string>;
 	/**
 	 * Offset from the texture at which drawing begins
@@ -19,8 +22,8 @@ export interface SpriteEntityProps extends CommonEntityProps {
 	/**
 	 * with and height to draw starting at the source point
 	 */
-	drawDistanceX?: Data<number>;
-	drawDistanceY?: Data<number>;
+	drawDistanceX?: Data<number | Unit>;
+	drawDistanceY?: Data<number | Unit>;
 
 	onAttach?(node: SpriteGraphNode): void;
 	onDetach?(node: SpriteGraphNode): void;

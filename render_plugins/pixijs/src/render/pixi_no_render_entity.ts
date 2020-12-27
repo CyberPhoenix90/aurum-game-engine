@@ -1,6 +1,6 @@
 import { BlendModes, CommonEntity, EntityRenderModel, SceneGraphNode, SceneGraphNodeModel, Shader } from 'aurum-game-engine';
 import { CancellationToken, dsUnique } from 'aurumjs';
-import { BLEND_MODES, Container, Filter, filters } from 'pixi.js';
+import { BLEND_MODES, Container, Filter, filters, Sprite } from 'pixi.js';
 
 export class NoRenderEntity {
 	public token: CancellationToken;
@@ -80,7 +80,7 @@ export class NoRenderEntity {
 			}
 		}, this.token);
 
-		if (Object.getPrototypeOf(this.displayObject).constructor !== Container) {
+		if (Object.getPrototypeOf(this.displayObject).constructor !== Container && Object.getPrototypeOf(this.displayObject).constructor !== Sprite) {
 			model.renderState.width.listenAndRepeat((v) => {
 				if (v !== undefined && model.resolvedModel.width.value !== 'auto') {
 					this.displayObject.width = v * model.renderState.scaleX.value;

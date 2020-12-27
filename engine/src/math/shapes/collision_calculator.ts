@@ -1,29 +1,30 @@
+import { Constructor, MapLike } from '../../models/common';
+import { PointLike } from '../../models/point';
+import { pointUtils } from '../vectors/point_utils';
 import { AbstractShape } from './abstract_shape';
 import { Circle } from './circle';
+import { ComposedShape } from './composed_shape';
 import { Point } from './point';
 import { Rectangle } from './rectangle';
-import { ComposedShape } from './composed_shape';
-import { MapLike, Constructor } from '../../models/common';
-import { Vector2D } from '../vectors/vector2d';
-import { PointLike } from '../../models/point';
 
 export class CollisionCalculator {
 	private collisionCheckMap: MapLike<(a: AbstractShape, b: AbstractShape) => boolean>;
 
 	constructor() {
 		this.collisionCheckMap = {};
+		this.addCollisionPair(Rectangle, Rectangle, this.isRectangleOverlappingRectangle);
+
+		this.addCollisionPair(Circle, Circle, this.isCircleOverlappingCircle);
+		this.addCollisionPair(Circle, Rectangle, this.isCirleOverlappingRectangle);
 
 		this.addCollisionPair(Point, Point, this.isPointOverlappingPoint);
 		this.addCollisionPair(Point, Rectangle, this.isPointOverlappingRectangle);
 		this.addCollisionPair(Point, Circle, this.isPointOverlappingCircle);
-		this.addCollisionPair(Circle, Circle, this.isCircleOverlappingCircle);
-		this.addCollisionPair(Circle, Rectangle, this.isCirleOverlappingRectangle);
-		this.addCollisionPair(Rectangle, Rectangle, this.isRectangleOverlappingRectangle);
 
 		this.addCollisionPair(ComposedShape, ComposedShape, this.isShapeOverlappingComposedShape);
 		this.addCollisionPair(Point, ComposedShape, this.isShapeOverlappingComposedShape);
-		this.addCollisionPair(Circle, ComposedShape, this.isShapeOverlappingComposedShape);
 		this.addCollisionPair(Rectangle, ComposedShape, this.isShapeOverlappingComposedShape);
+		this.addCollisionPair(Circle, ComposedShape, this.isShapeOverlappingComposedShape);
 	}
 
 	public isShapeOverlappingComposedShape(shape: AbstractShape, composedShape: ComposedShape): boolean {
@@ -59,11 +60,11 @@ export class CollisionCalculator {
 	}
 
 	public isPointOverlappingCircle(a: Point, b: Circle): boolean {
-		return Vector2D.fromPointLike(a.position).distanceToSquared(b.position) < b.radius ** 2;
+		return pointUtils.distanceToSquared(a.position, b.position) < b.radius ** 2;
 	}
 
 	public isCircleOverlappingCircle(a: Circle, b: Circle): boolean {
-		return Vector2D.fromPointLike(a.position).distanceToSquared(b.position) < (a.radius + b.radius) ** 2;
+		return pointUtils.distanceToSquared(a.position, b.position) < (a.radius + b.radius) ** 2;
 	}
 
 	public isCirleOverlappingRectangle(a: Circle, b: Rectangle): boolean {

@@ -104,7 +104,7 @@ export enum KeyboardButtons {
 	SINGLE_QUOTE = 222
 }
 
-export class AurumKeyboard {
+class AurumKeyboard {
 	/**
 	 * Fired whenever a frame in the engine starts with one or more keys held down
 	 */
@@ -166,3 +166,5 @@ export class AurumKeyboard {
 		this.cancelationToken.cancel();
 	}
 }
+
+export const aurumKeyboard = new AurumKeyboard();

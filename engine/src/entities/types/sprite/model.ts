@@ -2,6 +2,7 @@ import { EntityRenderModel } from '../../../rendering/model';
 import { ReadOnlyDataSource, DataSource, ArrayDataSource } from 'aurumjs';
 import { CommonEntity } from '../../../models/entities';
 import { ResourceWrapper } from '../../../resources/abstract_resource_manager';
+import { Unit } from '../../../math/unit';
 
 export interface SpriteEntityRenderModel extends EntityRenderModel {
 	texture: ReadOnlyDataSource<string | HTMLCanvasElement | HTMLImageElement | ResourceWrapper<HTMLImageElement, string>>;
@@ -14,8 +15,8 @@ export interface SpriteEntityRenderModel extends EntityRenderModel {
 	/**
 	 * with and height to draw starting at the source point
 	 */
-	drawDistanceX: ReadOnlyDataSource<number>;
-	drawDistanceY: ReadOnlyDataSource<number>;
+	drawDistanceX: ReadOnlyDataSource<number | Unit>;
+	drawDistanceY: ReadOnlyDataSource<number | Unit>;
 }
 
 export interface SpriteEntity extends CommonEntity {
@@ -29,7 +30,7 @@ export interface SpriteEntity extends CommonEntity {
 	/**
 	 * with and height to draw starting at the source point
 	 */
-	drawDistanceX?: DataSource<number>;
-	drawDistanceY?: DataSource<number>;
+	drawDistanceX?: DataSource<number | Unit>;
+	drawDistanceY?: DataSource<number | Unit>;
 	class?: SpriteEntity[] | ArrayDataSource<SpriteEntity>;
 }

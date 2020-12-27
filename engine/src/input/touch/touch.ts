@@ -3,7 +3,7 @@
 import { CancellationToken, DataSource } from 'aurumjs';
 import { PointLike } from '../../models/point';
 
-export class AurumTouch {
+class AurumTouch {
 	public get touches(): TouchList {
 		return this.touchesSource.value;
 	}
@@ -87,3 +87,5 @@ export class AurumTouch {
 		this.cancellationToken.cancel();
 	}
 }
+
+export const aurumTouch = new AurumTouch();
