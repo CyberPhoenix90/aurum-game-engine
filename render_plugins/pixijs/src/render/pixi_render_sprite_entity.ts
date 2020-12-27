@@ -97,14 +97,12 @@ export class RenderSpriteEntity extends NoRenderEntity {
 
 		model.resolvedModel.width.listenAndRepeat((v) => {
 			if (v === 'auto') {
-				this.displayObject.width = baseTexture.realWidth;
 				model.renderState.width.update(baseTexture.realWidth);
 			}
 		});
 
 		model.resolvedModel.height.listenAndRepeat((v) => {
 			if (v === 'auto') {
-				this.displayObject.height = baseTexture.realHeight;
 				model.renderState.height.update(baseTexture.realHeight);
 			}
 		});
@@ -167,15 +165,8 @@ export class RenderSpriteEntity extends NoRenderEntity {
 						this.displayObject.texture.frame.height = ddy.toPixels(ScreenHelper.PPI, this.displayObject.texture.baseTexture.realHeight);
 					}
 				}
-				this.displayObject.width =
-					this.displayObject.texture.frame.width *
-					(sx ?? 1) *
-					((w ?? this.displayObject.texture.baseTexture.realHeight) / this.displayObject.texture.baseTexture.realWidth);
-				this.displayObject.height =
-					this.displayObject.texture.frame.height *
-					(sy ?? 1) *
-					((h ?? this.displayObject.texture.baseTexture.realHeight) / this.displayObject.texture.baseTexture.realHeight);
-
+				this.displayObject.width = w * (sx ?? 1);
+				this.displayObject.height = h * (sy ?? 1);
 				this.displayObject.texture.updateUvs();
 			},
 			this.token

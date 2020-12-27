@@ -46,34 +46,58 @@ class AurumMouse {
 		});
 	}
 
-	public listenMouseDown(key: MouseButtons): DataSource<MouseEvent> {
+	public listenMouseDown(key: MouseButtons, cancellationToken?: CancellationToken): DataSource<MouseEvent> {
 		const result = new DataSource<MouseEvent>();
 
 		this.mouseDown.unshift(result);
 
+		if (cancellationToken) {
+			cancellationToken.addCancelable(() => {
+				this.mouseDown.splice(this.mouseDown.indexOf(result), 1);
+			});
+		}
+
 		return result.transform(dsFilter((e) => e.button === key));
 	}
 
-	public listenMouseMove(): DataSource<MouseEvent> {
+	public listenMouseMove(cancellationToken?: CancellationToken): DataSource<MouseEvent> {
 		const result = new DataSource<MouseEvent>();
 
 		this.mouseMove.unshift(result);
 
+		if (cancellationToken) {
+			cancellationToken.addCancelable(() => {
+				this.mouseMove.splice(this.mouseMove.indexOf(result), 1);
+			});
+		}
+
 		return result;
 	}
 
-	public listenMouseScroll(): DataSource<WheelEvent> {
+	public listenMouseScroll(cancellationToken?: CancellationToken): DataSource<WheelEvent> {
 		const result = new DataSource<WheelEvent>();
 
 		this.mouseScroll.unshift(result);
 
+		if (cancellationToken) {
+			cancellationToken.addCancelable(() => {
+				this.mouseScroll.splice(this.mouseScroll.indexOf(result), 1);
+			});
+		}
+
 		return result;
 	}
 
-	public listenMouseUp(key: MouseButtons): DataSource<MouseEvent> {
+	public listenMouseUp(key: MouseButtons, cancellationToken?: CancellationToken): DataSource<MouseEvent> {
 		const result = new DataSource<MouseEvent>();
 
 		this.mouseUp.unshift(result);
+
+		if (cancellationToken) {
+			cancellationToken.addCancelable(() => {
+				this.mouseUp.splice(this.mouseUp.indexOf(result), 1);
+			});
+		}
 
 		return result.transform(dsFilter((e) => e.button === key));
 	}

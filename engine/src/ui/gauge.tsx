@@ -1,14 +1,12 @@
-import { Aurum, DataSource, dsMap, dsUnique } from 'aurumjs';
+import { Aurum } from 'aurumjs';
 import { CommonEntityProps, Data, Texture } from '../aurum-game-engine';
 import { Container } from '../entities/types/container/container_entity';
 import { Sprite } from '../entities/types/sprite/sprite_entity';
-import { Unit, UnitType } from '../math/unit';
 import { toSourceIfDefined } from '../utilities/data/to_source';
 
 export interface GaugeProps extends CommonEntityProps {
 	filling: {
 		texture: Texture;
-		fillMode?: 'cutOff' | 'shrink';
 		drawOffsetX?: Data<number>;
 		drawOffsetY?: Data<number>;
 		drawDistanceX?: Data<number>;
@@ -26,7 +24,6 @@ export interface GaugeProps extends CommonEntityProps {
 
 export function Gauge(props: GaugeProps, children) {
 	const value = toSourceIfDefined(props.value);
-	const mode = props.filling.fillMode ?? 'cutOff';
 
 	const width = props.width;
 	const height = props.height;
@@ -49,17 +46,12 @@ export function Gauge(props: GaugeProps, children) {
 			<Sprite
 				width={width}
 				height={height}
+				drawDistanceX={props.filling.drawDistanceX}
 				drawDistanceY={props.filling.drawDistanceY}
 				drawOffsetX={props.filling.drawOffsetX}
 				drawOffsetY={props.filling.drawOffsetY}
 				texture={props.filling.texture}
-				scaleX={value.transform(
-					dsMap((s) => (mode === 'shrink' ? s : 1)),
-					dsUnique()
-				)}
-				drawDistanceX={value.aggregate([toSourceIfDefined(props.filling.drawOffsetX) ?? new DataSource(undefined)], (v, ddx) =>
-					mode === 'cutOff' ? new Unit(v * 100, UnitType.percent) : ddx
-				)}
+				scaleX={value}
 			></Sprite>
 			{children}
 		</Container>
