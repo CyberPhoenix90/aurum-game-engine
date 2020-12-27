@@ -1,6 +1,6 @@
 import { ArrayDataSource, DataSource, MapDataSource } from 'aurumjs';
 import { AbstractComponent } from '../entities/components/abstract_component';
-import { Constructor, MapLike, Position } from '../models/common';
+import { Constructor, MapLike, Position, Size } from '../models/common';
 import { Data } from '../models/input_data';
 import { SceneGraphNode } from './scene_graph';
 import { AbstractLayout } from '../layouts/abstract_layout';
@@ -24,8 +24,8 @@ export interface CommonEntityProps {
 	zIndex?: Data<number>;
 	shaders?: Shader[] | ArrayDataSource<Shader>;
 	blendMode?: Data<BlendModes>;
-	width?: Data<Position | 'content' | 'inherit' | 'remainder'>;
-	height?: Data<Position | 'content' | 'inherit' | 'remainder'>;
+	width?: Data<Size>;
+	height?: Data<Size>;
 	scaleX?: Data<number>;
 	scaleY?: Data<number>;
 	visible?: Data<boolean>;
@@ -53,8 +53,8 @@ export interface CommonEntity {
 	scaleY?: DataSource<number>;
 	shaders?: ArrayDataSource<Shader>;
 	blendMode?: DataSource<BlendModes>;
-	width?: DataSource<Position | 'content' | 'inherit' | 'remainder'>;
-	height?: DataSource<Position | 'content' | 'inherit' | 'remainder'>;
+	width?: DataSource<Size>;
+	height?: DataSource<Size>;
 	visible?: DataSource<boolean>;
 	alpha?: DataSource<number>;
 	rotation?: DataSource<number>;

@@ -4,7 +4,7 @@ import { LabelGraphNode } from '../entities/types/label/api';
 import { SpriteGraphNode } from '../entities/types/sprite/api';
 import { Calculation } from '../math/calculation';
 import { Unit } from '../math/unit';
-import { Position } from '../models/common';
+import { Position, Size } from '../models/common';
 import { CommonEntity } from '../models/entities';
 import { SceneGraphNode } from '../models/scene_graph';
 import { ScreenHelper } from '../utilities/other/screen_helper';
@@ -97,7 +97,7 @@ function getParentHeight(node: SceneGraphNode<CommonEntity>): number {
 }
 
 function computeSize(
-	value: Position,
+	value: Size,
 	parentSize: number,
 	distanceToEdge: number,
 	component: 'x' | 'y',
@@ -115,9 +115,11 @@ function computeSize(
 	} else if (value === 'content') {
 		return computeContentSize(children, component);
 	} else {
-		if (typeof value === 'number') {
+		if (typeof value === 'function') {
+			return value(parentSize, distanceToEdge, () => computeContentSize(children, component));
+		} else if (typeof value === 'number') {
 			return value;
-		} else if (value.startsWith('calc(')) {
+		} else if (Calculation.isCalculation(value)) {
 			return new Calculation(value).toPixels(96, parentSize, distanceToEdge, () => computeContentSize(children, component));
 		} else {
 			return new Unit(value).toPixels(96, parentSize);
@@ -155,10 +157,12 @@ function computePosition(value: Position, size: number, origin: number, scale: n
 	}
 
 	let computedValue;
-	if (typeof value === 'number') {
+	if (typeof value === 'function') {
+		computedValue = value(parentSize);
+	} else if (typeof value === 'number') {
 		computedValue = value;
 	} else {
-		if (value.startsWith('calc')) {
+		if (Calculation.isCalculation(value)) {
 			computedValue = new Calculation(value).toPixels(ScreenHelper.PPI, parentSize, 0);
 		} else {
 			computedValue = new Unit(value).toPixels(ScreenHelper.PPI, parentSize);

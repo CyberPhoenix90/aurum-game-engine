@@ -98,8 +98,8 @@ describe('position', () => {
 		renderRoot.update(
 			<Container x={6} y={10} width={50} height={20}>
 				<Container
-					x="calc(50% - 10px)"
-					y="calc(50% - 20px)"
+					x="(50% - 10px)"
+					y="(50% - 20px)"
 					onAttach={(c) => {
 						assert.deepEqual(c.getAbsolutePosition(), { x: 21, y: 0 });
 						assert.deepEqual(c.renderState.positionX.value, 15);

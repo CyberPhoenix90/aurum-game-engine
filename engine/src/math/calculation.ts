@@ -1,75 +1,55 @@
-import { Unit } from './unit';
+import { Unit, UnitType } from './unit';
 
-export enum Operators {
-	PLUS,
-	MINUS
-}
+const CALCULATION_PARSER = /(content|distanceToEdge|inherit|[0-9]+px|[0-9]+%|[0-9]+mm|[0-9]+cm|[0-9]+in)+/gi;
 
 export class Calculation {
-	public operands: Array<Unit | 'inherit' | 'remainder' | 'content'>;
-	public operators: Operators[];
+	private optimizedCalculation: (dpi: number, parentSize: number, distanceToEdge: number, computeContentSize?: () => number) => number;
 
 	constructor(value: string) {
-		this.operands = [];
-		this.operators = [];
 		this.parse(value);
 	}
 
-	private parse(value: string) {
-		let left = value.trim();
-		if (left.startsWith('calc(')) {
-			left = left.substring(5, left.length - 1).trim();
-			while (left.length > 0) {
-				let op = '';
-				let i = 0;
-				while (!['+', '-'].includes(left[i]) && i !== left.length) {
-					op += left[i];
-					i++;
-				}
-
-				if (left[i] === '+') {
-					this.operators.push(Operators.PLUS);
-				} else if (left[i] === '-') {
-					this.operators.push(Operators.MINUS);
-				}
-
-				op = op.trim();
-				if (op === 'inherit' || op === 'remainder' || op === 'content') {
-					this.operands.push(op);
-				} else {
-					this.operands.push(new Unit(op));
-				}
-				left = left.substring(i + 1);
-			}
-		} else {
-			throw new Error(`Invalid calc expression ${value}`);
+	public static isCalculation(input: string): boolean {
+		if (input.includes('-') || input.includes('+') || input.includes('*') || input.includes('/') || input.includes('%')) {
+			return true;
 		}
+
+		return false;
+	}
+
+	private parse(value: string) {
+		this.optimizedCalculation = new Function(
+			'dpi',
+			'parentSize',
+			'distanceToEdge',
+			'computeContentSize',
+			`return ${value.replace(CALCULATION_PARSER, (op) => {
+				if (op === 'inherit') {
+					return 'parentSize';
+				} else if (op === 'remainder') {
+					return 'distanceToEdge';
+				} else if (op === 'content') {
+					return 'computeContentSize()';
+				} else {
+					const unit = new Unit(op);
+					switch (unit.type) {
+						case UnitType.cm:
+							return `${unit.value / 2.54}*dpi`;
+						case UnitType.in:
+							return `${unit.value}*dpi`;
+						case UnitType.mm:
+							return `${unit.value / 25.4}*dpi`;
+						case UnitType.percent:
+							return `${unit.value * 0.01}*parentSize`;
+						case UnitType.pixels:
+							return unit.value.toString();
+					}
+				}
+			})}`
+		) as any;
 	}
 
 	public toPixels(dpi: number, parentSize: number, distanceToEdge: number, computeContentSize?: () => number): number {
-		return this.operands
-			.map((p) => {
-				switch (p) {
-					case 'content':
-						if (computeContentSize) {
-							return computeContentSize();
-						} else {
-							throw new Error('content in calculation is not supported in this context');
-						}
-					case 'inherit':
-						return parentSize;
-					case 'remainder':
-						return distanceToEdge;
-					default:
-						return p.toPixels(dpi, parentSize);
-				}
-			})
-			.reduce((p, c, i) => {
-				if (this.operators[i] === Operators.PLUS) {
-					return p + c;
-				} else {
-					return p - c;
-				}
-			});
+		return this.optimizedCalculation(dpi, parentSize, distanceToEdge, computeContentSize);
 	}
 }

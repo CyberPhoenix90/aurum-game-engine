@@ -1,6 +1,13 @@
 import { PointLike } from './point';
 
-export type Position = number | string;
+export type Position = number | string | ((parentSize: number) => number);
+export type Size =
+	| number
+	| string
+	| 'content'
+	| 'inherit'
+	| 'remainder'
+	| ((parentSize: number, distanceToEdge: number, computeContentSize: () => number) => number);
 
 export type Radian = number;
 export type Degrees = number;

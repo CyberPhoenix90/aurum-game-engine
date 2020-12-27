@@ -73,8 +73,8 @@ export function Panel(props: PanelProps, children: Renderable[], api: AurumCompo
 				x={paddingLeft.aggregate([borderThickness], (a, b) => a + b)}
 				components={[createMouseComponent(props)]}
 				name="PanelInternal"
-				width={horizontalMargin.transform(dsMap((m) => `calc(content + ${m}px)`))}
-				height={verticalMargin.transform(dsMap((m) => `calc(content + ${m}px)`))}
+				width={horizontalMargin.transform(dsMap((m) => `content + ${m}px`))}
+				height={verticalMargin.transform(dsMap((m) => `content + ${m}px`))}
 				onAttach={(node) => {
 					node.renderState.width.aggregate(
 						[node.renderState.height, borderThickness, borderColor, background],
