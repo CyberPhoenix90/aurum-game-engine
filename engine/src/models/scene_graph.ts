@@ -425,6 +425,8 @@ export const arrayDataSourceDefaultModel: ContainerEntity = {
 };
 
 export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
+	private sessionMap: Map<SceneGraphNode<any>, CancellationToken[]>;
+
 	constructor(dataSource: ArrayDataSource<Renderable>) {
 		super({
 			children: new ArrayDataSource(),
@@ -439,6 +441,7 @@ export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 			components: new MapDataSource(new Map())
 		});
 
+		this.sessionMap = new Map();
 		const dynamicRenderKeys = new Map<Renderable, SceneGraphNode<any>>();
 		dataSource.listenAndRepeat((change) => {
 			switch (change.operation) {
@@ -453,10 +456,12 @@ export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 					break;
 				case 'remove':
 					for (const item of change.items) {
+						this.cancelSession(dynamicRenderKeys.get(item));
 						this.children.remove(dynamicRenderKeys.get(item));
 					}
 					break;
 				case 'replace':
+					this.cancelSession(dynamicRenderKeys.get(change.target));
 					this.children.remove(dynamicRenderKeys.get(change.target));
 					const node = this.renderableToNode(change.items[0]);
 					dynamicRenderKeys.set(change.items[0], node);
@@ -488,6 +493,7 @@ export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 								source[i] = d;
 								source[index] = c;
 							} else {
+								this.cancelSession(dynamicRenderKeys.get(source[i]));
 								this.children.remove(dynamicRenderKeys.get(source[i]));
 								this.children.insertAt(i, this.renderableToNode(change.newState[i]));
 								source.splice(i, 0, change.newState[i]);
@@ -495,6 +501,9 @@ export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 						}
 					}
 					if (this.children.length.value > change.newState.length) {
+						for (let i = this.children.length.value - change.newState.length; i < this.children.length.value; i++) {
+							this.cancelSession(dynamicRenderKeys.get(source[i]));
+						}
 						this.children.removeRight(this.children.length.value - change.newState.length);
 					}
 					break;
@@ -502,6 +511,14 @@ export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 					throw new Error(`operation ${change.operationDetailed} not implemented`);
 			}
 		});
+	}
+
+	private cancelSession(key: SceneGraphNode<any>) {
+		const session: CancellationToken[] = this.sessionMap.get(key);
+		for (const token of session) {
+			token.cancel();
+		}
+		this.sessionMap.delete(key);
 	}
 
 	private renderableToNode(item: Renderable): SceneGraphNode<any> {
@@ -513,6 +530,7 @@ export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 
 		const result = render(item, s) as SceneGraphNode<any>;
 		s.attachCalls.forEach((ac) => ac());
+		this.sessionMap.set(result, s.tokens);
 		return result;
 	}
 }
