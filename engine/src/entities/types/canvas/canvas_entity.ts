@@ -9,6 +9,7 @@ import { CanvasEntity } from './model';
 
 export interface PaintOperation {
 	shape?: AbstractShape;
+	strokeAlignment?: number;
 	strokeStyle?: Data<string>;
 	fillStyle?: Data<string>;
 	strokeThickness?: Data<number>;

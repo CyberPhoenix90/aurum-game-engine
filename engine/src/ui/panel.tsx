@@ -5,19 +5,22 @@ import { MouseInteractionComponent } from '../entities/components/mouse_interact
 import { Canvas, PaintOperation } from '../entities/types/canvas/canvas_entity';
 import { Container } from '../entities/types/container/container_entity';
 import { Color } from '../graphics/color';
-import { Rectangle } from '../math/shapes/rectangle';
+import { RoundedRectangle } from '../math/shapes/rounded_rectangle';
 import { toSourceIfDefined } from '../utilities/data/to_source';
 
 export interface PanelProps extends ContainerEntityProps {
 	hover?: {
 		background?: Data<string | Color>;
+		borderRadius?: Data<number>;
 		border?: {
+			radius?: Data<number>;
 			thickness: Data<number>;
 			color: Data<string | Color>;
 		};
 	};
 	background?: Data<string | Color>;
 	border?: {
+		radius?: Data<number>;
 		thickness: Data<number>;
 		color: Data<string | Color>;
 	};
@@ -62,6 +65,11 @@ export function Panel(props: PanelProps, children: Renderable[], api: AurumCompo
 
 	let borderThickness = toSourceIfDefined(props.border?.thickness) ?? new DataSource(0);
 	let borderColor = toSourceIfDefined(props.border?.color) ?? new DataSource('transparent');
+	let borderRadius = toSourceIfDefined(props.border?.radius) ?? new DataSource(0);
+
+	if (props.hover?.border?.radius) {
+		borderRadius = borderRadius.aggregate([toSourceIfDefined(props.hover.border.radius), hover], (br, hbr, h) => (h ? hbr : br));
+	}
 
 	if (props.hover?.border?.thickness) {
 		borderThickness = borderThickness.aggregate([toSourceIfDefined(props.hover.border.thickness), hover], (bt, hbt, h) => (h ? hbt : bt));
@@ -98,8 +106,8 @@ export function Panel(props: PanelProps, children: Renderable[], api: AurumCompo
 				height={verticalMargin.transform(dsMap((m) => `content + ${m}px`))}
 				onAttach={(node) => {
 					node.renderState.width.aggregate(
-						[node.renderState.height, borderThickness, borderColor, background],
-						(width, height, bt, bc, bg) => {
+						[node.renderState.height, borderThickness, borderColor, borderRadius, background],
+						(width, height, bt, bc, br, bg) => {
 							drawing.clear();
 							if (bt && bc) {
 								let color: string;
@@ -109,20 +117,10 @@ export function Panel(props: PanelProps, children: Renderable[], api: AurumCompo
 									color = bc.toRGBA();
 								}
 								drawing.push({
-									fillStyle: color,
-									shape: new Rectangle({ x: -bt, y: -bt }, { x: width + bt * 2, y: bt })
-								});
-								drawing.push({
-									fillStyle: color,
-									shape: new Rectangle({ x: -bt, y: 0 }, { x: bt, y: height + bt })
-								});
-								drawing.push({
-									fillStyle: color,
-									shape: new Rectangle({ x: width, y: 0 }, { x: bt, y: height + bt })
-								});
-								drawing.push({
-									fillStyle: color,
-									shape: new Rectangle({ x: 0, y: height }, { x: width, y: bt })
+									strokeStyle: color,
+									strokeThickness: bt,
+									strokeAlignment: 1,
+									shape: new RoundedRectangle({ x: 0, y: 0 }, { x: width, y: height }, br)
 								});
 							}
 							if (bg) {
@@ -132,7 +130,7 @@ export function Panel(props: PanelProps, children: Renderable[], api: AurumCompo
 								} else {
 									draw.fillStyle = bg.toRGBA();
 								}
-								draw.shape = new Rectangle({ x: 0, y: 0 }, { x: width, y: height });
+								draw.shape = new RoundedRectangle({ x: 0, y: 0 }, { x: width, y: height }, br);
 								drawing.push(draw);
 							}
 						},

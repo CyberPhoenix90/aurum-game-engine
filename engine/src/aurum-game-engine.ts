@@ -36,6 +36,7 @@ export * from './math/vectors/vector2d';
 export * from './math/vectors/vector3d';
 export * from './math/vectors/vector4d';
 export * from './math/vectors/point_utils';
+
 export * from './math/shapes/abstract_shape';
 export * from './math/shapes/circle';
 export * from './math/shapes/collision_calculator';
@@ -44,6 +45,7 @@ export * from './math/shapes/point';
 export * from './math/shapes/polygon';
 export * from './math/shapes/regular_polygon';
 export * from './math/shapes/rectangle';
+export * from './math/shapes/rounded_rectangle';
 
 export * from './models/common';
 export * from './models/input_data';
