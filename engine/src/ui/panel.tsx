@@ -11,6 +11,13 @@ import { toSourceIfDefined } from '../utilities/data/to_source';
 
 export interface PanelProps extends ContainerEntityProps {
 	mouse: AurumMouse;
+	hover?: {
+		background?: Data<string | Color>;
+		border?: {
+			thickness: Data<number>;
+			color: Data<string | Color>;
+		};
+	};
 	background?: Data<string | Color>;
 	border?: {
 		thickness: Data<number>;
@@ -42,6 +49,7 @@ export interface PanelProps extends ContainerEntityProps {
 export function Panel(props: PanelProps, children: Renderable[], api: AurumComponentAPI): Renderable {
 	const isSimpleMargin = typeof props.margin === 'number' || props.margin instanceof DataSource;
 	const isSimplePadding = typeof props.padding === 'number' || props.padding instanceof DataSource;
+	const hover = new DataSource(false);
 
 	const marginLeft = toSourceIfDefined((props.margin as any)?.left ?? (isSimpleMargin ? (props.margin as Data<number>) : undefined)) ?? new DataSource(0);
 	const marginTop = toSourceIfDefined((props.margin as any)?.top ?? (isSimpleMargin ? (props.margin as Data<number>) : undefined)) ?? new DataSource(0);
@@ -54,24 +62,39 @@ export function Panel(props: PanelProps, children: Renderable[], api: AurumCompo
 	const horizontalMargin = marginLeft.aggregate([marginRight], (a, b) => a + b);
 	const verticalMargin = marginTop.aggregate([marginBottom], (a, b) => a + b);
 
-	const borderThickness = toSourceIfDefined(props.border?.thickness) ?? new DataSource(0);
-	const borderColor = toSourceIfDefined(props.border?.color) ?? new DataSource('transparent');
+	let borderThickness = toSourceIfDefined(props.border?.thickness) ?? new DataSource(0);
+	let borderColor = toSourceIfDefined(props.border?.color) ?? new DataSource('transparent');
 
-	const background = toSourceIfDefined(props.background) ?? new DataSource<string | Color>(undefined);
+	if (props.hover?.border?.thickness) {
+		borderThickness = borderThickness.aggregate([toSourceIfDefined(props.hover.border.thickness), hover], (bt, hbt, h) => (h ? hbt : bt));
+	}
+
+	if (props.hover?.border?.color) {
+		borderColor = borderColor.aggregate([toSourceIfDefined(props.hover.border.color), hover], (bc, hbc, h) => (h ? hbc : bc));
+	}
+
+	let background = toSourceIfDefined(props.background) ?? new DataSource<string | Color>(undefined);
+	if (props.hover?.background) {
+		background = background.aggregate([toSourceIfDefined(props.hover.background), hover], (bg, hbg, h) => (h ? hbg : bg));
+	}
 
 	const drawing = new ArrayDataSource<PaintOperation>();
 
 	const x = props.x;
 	const y = props.y;
+	const originX = props.originX;
+	const originY = props.originY;
 	delete props.x;
 	delete props.y;
+	delete props.originX;
+	delete props.originY;
 
 	return (
-		<Container x={x} y={y} name="Panel">
+		<Container x={x} y={y} originX={originX} originY={originY} name="Panel">
 			<Container
 				y={paddingTop.aggregate([borderThickness], (a, b) => a + b)}
 				x={paddingLeft.aggregate([borderThickness], (a, b) => a + b)}
-				components={[createMouseComponent(props)]}
+				components={[createMouseComponent(props, hover)]}
 				name="PanelInternal"
 				width={horizontalMargin.transform(dsMap((m) => `content + ${m}px`))}
 				height={verticalMargin.transform(dsMap((m) => `content + ${m}px`))}
@@ -127,13 +150,19 @@ export function Panel(props: PanelProps, children: Renderable[], api: AurumCompo
 		</Container>
 	);
 }
-function createMouseComponent(props: PanelProps): AbstractComponent {
+function createMouseComponent(props: PanelProps, hover: DataSource<boolean>): AbstractComponent {
 	return new MouseInteractionComponent({
 		mouse: props.mouse,
 		onClick: props.onClick,
 		onMouseDown: props.onMouseDown,
-		onMouseEnter: props.onMouseEnter,
-		onMouseLeave: props.onMouseLeave,
+		onMouseEnter: (e) => {
+			hover.update(true);
+			props.onMouseEnter?.(e);
+		},
+		onMouseLeave: (e) => {
+			hover.update(false);
+			props.onMouseLeave?.(e);
+		},
 		onMouseMove: props.onMouseMove,
 		onMouseUp: props.onMouseUp,
 		onScroll: props.onScroll
