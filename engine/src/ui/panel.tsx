@@ -90,13 +90,15 @@ export function Panel(props: PanelProps, children: Renderable[], api: AurumCompo
 	const y = props.y;
 	const originX = props.originX;
 	const originY = props.originY;
+	const visible = props.visible;
 	delete props.x;
 	delete props.y;
 	delete props.originX;
 	delete props.originY;
+	delete props.visible;
 
 	return (
-		<Container x={x} y={y} originX={originX} originY={originY} name="Panel">
+		<Container x={x} y={y} originX={originX} originY={originY} visible={visible} name="Panel">
 			<Container
 				y={paddingTop.aggregate([borderThickness], (a, b) => a + b)}
 				x={paddingLeft.aggregate([borderThickness], (a, b) => a + b)}
