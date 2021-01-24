@@ -59,9 +59,10 @@ export function Panel(props: PanelProps, children: Renderable[], api: AurumCompo
 
 	const paddingTop = toSourceIfDefined((props.padding as any)?.top ?? (isSimplePadding ? (props.padding as Data<number>) : undefined)) ?? new DataSource(0);
 	const paddingLeft = toSourceIfDefined((props.padding as any)?.left ?? (isSimplePadding ? (props.padding as Data<number>) : undefined)) ?? new DataSource(0);
-
-	const horizontalMargin = marginLeft.aggregate([marginRight], (a, b) => a + b);
-	const verticalMargin = marginTop.aggregate([marginBottom], (a, b) => a + b);
+	const paddingRight =
+		toSourceIfDefined((props.padding as any)?.right ?? (isSimplePadding ? (props.padding as Data<number>) : undefined)) ?? new DataSource(0);
+	const paddingBottom =
+		toSourceIfDefined((props.padding as any)?.bottom ?? (isSimplePadding ? (props.padding as Data<number>) : undefined)) ?? new DataSource(0);
 
 	let borderThickness = toSourceIfDefined(props.border?.thickness) ?? new DataSource(0);
 	let borderColor = toSourceIfDefined(props.border?.color) ?? new DataSource('transparent');
@@ -98,14 +99,23 @@ export function Panel(props: PanelProps, children: Renderable[], api: AurumCompo
 	delete props.visible;
 
 	return (
-		<Container x={x} y={y} originX={originX} originY={originY} visible={visible} name="Panel">
+		<Container
+			x={x}
+			y={y}
+			originX={originX}
+			originY={originY}
+			visible={visible}
+			width={marginRight.transform(dsMap((m) => `content + ${m}px`))}
+			height={marginBottom.transform(dsMap((m) => `content + ${m}px`))}
+			name="Panel"
+		>
 			<Container
-				y={paddingTop.aggregate([borderThickness], (a, b) => a + b)}
-				x={paddingLeft.aggregate([borderThickness], (a, b) => a + b)}
+				y={marginTop.aggregate([borderThickness], (a, b) => a + b)}
+				x={marginLeft.aggregate([borderThickness], (a, b) => a + b)}
 				components={[createMouseComponent(props, hover)]}
 				name="PanelInternal"
-				width={horizontalMargin.transform(dsMap((m) => `content + ${m}px`))}
-				height={verticalMargin.transform(dsMap((m) => `content + ${m}px`))}
+				width={paddingRight.transform(dsMap((m) => `content + ${m}px`))}
+				height={paddingBottom.transform(dsMap((m) => `content + ${m}px`))}
 				onAttach={(node) => {
 					node.renderState.width.aggregate(
 						[node.renderState.height, borderThickness, borderColor, borderRadius, background],
@@ -141,7 +151,7 @@ export function Panel(props: PanelProps, children: Renderable[], api: AurumCompo
 				}}
 			>
 				<Canvas width={0} height={0} name="PanelBackground" paintOperations={drawing}></Canvas>
-				<Container name="PanelContent" x={marginLeft} y={marginTop} {...props}>
+				<Container name="PanelContent" x={paddingLeft} y={paddingTop} {...props}>
 					{children}
 				</Container>
 			</Container>
