@@ -34,6 +34,14 @@ class SaveStateHelper {
 		localStorage.setItem(key, this.serializeState());
 	}
 
+	public saveStateAs(): string {
+		return this.serializeState());
+	}
+
+	public loadFrom(data:string):void {
+		this.load(data);
+	}
+
 	public hasState(key: string): boolean {
 		return key in localStorage;
 	}
@@ -41,23 +49,27 @@ class SaveStateHelper {
 	public loadState(key: string): boolean {
 		const item = localStorage.getItem(key);
 		if (item) {
-			const data = JSON.parse(item);
-			for (const key in data) {
-				if (key in this.streams) {
-					const stream = this.streams[key];
-					if (stream instanceof ArrayDataSource) {
-						stream.merge(data[key]);
-					} else if (stream instanceof DataSource) {
-						stream.update(data[key]);
-					} else if (stream instanceof DuplexDataSource) {
-						stream.updateUpstream(data[key]);
-					}
-				}
-			}
+			this.load(item);
 
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	private load(item: string):void {
+		const data = JSON.parse(item);
+		for (const key in data) {
+			if (key in this.streams) {
+				const stream = this.streams[key];
+				if (stream instanceof ArrayDataSource) {
+					stream.merge(data[key]);
+				} else if (stream instanceof DataSource) {
+					stream.update(data[key]);
+				} else if (stream instanceof DuplexDataSource) {
+					stream.updateUpstream(data[key]);
+				}
+			}
 		}
 	}
 }
