@@ -22,7 +22,9 @@ export class NoRenderEntity {
 		this.displayObject.entity = model;
 		//@ts-ignore
 		this.displayObject.renderNode = this;
-		this.displayObject.name = model.name;
+		model.name.listenAndRepeat((v) => {
+			this.displayObject.name = v;
+		}, this.token);
 		this.children = [];
 
 		this.bind(model);

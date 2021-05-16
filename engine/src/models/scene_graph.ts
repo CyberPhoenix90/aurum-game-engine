@@ -1,4 +1,4 @@
-import { ArrayDataSource, CancellationToken, DataSource, MapDataSource, render, Renderable, dsUnique } from 'aurumjs';
+import { ArrayDataSource, CancellationToken, DataSource, dsUnique, MapDataSource, render, Renderable } from 'aurumjs';
 import { layoutAlgorithm } from '../core/layout_engine';
 import { AbstractComponent } from '../entities/components/abstract_component';
 import { entityDefaults } from '../entities/entity_defaults';
@@ -6,13 +6,15 @@ import { ContainerGraphNodeModel } from '../entities/types/container/api';
 import { ContainerEntity, ContainerEntityRenderModel } from '../entities/types/container/model';
 import { AbstractRenderPlugin } from '../rendering/abstract_render_plugin';
 import { EntityRenderModel } from '../rendering/model';
+import { toSourceIfDefined } from '../utilities/data/to_source';
 import { _ } from '../utilities/other/streamline';
 import { Constructor } from './common';
 import { CommonEntity, RenderableType } from './entities';
+import { Data } from './input_data';
 import { PointLike } from './point';
 
 export interface SceneGraphNodeModel<T> {
-	name?: string;
+	name?: Data<string>;
 	components?: MapDataSource<Constructor<AbstractComponent>, AbstractComponent>;
 	children: ArrayDataSource<SceneGraphNode<CommonEntity> | ArrayDataSource<Renderable> | DataSource<Renderable>>;
 	cancellationToken: CancellationToken;
@@ -28,7 +30,7 @@ export interface SceneGraphNodeModel<T> {
 
 export abstract class SceneGraphNode<T extends CommonEntity> {
 	public readonly renderState: EntityRenderModel;
-	public name?: string;
+	public name?: DataSource<string>;
 	public readonly components?: MapDataSource<Constructor<AbstractComponent>, AbstractComponent>;
 	public parent?: DataSource<SceneGraphNode<CommonEntity>>;
 	public readonly uid: number;
@@ -52,7 +54,7 @@ export abstract class SceneGraphNode<T extends CommonEntity> {
 		this.onAttach = config.onAttach;
 		this.onDetach = config.onDetach;
 		this.onRequestNodeLayoutRefresh = new DataSource();
-		this.name = config.name;
+		this.name = toSourceIfDefined(config.name);
 		this.children = config.children ?? new ArrayDataSource([]);
 		this.cancellationToken = config.cancellationToken;
 		this.components = config.components;

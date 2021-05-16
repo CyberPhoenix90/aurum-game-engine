@@ -4,9 +4,10 @@ import { SceneGraphNode, ContainerGraphNode } from '../../../models/scene_graph'
 import { AbstractComponent } from '../../components/abstract_component';
 import { ContainerEntity } from './model';
 import { CommonEntity } from '../../../models/entities';
+import { Data } from '../../../models/input_data';
 
 export interface ContainerGraphNodeModel {
-	name?: string;
+	name?: Data<string>;
 	cancellationToken: CancellationToken;
 	components?: MapDataSource<Constructor<AbstractComponent>, AbstractComponent>;
 	children?: ArrayDataSource<SceneGraphNode<any>>;

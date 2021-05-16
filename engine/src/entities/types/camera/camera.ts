@@ -9,8 +9,8 @@ import { CameraGraphNode } from './api';
 import { CameraEntity } from './model';
 
 export interface CameraProps extends CommonEntityProps {
-	resolutionX?: number;
-	resolutionY?: number;
+	resolutionX?: Data<number>;
+	resolutionY?: Data<number>;
 	backgroundColor?: Data<string>;
 	onAttach?(node: CameraGraphNode): void;
 	onDetach?(node: CameraGraphNode): void;

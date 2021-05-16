@@ -33,7 +33,7 @@ export interface CommonEntityProps {
 	rotation?: Data<number>;
 	components?: MapDataSource<Constructor<AbstractComponent>, AbstractComponent> | AbstractComponent[];
 	class?: CommonEntity[] | ArrayDataSource<CommonEntity>;
-	name?: string;
+	name?: Data<string>;
 	layout?: AbstractLayout | DataSource<AbstractLayout>;
 	onAttach?(node: SceneGraphNode<CommonEntity>): void;
 	onDetach?(node: SceneGraphNode<CommonEntity>): void;

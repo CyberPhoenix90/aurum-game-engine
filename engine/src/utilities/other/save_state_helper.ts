@@ -35,10 +35,10 @@ class SaveStateHelper {
 	}
 
 	public saveStateAs(): string {
-		return this.serializeState());
+		return this.serializeState();
 	}
 
-	public loadFrom(data:string):void {
+	public loadFrom(data: string): void {
 		this.load(data);
 	}
 
@@ -57,7 +57,7 @@ class SaveStateHelper {
 		}
 	}
 
-	private load(item: string):void {
+	private load(item: string): void {
 		const data = JSON.parse(item);
 		for (const key in data) {
 			if (key in this.streams) {
