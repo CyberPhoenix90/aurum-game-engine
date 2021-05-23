@@ -37,6 +37,9 @@ export * from './math/vectors/vector3d';
 export * from './math/vectors/vector4d';
 export * from './math/vectors/point_utils';
 
+export * from './math/reactive_shapes/abstract_reactive_shape';
+export * from './math/reactive_shapes/reactive_rectangle';
+
 export * from './math/shapes/abstract_shape';
 export * from './math/shapes/circle';
 export * from './math/shapes/collision_calculator';

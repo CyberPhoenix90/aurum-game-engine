@@ -9,7 +9,9 @@ import {
 	Rectangle,
 	RoundedRectangle,
 	RegularPolygon,
-	Vector2D
+	Vector2D,
+	AbstractReactiveShape,
+	ReactiveRectangle
 } from 'aurum-game-engine';
 import { ArrayDataSource, CancellationToken, DataSource } from 'aurumjs';
 import { Graphics } from 'pixi.js';
@@ -75,16 +77,35 @@ export class RenderCanvasEntity extends NoRenderEntity {
 		this.displayObject.lineStyle(
 			action.strokeThickness instanceof DataSource ? action.strokeThickness.value : action.strokeThickness ?? 1,
 			strokeColor.toRGBNumber(),
-			strokeColor.a / 256, action.strokeAlignment ?? 0.5
+			strokeColor.a / 256,
+			action.strokeAlignment ?? 0.5
 		);
 		const shape = action.shape;
-		this.renderShape(shape);
+		this.renderShape(shape, token);
 	}
 
-	private renderShape(shape: AbstractShape, offsetX: number = 0, offsetY: number = 0) {
+	private renderShape(shape: AbstractShape | AbstractReactiveShape, drawToken: CancellationToken, offsetX: number = 0, offsetY: number = 0) {
+		if (shape instanceof AbstractReactiveShape) {
+			shape.position.x.listen(() => {
+				this.drawAll();
+			}, drawToken);
+			shape.position.y.listen(() => {
+				this.drawAll();
+			}, drawToken);
+		}
+
+		if (shape instanceof ReactiveRectangle) {
+			shape.size.x.listen(() => {
+				this.drawAll();
+			}, drawToken);
+			shape.size.y.listen(() => {
+				this.drawAll();
+			}, drawToken);
+		}
+
 		if (shape instanceof RoundedRectangle) {
 			this.displayObject.drawRoundedRect(shape.x + offsetX, shape.y + offsetY, shape.width, shape.height, shape.radius);
-		} else if (shape instanceof Rectangle) {
+		} else if (shape instanceof Rectangle || shape instanceof ReactiveRectangle) {
 			this.displayObject.drawRect(shape.x + offsetX, shape.y + offsetY, shape.width, shape.height);
 		} else if (shape instanceof Circle) {
 			this.displayObject.drawCircle(shape.x + offsetX, shape.y + offsetY, shape.radius);
@@ -105,7 +126,7 @@ export class RenderCanvasEntity extends NoRenderEntity {
 			}
 		} else if (shape instanceof ComposedShape) {
 			for (const subShape of shape.shapes) {
-				this.renderShape(subShape, offsetX + shape.x, offsetY + shape.y);
+				this.renderShape(subShape, drawToken, offsetX + shape.x, offsetY + shape.y);
 			}
 		}
 	}

@@ -6,9 +6,10 @@ import { Data } from '../../../models/input_data';
 import { normalizeComponents, propsToModel } from '../../shared';
 import { entityDefaults } from '../../entity_defaults';
 import { CanvasEntity } from './model';
+import { AbstractReactiveShape } from '../../../math/reactive_shapes/abstract_reactive_shape';
 
 export interface PaintOperation {
-	shape?: AbstractShape;
+	shape?: AbstractShape | AbstractReactiveShape;
 	strokeAlignment?: number;
 	strokeStyle?: Data<string>;
 	fillStyle?: Data<string>;
