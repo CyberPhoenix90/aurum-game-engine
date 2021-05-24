@@ -432,7 +432,7 @@ export const arrayDataSourceDefaultModel: ContainerEntity = {
 export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 	private sessionMap: Map<SceneGraphNode<any>, CancellationToken[]>;
 
-	constructor(dataSource: ArrayDataSource<Renderable>) {
+	constructor(arrayDataSource: ArrayDataSource<Renderable>) {
 		super({
 			children: new ArrayDataSource(),
 			name: ArrayDataSourceSceneGraphNode.name,
@@ -448,15 +448,17 @@ export class ArrayDataSourceSceneGraphNode extends ContainerGraphNode {
 
 		this.sessionMap = new Map();
 		const dynamicRenderKeys = new Map<Renderable, SceneGraphNode<any>>();
-		dataSource.listenAndRepeat((change) => {
+		arrayDataSource.listenAndRepeat((change) => {
 			switch (change.operation) {
 				case 'add':
 					let i = 0;
 					for (const item of change.items) {
 						const node = this.renderableToNode(item);
 						dynamicRenderKeys.set(item, node);
-						this.children.insertAt(change.index + i, node);
-						i++;
+						if (node) {
+							this.children.insertAt(change.index + i, node);
+							i++;
+						}
 					}
 					break;
 				case 'remove':
