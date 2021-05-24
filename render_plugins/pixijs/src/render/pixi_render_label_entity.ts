@@ -16,18 +16,6 @@ export class RenderLabelEntity extends NoRenderEntity {
 	}
 
 	public bind(model: LabelGraphNode) {
-		model.resolvedModel.width.listenAndRepeat((v) => {
-			if (v === 'auto') {
-				model.renderState.width.update(this.displayObject.width);
-			}
-		});
-
-		model.resolvedModel.height.listenAndRepeat((v) => {
-			if (v === 'auto') {
-				model.renderState.height.update(this.displayObject.height);
-			}
-		});
-
 		model.renderState.text.listenAndRepeat((v) => {
 			updateText.call(this, v.substring(0, model.renderState.renderCharCount.value));
 			this.updateSize(model);
@@ -95,21 +83,42 @@ export class RenderLabelEntity extends NoRenderEntity {
 			this.updateSize(model);
 		}, this.token);
 
+		super.bind(model);
+
+		model.resolvedModel.width.listenAndRepeat((v) => {
+			this.updateSize(model);
+		});
+
+		model.resolvedModel.height.listenAndRepeat((v) => {
+			this.updateSize(model);
+		});
+
+		model.renderState.scaleX.listenAndRepeat((v) => {
+			this.updateSize(model);
+		}, this.token);
+
+		model.renderState.scaleY.listenAndRepeat((v) => {
+			this.updateSize(model);
+		}, this.token);
+
 		function updateText(text: string): void {
 			this.displayObject.text = text;
 		}
-
-		super.bind(model);
 	}
 
 	private updateSize(model: LabelGraphNode) {
-		if (model.resolvedModel.width.value === 'auto') {
+		let dirty = false;
+		if (model.resolvedModel.width.value === 'auto' && model.renderState.width.value !== this.displayObject.width) {
 			model.renderState.width.update(this.displayObject.width);
-			model.onRequestNodeLayoutRefresh.update();
+			dirty = true;
 		}
 
-		if (model.resolvedModel.height.value === 'auto') {
+		if (model.resolvedModel.height.value === 'auto' && model.renderState.height.value !== this.displayObject.height) {
 			model.renderState.height.update(this.displayObject.height);
+			dirty = true;
+		}
+
+		if (dirty) {
 			model.onRequestNodeLayoutRefresh.update();
 		}
 	}

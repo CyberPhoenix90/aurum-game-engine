@@ -113,6 +113,10 @@ export class RenderSpriteEntity extends NoRenderEntity {
 	public bind(model: SpriteGraphNode) {
 		const { width, height, drawOffsetX, drawOffsetY, drawDistanceX, drawDistanceY, scaleX, scaleY } = model.renderState;
 
+		model.resolvedModel.texture.listen(() => {
+			this.displayObject.texture = this.createTexture(model);
+		});
+
 		model.resolvedModel.width.listenAndRepeat((v) => {
 			if (v === 'auto') {
 				this.displayObject.width = this.displayObject.texture.baseTexture.realWidth;
