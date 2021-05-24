@@ -18,35 +18,40 @@ export class Calculation {
 	}
 
 	private parse(value: string) {
-		this.optimizedCalculation = new Function(
-			'dpi',
-			'parentSize',
-			'distanceToEdge',
-			'computeContentSize',
-			`return ${value.replace(CALCULATION_PARSER, (op) => {
-				if (op === 'inherit') {
-					return 'parentSize';
-				} else if (op === 'remainder') {
-					return 'distanceToEdge';
-				} else if (op === 'content') {
-					return 'computeContentSize()';
-				} else {
-					const unit = new Unit(op);
-					switch (unit.type) {
-						case UnitType.cm:
-							return `${unit.value / 2.54}*dpi`;
-						case UnitType.in:
-							return `${unit.value}*dpi`;
-						case UnitType.mm:
-							return `${unit.value / 25.4}*dpi`;
-						case UnitType.percent:
-							return `${unit.value * 0.01}*parentSize`;
-						case UnitType.pixels:
-							return unit.value.toString();
+		try {
+			this.optimizedCalculation = new Function(
+				'dpi',
+				'parentSize',
+				'distanceToEdge',
+				'computeContentSize',
+				`return ${value.replace(CALCULATION_PARSER, (op) => {
+					if (op === 'inherit') {
+						return 'parentSize';
+					} else if (op === 'remainder') {
+						return 'distanceToEdge';
+					} else if (op === 'content') {
+						return 'computeContentSize()';
+					} else {
+						const unit = new Unit(op);
+						switch (unit.type) {
+							case UnitType.cm:
+								return `${unit.value / 2.54}*dpi`;
+							case UnitType.in:
+								return `${unit.value}*dpi`;
+							case UnitType.mm:
+								return `${unit.value / 25.4}*dpi`;
+							case UnitType.percent:
+								return `${unit.value * 0.01}*parentSize`;
+							case UnitType.pixels:
+								return unit.value.toString();
+						}
 					}
-				}
-			})}`
-		) as any;
+				})}`
+			) as any;
+		} catch (e) {
+			console.error(e);
+			this.optimizedCalculation = () => 0;
+		}
 	}
 
 	public toPixels(dpi: number, parentSize: number, distanceToEdge: number, computeContentSize?: () => number): number {

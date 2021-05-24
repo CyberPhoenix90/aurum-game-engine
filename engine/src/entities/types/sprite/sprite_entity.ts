@@ -62,5 +62,6 @@ export const spriteDefaultModel: SpriteEntity = {
 	drawDistanceX: new DataSource(undefined),
 	drawDistanceY: new DataSource(undefined),
 	drawOffsetX: new DataSource(undefined),
-	drawOffsetY: new DataSource(undefined)
+	drawOffsetY: new DataSource(undefined),
+	texture: new DataSource(undefined)
 };
