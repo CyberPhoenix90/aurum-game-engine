@@ -1,4 +1,4 @@
-import { CancellationToken, DataSource, dsMap } from 'aurumjs';
+import { CancellationToken, DataSource, dsMap, dsUnique } from 'aurumjs';
 import { CanvasGraphNode } from '../entities/types/canvas/api';
 import { LabelGraphNode } from '../entities/types/label/api';
 import { SpriteGraphNode } from '../entities/types/sprite/api';
@@ -70,10 +70,10 @@ export function layoutAlgorithm(node: SceneGraphNode<CommonEntity>): LayoutData 
 			width.listen(() => p.refreshNodeLayoutIfContent(), parentToken);
 			height.listen(() => p.refreshNodeLayoutIfContent(), parentToken);
 			parentToken = new CancellationToken();
-			p.renderState.width.listen(() => {
+			p.renderState.width.transform(dsUnique()).listen(() => {
 				node.refreshNodeLayoutIfRelative();
 			}, parentToken);
-			p.renderState.height.listen(() => {
+			p.renderState.height.transform(dsUnique()).listen(() => {
 				node.refreshNodeLayoutIfRelative();
 			}, parentToken);
 		}
