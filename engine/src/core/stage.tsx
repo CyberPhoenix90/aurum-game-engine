@@ -37,10 +37,14 @@ const StageComponent = Webcomponent(
 		function attachNodes(renderPlugin: AbstractRenderPlugin, nodes: Array<SceneGraphNode<any> | DataSource<Renderable> | ArrayDataSource<Renderable>>) {
 			for (let i = 0; i < nodes.length; i++) {
 				let node = nodes[i];
-				if (node instanceof DataSource) {
+				if (node instanceof Promise) {
+					node = new DataSourceSceneGraphNode(new DataSource(node));
+				} else if (node instanceof DataSource) {
 					node = new DataSourceSceneGraphNode(node);
 				} else if (node instanceof ArrayDataSource) {
 					node = new ArrayDataSourceSceneGraphNode(node);
+				} else if (!(node instanceof SceneGraphNode)) {
+					throw new Error(`Unhandled node type`);
 				}
 
 				node.attachToStage(renderPlugin, stageId);
