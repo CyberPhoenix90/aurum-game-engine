@@ -1,5 +1,6 @@
-import { ArrayDataSource, AurumComponentAPI, createLifeCycle, DataSource, Renderable } from 'aurumjs';
-import { CommonEntityProps, CommonEntity } from '../../../models/entities';
+import { ArrayDataSource, AurumComponentAPI, createRenderSession, DataSource, Renderable } from 'aurumjs';
+import { render } from '../../../core/custom_aurum_renderer';
+import { CommonEntity, CommonEntityProps } from '../../../models/entities';
 import { ContainerGraphNode } from '../../../models/scene_graph';
 import { entityDefaults } from '../../entity_defaults';
 import { normalizeComponents, propsToModel } from '../../shared';
@@ -12,9 +13,15 @@ export interface ContainerEntityProps extends CommonEntityProps {
 }
 
 export function Container(props: ContainerEntityProps, children: Renderable[], api: AurumComponentAPI): ContainerGraphNode {
-	const lc = createLifeCycle();
-	api.synchronizeLifeCycle(lc);
-	const content = api.prerender(children, lc);
+	const rs = createRenderSession();
+	const content = render(children, rs);
+	api.onAttach(() => {
+		rs.attachCalls.forEach((ac) => ac());
+	});
+	api.onDetach(() => {
+		rs.sessionToken.cancel();
+	});
+
 	return new ContainerGraphNode({
 		name: props.name ?? ContainerGraphNode.name,
 		cancellationToken: api.cancellationToken,

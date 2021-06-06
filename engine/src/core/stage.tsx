@@ -1,10 +1,11 @@
-import { Aurum, AurumComponentAPI, DataSource, EventEmitter, Renderable, Webcomponent, ArrayDataSource, createLifeCycle } from 'aurumjs';
+import { ArrayDataSource, Aurum, AurumComponentAPI, createRenderSession, DataSource, EventEmitter, Renderable, Webcomponent } from 'aurumjs';
 import { CameraGraphNode } from '../entities/types/camera/api';
 import { Clock } from '../game_features/time/clock';
-import { SceneGraphNode, DataSourceSceneGraphNode, ArrayDataSourceSceneGraphNode } from '../models/scene_graph';
+import { ArrayDataSourceSceneGraphNode, DataSourceSceneGraphNode, SceneGraphNode } from '../models/scene_graph';
 import { AbstractRenderPlugin } from '../rendering/abstract_render_plugin';
 import { _ } from '../utilities/other/streamline';
 import { activeCameras } from './active_cameras';
+import { render } from './custom_aurum_renderer';
 
 export let engineRootTime: DataSource<number> = new DataSource(0);
 
@@ -92,9 +93,15 @@ export const onBeforeRender: EventEmitter<number> = new EventEmitter();
 export const onAfterRender: EventEmitter<number> = new EventEmitter();
 
 export function Stage(props: StageProps, children: Renderable[], api: AurumComponentAPI): Renderable {
-	const lc = createLifeCycle();
-	api.synchronizeLifeCycle(lc);
-	const nodes = api.prerender(children, lc);
+	const rs = createRenderSession();
+	const nodes = render(children, rs);
+	api.onAttach(() => {
+		rs.attachCalls.forEach((ac) => ac());
+	});
+	api.onDetach(() => {
+		rs.sessionToken.cancel();
+	});
+
 	props.clock?.stop();
 	return (
 		<StageComponent

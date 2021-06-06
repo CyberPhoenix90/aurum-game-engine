@@ -1,4 +1,5 @@
-import { ArrayDataSource, AurumComponentAPI, DataSource, render, Renderable } from 'aurumjs';
+import { ArrayDataSource, AurumComponentAPI, DataSource, Renderable } from 'aurumjs';
+import { render } from '../../../core/custom_aurum_renderer';
 import { CommonEntityProps } from '../../../models/entities';
 import { Data } from '../../../models/input_data';
 import { SceneGraphNode } from '../../../models/scene_graph';
